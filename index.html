@@ -1,0 +1,5041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
+
+<title>DEVINE 3 v5.9.6</title>
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#020617">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent">
+
+<meta name="apple-mobile-web-app-title"
+      content="DEVINE 3">
+
+<link rel="apple-touch-icon"
+      href="icon-180.png">
+<style>
+
+/* =====================================================
+   DEVINE 3 v5.9.6
+   STYLE GENERAL
+   ===================================================== */
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+    font-family:-apple-system,BlinkMacSystemFont,
+    "Segoe UI",Arial,sans-serif;
+    background:#020617;
+    color:#f8fafc;
+}
+
+body{
+    overflow-x:hidden;
+}
+
+button,
+input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    min-height:100vh;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 20% 10%,rgba(34,211,238,.12),transparent 28%),
+        radial-gradient(circle at 80% 30%,rgba(236,72,153,.12),transparent 28%),
+        linear-gradient(145deg,#020617,#07111f 50%,#020617);
+}
+
+.app::before,
+.app::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+}
+
+.app::before{
+    opacity:.45;
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px);
+    background-size:90px 90px;
+    animation:starsMove 30s linear infinite;
+}
+
+.app::after{
+    background:
+        radial-gradient(circle at 50% 0%,rgba(34,211,238,.12),transparent 35%);
+    animation:aura 8s ease-in-out infinite alternate;
+}
+
+
+/* =====================================================
+   ECRANS
+   ===================================================== */
+
+.screen{
+    position:relative;
+    z-index:2;
+    display:none;
+    min-height:100vh;
+    padding:20px;
+    padding-bottom:40px;
+    animation:screenIn .35s ease;
+}
+
+.screen.active{
+    display:block;
+}
+
+@keyframes screenIn{
+    from{
+        opacity:0;
+        transform:translateY(15px) scale(.985);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+
+/* =====================================================
+   LOGO
+   ===================================================== */
+
+.logo{
+    text-align:center;
+    font-size:clamp(48px,14vw,82px);
+    font-weight:1000;
+    letter-spacing:5px;
+    line-height:1;
+    background:linear-gradient(
+        90deg,
+        #22d3ee,
+        #a78bfa,
+        #ec4899,
+        #22d3ee
+    );
+    background-size:300% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:logoFlow 5s linear infinite,
+              logoPulse 2.8s ease-in-out infinite;
+    text-shadow:0 0 35px rgba(34,211,238,.25);
+}
+
+.version{
+    text-align:center;
+    margin-top:8px;
+    color:#64748b;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#cbd5e1;
+    margin-top:8px;
+    font-size:14px;
+}
+
+@keyframes logoFlow{
+    to{
+        background-position:300% 0;
+    }
+}
+
+@keyframes logoPulse{
+    50%{
+        transform:scale(1.025);
+    }
+}
+
+
+/* =====================================================
+   ACCUEIL
+   ===================================================== */
+
+.casino-banner{
+    max-width:600px;
+    margin:22px auto;
+    padding:10px 16px;
+    text-align:center;
+    border:1px solid rgba(250,204,21,.35);
+    border-radius:999px;
+    color:#fde68a;
+    background:rgba(250,204,21,.07);
+    overflow:hidden;
+    position:relative;
+}
+
+.casino-banner::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:60%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.25),
+        transparent
+    );
+    animation:bannerShine 3.5s infinite;
+}
+
+@keyframes bannerShine{
+    100%{
+        left:140%;
+    }
+}
+
+.hero{
+    max-width:650px;
+    margin:30px auto 20px;
+    text-align:center;
+    padding:30px 20px;
+    border:1px solid rgba(34,211,238,.18);
+    border-radius:30px;
+    background:rgba(15,23,42,.72);
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.35),
+        inset 0 0 30px rgba(34,211,238,.03);
+    animation:heroGlow 4s ease-in-out infinite alternate;
+}
+
+.hero h1{
+    margin:0 0 10px;
+    font-size:clamp(25px,7vw,42px);
+}
+
+.hero p{
+    color:#94a3b8;
+    line-height:1.6;
+    margin:0;
+}
+
+.menu{
+    max-width:650px;
+    margin:auto;
+    display:grid;
+    gap:13px;
+}
+
+.menu button{
+    width:100%;
+}
+
+.menu-btn{
+    min-height:62px;
+    border:none;
+    border-radius:18px;
+    color:white;
+    font-weight:900;
+    font-size:16px;
+    letter-spacing:.4px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    transition:.2s;
+}
+
+.menu-btn:active{
+    transform:scale(.97);
+}
+
+.menu-solo{
+    background:linear-gradient(135deg,#0891b2,#2563eb);
+}
+
+.menu-duel{
+    background:linear-gradient(135deg,#7c3aed,#db2777);
+}
+
+.menu-stat{
+    background:linear-gradient(135deg,#475569,#334155);
+}
+
+.menu-challenge{
+    background:linear-gradient(135deg,#b45309,#eab308);
+}
+
+.menu-level{
+    background:linear-gradient(135deg,#059669,#0d9488);
+}
+
+.menu-rules{
+    background:linear-gradient(135deg,#475569,#1e293b);
+}
+
+
+/* =====================================================
+   BOUTONS
+   ===================================================== */
+
+.action-btn{
+    border:none;
+    border-radius:15px;
+    padding:14px 18px;
+    color:white;
+    font-weight:900;
+    transition:.2s;
+    box-shadow:0 8px 20px rgba(0,0,0,.22);
+}
+
+.action-btn:active{
+    transform:scale(.96);
+}
+
+.primary{
+    background:linear-gradient(135deg,#0891b2,#2563eb);
+}
+
+.success{
+    background:linear-gradient(135deg,#059669,#16a34a);
+}
+
+.danger{
+    background:linear-gradient(135deg,#dc2626,#be123c);
+}
+
+.warning{
+    background:linear-gradient(135deg,#d97706,#eab308);
+}
+
+.back{
+    background:linear-gradient(135deg,#475569,#1e293b);
+}
+
+.full{
+    width:100%;
+}
+
+.topbar{
+    max-width:700px;
+    margin:0 auto 20px;
+    display:grid;
+    grid-template-columns:70px 1fr 70px;
+    align-items:center;
+    gap:10px;
+}
+
+.topbar h2{
+    text-align:center;
+    margin:0;
+    font-size:20px;
+}
+
+.top-btn{
+    border:1px solid rgba(148,163,184,.2);
+    background:rgba(15,23,42,.8);
+    color:#e2e8f0;
+    border-radius:12px;
+    padding:10px 7px;
+    font-size:12px;
+    font-weight:800;
+}
+
+
+/* =====================================================
+   CARTES
+   ===================================================== */
+
+.card{
+    max-width:650px;
+    margin:15px auto;
+    padding:22px;
+    border-radius:22px;
+    background:rgba(15,23,42,.78);
+    border:1px solid rgba(148,163,184,.13);
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+.card h3{
+    margin-top:0;
+}
+
+.card p{
+    line-height:1.6;
+}
+
+.score-box{
+    text-align:center;
+}
+
+
+/* =====================================================
+   NIVEAUX
+   ===================================================== */
+
+.level-grid{
+    max-width:650px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.level-card{
+    padding:22px 14px;
+    border-radius:20px;
+    color:white;
+    border:1px solid rgba(255,255,255,.1);
+    text-align:center;
+    background:rgba(15,23,42,.85);
+    transition:.2s;
+}
+
+.level-card:active{
+    transform:scale(.96);
+}
+
+.level-card strong{
+    display:block;
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.level-card span{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.level-beginner{
+    border-color:rgba(34,197,94,.35);
+}
+
+.level-intermediate{
+    border-color:rgba(234,179,8,.35);
+}
+
+.level-pro{
+    border-color:rgba(249,115,22,.35);
+}
+
+.level-expert{
+    border-color:rgba(236,72,153,.4);
+}
+
+
+/* =====================================================
+   JEU SOLO
+   ===================================================== */
+
+.game-info{
+    max-width:650px;
+    margin:0 auto 15px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.info{
+    text-align:center;
+    padding:15px;
+    border-radius:18px;
+    background:rgba(15,23,42,.75);
+    border:1px solid rgba(148,163,184,.12);
+}
+
+.info small{
+    display:block;
+    color:#94a3b8;
+    margin-bottom:5px;
+}
+
+.info strong{
+    font-size:22px;
+}
+
+.timer{
+    color:#67e8f9;
+}
+
+.danger-time{
+    color:#fb7185 !important;
+    animation:dangerPulse .7s infinite;
+}
+
+.code-display{
+    text-align:center;
+    font-size:42px;
+    letter-spacing:12px;
+    font-weight:1000;
+    margin:25px 0;
+    color:#67e8f9;
+    text-shadow:0 0 20px rgba(34,211,238,.25);
+    animation:displayShine 3s ease-in-out infinite;
+}
+
+.input-row{
+    display:grid;
+    grid-template-columns:1fr 65px;
+    gap:10px;
+}
+
+.input-row input{
+    width:100%;
+    min-width:0;
+    border:1px solid rgba(148,163,184,.2);
+    border-radius:15px;
+    background:#020617;
+    color:white;
+    padding:15px;
+    font-size:22px;
+    text-align:center;
+    letter-spacing:8px;
+    outline:none;
+}
+
+.input-row input:focus{
+    border-color:#22d3ee;
+    box-shadow:0 0 20px rgba(34,211,238,.15);
+}
+
+.history-title{
+    color:#94a3b8;
+    margin-top:25px;
+    margin-bottom:10px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.history{
+    display:grid;
+    gap:8px;
+}
+
+.history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:11px 14px;
+    background:rgba(2,6,23,.65);
+    border-radius:12px;
+    border:1px solid rgba(148,163,184,.08);
+    animation:historyIn .25s ease;
+}
+
+.guess{
+    font-weight:900;
+    letter-spacing:4px;
+}
+
+.result{
+    display:flex;
+    gap:6px;
+}
+
+.v{
+    color:#4ade80;
+    font-weight:900;
+}
+
+.x{
+    color:#facc15;
+    font-weight:900;
+}
+
+.none{
+    color:#64748b;
+}
+
+.empty{
+    color:#64748b;
+    text-align:center;
+    padding:15px;
+    font-size:13px;
+}
+
+
+/* =====================================================
+   STATISTIQUES
+   ===================================================== */
+
+.stats-grid{
+    max-width:650px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.stat{
+    text-align:center;
+    padding:18px 10px;
+    border-radius:18px;
+    background:rgba(15,23,42,.78);
+    border:1px solid rgba(148,163,184,.1);
+}
+
+.stat strong{
+    display:block;
+    font-size:28px;
+    color:#67e8f9;
+}
+
+.stat span{
+    color:#94a3b8;
+    font-size:12px;
+}
+
+
+/* =====================================================
+   DEFIS
+   ===================================================== */
+
+.challenge{
+    cursor:pointer;
+}
+
+.challenge-top{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:flex-start;
+}
+
+.challenge h3{
+    margin:0;
+}
+
+.challenge p{
+    color:#94a3b8;
+    margin-bottom:0;
+}
+
+.badge{
+    white-space:nowrap;
+    color:#64748b;
+    font-size:11px;
+}
+
+.badge.unlocked{
+    color:#4ade80;
+}
+
+.locked{
+    opacity:.65;
+}
+
+.progress{
+    height:5px;
+    margin-top:15px;
+    border-radius:999px;
+    overflow:hidden;
+    background:#1e293b;
+}
+
+.progress div{
+    height:100%;
+    background:linear-gradient(90deg,#22d3ee,#a78bfa,#ec4899);
+}
+
+
+/* =====================================================
+   REGLES
+   ===================================================== */
+
+.rules h3{
+    color:#67e8f9;
+    margin-top:25px;
+}
+
+.rules h3:first-child{
+    margin-top:0;
+}
+
+.rules li{
+    color:#cbd5e1;
+    margin:10px 0;
+    line-height:1.5;
+}
+
+
+/* =====================================================
+   POPUP
+   ===================================================== */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(8px);
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.overlay.show{
+    opacity:1;
+    pointer-events:auto;
+}
+
+.popup{
+    width:min(420px,100%);
+    padding:25px;
+    border-radius:25px;
+    text-align:center;
+    background:#0f172a;
+    border:1px solid rgba(34,211,238,.25);
+    box-shadow:0 25px 80px rgba(0,0,0,.55);
+    animation:popupIn .25s ease;
+}
+
+.popup h2{
+    margin-top:0;
+}
+
+.popup p{
+    color:#cbd5e1;
+    line-height:1.5;
+    margin-bottom:22px;
+}
+
+@keyframes popupIn{
+    from{
+        transform:scale(.85);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+
+/* =====================================================
+   v5.9.6 — NEON BATTLE
+   ===================================================== */
+
+.two-battle{
+    max-width:650px;
+    margin:0 auto 18px;
+    min-height:145px;
+    position:relative;
+    overflow:hidden;
+    border-radius:28px;
+    background:#050b18;
+    border:1px solid transparent;
+    isolation:isolate;
+}
+
+.two-battle::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    z-index:-2;
+    background:conic-gradient(
+        from 0deg,
+        #22d3ee,
+        #2563eb,
+        #a78bfa,
+        #ec4899,
+        #f97316,
+        #22d3ee
+    );
+    animation:battleRotate 5s linear infinite;
+}
+
+.two-battle::after{
+    content:"";
+    position:absolute;
+    inset:2px;
+    z-index:-1;
+    border-radius:25px;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(34,211,238,.16),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(236,72,153,.18),transparent 30%),
+        #07101f;
+}
+
+.two-battle-content{
+    position:relative;
+    text-align:center;
+    padding:22px 15px;
+}
+
+.battle-icon{
+    font-size:38px;
+    animation:phonePass 2s ease-in-out infinite;
+}
+
+.battle-title{
+    font-size:clamp(22px,6vw,34px);
+    font-weight:1000;
+    letter-spacing:2px;
+    margin-top:5px;
+    background:linear-gradient(
+        90deg,
+        #67e8f9,
+        #c4b5fd,
+        #f9a8d4
+    );
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.battle-subtitle{
+    margin-top:7px;
+    color:#94a3b8;
+    font-size:11px;
+    letter-spacing:2px;
+    font-weight:800;
+}
+
+.player-card{
+    max-width:650px;
+    margin:0 auto 18px;
+    padding:25px 20px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    border-radius:28px;
+    background:
+        radial-gradient(circle at 50% 0%,rgba(34,211,238,.12),transparent 40%),
+        rgba(15,23,42,.88);
+    border:1px solid rgba(34,211,238,.22);
+    box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+
+.player-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    border-radius:28px;
+    box-shadow:inset 0 0 45px rgba(34,211,238,.04);
+}
+
+.player-two{
+    border-color:rgba(236,72,153,.24);
+    background:
+        radial-gradient(circle at 50% 0%,rgba(236,72,153,.12),transparent 40%),
+        rgba(15,23,42,.88);
+}
+
+.player-avatar{
+    width:75px;
+    height:75px;
+    margin:0 auto 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    font-size:38px;
+    background:rgba(34,211,238,.08);
+    border:1px solid rgba(34,211,238,.25);
+    box-shadow:0 0 30px rgba(34,211,238,.15);
+}
+
+.player-two .player-avatar{
+    background:rgba(236,72,153,.08);
+    border-color:rgba(236,72,153,.25);
+    box-shadow:0 0 30px rgba(236,72,153,.15);
+}
+
+.player-name{
+    font-size:24px;
+    font-weight:1000;
+    letter-spacing:2px;
+}
+
+.player-description{
+    color:#94a3b8;
+    margin:7px 0 18px;
+}
+
+.secret-box{
+    padding:15px;
+    margin:15px 0;
+    border-radius:18px;
+    background:rgba(2,6,23,.6);
+    border:1px dashed rgba(34,211,238,.3);
+}
+
+.secret-label{
+    color:#67e8f9;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+
+.secret-dots{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:12px;
+}
+
+.secret-lock{
+    display:flex;
+    width:17px;
+    height:17px;
+    border-radius:50%;
+    align-items:center;
+    justify-content:center;
+    color:#475569;
+    font-size:10px;
+}
+
+.pass-battle{
+    max-width:650px;
+    margin:80px auto 0;
+    padding:40px 22px;
+    text-align:center;
+    border-radius:30px;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 0%,rgba(167,139,250,.18),transparent 45%),
+        #0f172a;
+    border:1px solid rgba(167,139,250,.3);
+    box-shadow:0 25px 80px rgba(0,0,0,.45);
+    animation:passIn .45s ease;
+}
+
+.pass-battle::before{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    left:50%;
+    top:-100px;
+    transform:translateX(-50%);
+    border-radius:50%;
+    border:1px solid rgba(167,139,250,.3);
+    animation:passRing 2.5s ease-out infinite;
+}
+
+.pass-icon{
+    font-size:70px;
+    position:relative;
+    animation:phonePass 1.8s ease-in-out infinite;
+}
+
+.pass-battle h2{
+    font-size:27px;
+    margin:20px 0 10px;
+}
+
+.pass-battle p{
+    color:#94a3b8;
+    line-height:1.6;
+    max-width:480px;
+    margin:0 auto 25px;
+}
+
+.two-turn-banner{
+    max-width:650px;
+    margin:0 auto 15px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-radius:18px;
+    background:rgba(15,23,42,.8);
+    border:1px solid rgba(34,211,238,.45);
+    transition:.3s;
+}
+
+.two-turn-dot{
+    width:12px;
+    height:12px;
+    flex:none;
+    border-radius:50%;
+    background:#22d3ee;
+    box-shadow:0 0 15px #22d3ee;
+    animation:dotPulse 1s infinite;
+}
+
+.two-turn-text strong{
+    display:block;
+    font-size:14px;
+    letter-spacing:1px;
+}
+
+.two-turn-text small{
+    color:#94a3b8;
+}
+
+.two-timer-box{
+    position:relative;
+    overflow:hidden;
+}
+
+.two-timer-box::after{
+    content:"";
+    position:absolute;
+    inset:3px;
+    border-radius:15px;
+    border:1px solid rgba(34,211,238,.1);
+    animation:timerRing 2s linear infinite;
+}
+
+.result-burst{
+    animation:resultBurst .4s ease;
+}
+
+.v-badge,
+.x-badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:1000;
+}
+
+.v-badge{
+    color:#4ade80;
+    background:rgba(34,197,94,.12);
+    border:1px solid rgba(34,197,94,.25);
+}
+
+.x-badge{
+    color:#facc15;
+    background:rgba(234,179,8,.12);
+    border:1px solid rgba(234,179,8,.25);
+}
+
+.two-final-hero{
+    max-width:650px;
+    margin:10px auto 20px;
+    text-align:center;
+    padding:30px 15px;
+    border-radius:30px;
+    background:
+        radial-gradient(circle at 50% 20%,rgba(250,204,21,.16),transparent 42%),
+        rgba(15,23,42,.8);
+    border:1px solid rgba(250,204,21,.2);
+    animation:heroGlow 3s ease-in-out infinite alternate;
+}
+
+.two-final-trophy{
+    font-size:75px;
+    animation:crownFloat 2.5s ease-in-out infinite;
+}
+
+.two-winner-name{
+    margin-top:8px;
+    font-size:clamp(24px,7vw,38px);
+    font-weight:1000;
+    background:linear-gradient(
+        90deg,
+        #fde68a,
+        #facc15,
+        #fb923c,
+        #fde68a
+    );
+    background-size:250% 100%;
+    -webkit-background-clip:text;
+    color:transparent;
+    animation:goldFlow 3s linear infinite;
+}
+
+.duel-score{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.duel-player{
+    padding:17px 10px;
+    text-align:center;
+    border-radius:18px;
+    background:rgba(2,6,23,.6);
+    border:1px solid rgba(148,163,184,.12);
+}
+
+.duel-player strong{
+    display:block;
+    margin-bottom:9px;
+}
+
+.duel-player span{
+    display:block;
+    color:#4ade80;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.duel-player small{
+    color:#94a3b8;
+    line-height:1.6;
+}
+
+.battle-particle{
+    position:absolute;
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background:#67e8f9;
+    opacity:.7;
+    animation:particleFloat 5s linear infinite;
+}
+
+.battle-particle:nth-child(1){
+    left:10%;
+    bottom:-5px;
+}
+
+.battle-particle:nth-child(2){
+    left:30%;
+    bottom:-5px;
+    animation-delay:1s;
+}
+
+.battle-particle:nth-child(3){
+    left:65%;
+    bottom:-5px;
+    animation-delay:2s;
+}
+
+.battle-particle:nth-child(4){
+    left:85%;
+    bottom:-5px;
+    animation-delay:3s;
+}
+
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes starsMove{
+    to{
+        transform:translateY(90px);
+    }
+}
+
+@keyframes aura{
+    from{
+        opacity:.5;
+    }
+    to{
+        opacity:1;
+    }
+}
+
+@keyframes heroGlow{
+    from{
+        box-shadow:
+            0 15px 50px rgba(0,0,0,.3),
+            inset 0 0 20px rgba(34,211,238,.02);
+    }
+    to{
+        box-shadow:
+            0 15px 65px rgba(34,211,238,.08),
+            inset 0 0 30px rgba(167,139,250,.04);
+    }
+}
+
+@keyframes dangerPulse{
+    50%{
+        transform:scale(1.08);
+        text-shadow:0 0 18px rgba(248,113,113,.65);
+    }
+}
+
+@keyframes displayShine{
+    50%{
+        text-shadow:0 0 28px rgba(34,211,238,.4);
+    }
+}
+
+@keyframes historyIn{
+    from{
+        opacity:0;
+        transform:translateX(15px);
+    }
+}
+
+@keyframes resultBurst{
+    0%{
+        transform:scale(.92);
+        opacity:0;
+    }
+    60%{
+        transform:scale(1.03);
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+@keyframes battleRotate{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes phonePass{
+    0%,100%{
+        transform:translateY(0) rotate(-3deg);
+    }
+    50%{
+        transform:translateY(-8px) rotate(3deg);
+    }
+}
+
+@keyframes passIn{
+    from{
+        opacity:0;
+        transform:scale(.9) translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+@keyframes passRing{
+    from{
+        transform:translateX(-50%) scale(.5);
+        opacity:.8;
+    }
+    to{
+        transform:translateX(-50%) scale(2);
+        opacity:0;
+    }
+}
+
+@keyframes timerRing{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes dotPulse{
+    50%{
+        transform:scale(1.4);
+        opacity:.6;
+    }
+}
+
+@keyframes crownFloat{
+    50%{
+        transform:translateY(-8px) rotate(2deg);
+    }
+}
+
+@keyframes goldFlow{
+    to{
+        background-position:250% 0;
+    }
+}
+
+@keyframes particleFloat{
+    from{
+        transform:translateY(30px) scale(.5);
+        opacity:0;
+    }
+    20%{
+        opacity:.8;
+    }
+    to{
+        transform:translateY(-170px) scale(1.5);
+        opacity:0;
+    }
+}
+
+@keyframes numberPop{
+    50%{
+        transform:scale(1.04);
+    }
+}
+
+@keyframes shake{
+    20%,60%{
+        transform:translateX(-6px);
+    }
+    40%,80%{
+        transform:translateX(6px);
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media(max-width:500px){
+
+    .screen{
+        padding:15px;
+    }
+
+    .level-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .duel-score{
+        grid-template-columns:1fr;
+    }
+
+    .topbar{
+        grid-template-columns:65px 1fr 65px;
+    }
+
+    .top-btn{
+        font-size:11px;
+    }
+
+    .card{
+        padding:18px;
+    }
+
+    .battle-title{
+        font-size:22px;
+    }
+
+    .two-battle{
+        min-height:135px;
+    }
+
+    .player-card{
+        padding:22px 16px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+<!-- =====================================================
+     ACCUEIL
+     ===================================================== -->
+
+<section id="homeScreen" class="screen active">
+
+    <div class="logo">
+        DEVINE 3
+    </div>
+
+    <div class="version">
+        VERSION 5.9.6
+    </div>
+
+    <div class="subtitle">
+        Le jeu de logique et de réflexion
+    </div>
+
+    <div class="casino-banner">
+        🎯 LOGIQUE • RAPIDITÉ • RÉFLEXION • STRATÉGIE
+    </div>
+
+    <div class="hero">
+
+        <h1>
+            🧠 À toi de jouer !
+        </h1>
+
+        <p>
+            Déchiffre le code de trois chiffres,
+            analyse les indices et bats ton chrono.
+        </p>
+
+    </div>
+
+    <div class="menu">
+
+        <button class="menu-btn menu-solo"
+                onclick="showLevels()">
+
+            🎯 SOLO
+
+        </button>
+
+        <button class="menu-btn menu-duel"
+                onclick="startTwoPlayers()">
+
+            ⚔️ 2 JOUEURS — DUEL
+
+        </button>
+
+        <button class="menu-btn menu-stat"
+                onclick="showScreen('statisticsScreen')">
+
+            📊 STATISTIQUES
+
+        </button>
+
+        <button class="menu-btn menu-challenge"
+                onclick="showScreen('challengesScreen')">
+
+            🏆 DÉFIS
+
+        </button>
+
+        <button class="menu-btn menu-level"
+                onclick="showScreen('levelsScreen')">
+
+            🎮 NIVEAUX
+
+        </button>
+
+        <button class="menu-btn menu-rules"
+                onclick="showScreen('rulesScreen')">
+
+            📖 RÈGLES
+
+        </button>
+
+        <button id="soundButton"
+                class="action-btn back full"
+                onclick="toggleSound()">
+
+            🔊 Sons : ACTIVÉS
+
+        </button>
+
+    </div>
+
+    <div class="card score-box">
+
+        <div style="color:#94a3b8">
+            🏆 Meilleur score
+        </div>
+
+        <div id="homeBestScore"
+             style="
+             font-size:38px;
+             font-weight:1000;
+             color:#facc15;
+             margin-top:8px;
+             ">
+
+            0
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NIVEAUX
+     ===================================================== -->
+
+<section id="levelsScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Retour
+
+        </button>
+
+        <h2>
+            Niveaux
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="level-grid">
+
+        <button class="level-card level-beginner"
+                onclick="startSolo('beginner')">
+
+            <strong>
+                🟢 Débutant
+            </strong>
+
+            <span>
+                5 minutes
+            </span>
+
+        </button>
+
+
+        <button class="level-card level-intermediate"
+                onclick="startSolo('intermediate')">
+
+            <strong>
+                🟡 Intermédiaire
+            </strong>
+
+            <span>
+                4 minutes
+            </span>
+
+        </button>
+
+
+        <button class="level-card level-pro"
+                onclick="startSolo('pro')">
+
+            <strong>
+                🟠 Pro
+            </strong>
+
+            <span>
+                3 minutes
+            </span>
+
+        </button>
+
+
+        <button class="level-card level-expert"
+                onclick="startSolo('expert')">
+
+            <strong>
+                🔴 Expert
+            </strong>
+
+            <span>
+                2 minutes
+            </span>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     JEU SOLO
+     ===================================================== -->
+
+<section id="gameScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="quitSolo()">
+
+            ← Quitter
+
+        </button>
+
+        <h2 id="gameLevelName">
+            Solo
+        </h2>
+
+        <button class="top-btn"
+                onclick="showScreen('rulesScreen')">
+
+            ?
+
+        </button>
+
+    </div>
+
+
+    <div class="game-info">
+
+        <div class="info">
+
+            <small>
+                Temps
+            </small>
+
+            <strong id="timer"
+                    class="timer">
+
+                05:00
+
+            </strong>
+
+        </div>
+
+
+        <div class="info">
+
+            <small>
+                Essais
+            </small>
+
+            <strong id="attemptCount">
+                0
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div style="text-align:center;color:#94a3b8">
+
+            Devine le code de 3 chiffres
+
+        </div>
+
+
+        <div class="code-display">
+            ???
+        </div>
+
+
+        <div class="input-row">
+
+            <input id="guessInput"
+                   type="tel"
+                   maxlength="3"
+                   inputmode="numeric"
+                   placeholder="123"
+                   autocomplete="off">
+
+
+            <button class="action-btn primary"
+                    onclick="submitGuess()">
+
+                ✓
+
+            </button>
+
+        </div>
+
+
+        <div class="history-title">
+            Historique
+        </div>
+
+
+        <div id="history"
+             class="history">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RESULTAT SOLO
+     ===================================================== -->
+
+<section id="finalScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Accueil
+
+        </button>
+
+        <h2>
+            Résultat
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div id="finalCard"
+         class="card score-box">
+
+        <div id="finalEmoji"
+             style="font-size:55px">
+
+            🎉
+
+        </div>
+
+
+        <div id="finalMessage"
+             style="
+             font-size:25px;
+             font-weight:1000;
+             margin:10px 0;
+             ">
+
+            Bravo !
+
+        </div>
+
+
+        <div>
+            Le code était :
+        </div>
+
+
+        <div id="finalSecret"
+             style="
+             font-size:35px;
+             color:#67e8f9;
+             font-weight:bold;
+             letter-spacing:10px;
+             margin:15px">
+
+            123
+
+        </div>
+
+
+        <hr>
+
+
+        <div>
+            Score
+        </div>
+
+
+        <div id="finalScore"
+             style="
+             font-size:45px;
+             color:#facc15;
+             font-weight:1000;
+             margin:10px">
+
+            0
+
+        </div>
+
+
+        <div id="finalDetails"
+             style="color:#94a3b8;margin:10px 0 20px">
+
+        </div>
+
+
+        <button class="action-btn primary full"
+                onclick="showLevels()">
+
+            🔄 Rejouer
+
+        </button>
+
+
+        <br><br>
+
+
+        <button class="action-btn back full"
+                onclick="showScreen('homeScreen')">
+
+            🏠 Accueil
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     STATISTIQUES
+     ===================================================== -->
+
+<section id="statisticsScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Retour
+
+        </button>
+
+        <h2>
+            Statistiques
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat">
+            <strong id="statGames">0</strong>
+            <span>Parties</span>
+        </div>
+
+        <div class="stat">
+            <strong id="statWins">0</strong>
+            <span>Victoires</span>
+        </div>
+
+        <div class="stat">
+            <strong id="statLosses">0</strong>
+            <span>Défaites</span>
+        </div>
+
+        <div class="stat">
+            <strong id="statWinRate">0%</strong>
+            <span>Taux de victoire</span>
+        </div>
+
+        <div class="stat">
+            <strong id="statBest">0</strong>
+            <span>Meilleur score</span>
+        </div>
+
+        <div class="stat">
+            <strong id="statAttempts">0</strong>
+            <span>Essais total</span>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🏆 Performance
+        </h3>
+
+        <p id="performanceText"
+           style="color:#cbd5e1;line-height:1.5">
+
+            Commence à jouer pour voir tes performances.
+
+        </p>
+
+    </div>
+
+
+    <button class="action-btn danger full"
+            onclick="resetStatistics()">
+
+        🗑 Réinitialiser les statistiques
+
+    </button>
+
+</section>
+
+
+<!-- =====================================================
+     DEFIS
+     ===================================================== -->
+
+<section id="challengesScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Retour
+
+        </button>
+
+        <h2>
+            Défis
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div id="challengeList"></div>
+
+</section>
+
+
+<!-- =====================================================
+     REGLES
+     ===================================================== -->
+
+<section id="rulesScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Retour
+
+        </button>
+
+        <h2>
+            Règles
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="card rules">
+
+        <h3>
+            🎯 Objectif
+        </h3>
+
+        <p>
+            Le téléphone choisit secrètement un nombre de
+            <strong>3 chiffres différents</strong>.
+            Ton objectif est de le retrouver avant la fin du chrono.
+        </p>
+
+
+        <h3>
+            🟢 V — Chiffre bien placé
+        </h3>
+
+        <p>
+            Un <strong>V</strong> signifie qu'un chiffre est correct
+            et placé exactement au bon endroit.
+        </p>
+
+
+        <h3>
+            🟡 X — Chiffre mal placé
+        </h3>
+
+        <p>
+            Un <strong>X</strong> signifie qu'un chiffre appartient
+            au code mais n'est pas à la bonne position.
+        </p>
+
+
+        <h3>
+            Exemple
+        </h3>
+
+        <p>
+            Code secret : <strong>527</strong><br><br>
+            Proposition : <strong>572</strong><br><br>
+            Résultat : <strong>1V 2X</strong>
+        </p>
+
+
+        <h3>
+            ⚠️ Important
+        </h3>
+
+        <ul>
+
+            <li>
+                Les trois chiffres du code sont différents.
+            </li>
+
+            <li>
+                Un même chiffre n'est compté qu'une seule fois.
+            </li>
+
+            <li>
+                Le chrono continue pendant toute la partie.
+            </li>
+
+            <li>
+                Le score dépend notamment du niveau,
+                du temps et des essais.
+            </li>
+
+        </ul>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     2 JOUEURS — JOUEUR 1
+     ===================================================== -->
+
+<section id="twoP1SecretScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="quitTwoPlayers()">
+
+            ← Quitter
+
+        </button>
+
+        <h2>
+            DUEL
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="two-battle">
+
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+
+        <div class="two-battle-content">
+
+            <div class="battle-icon">
+                ⚔️
+            </div>
+
+            <div class="battle-title">
+                DUEL DES CHIFFRES
+            </div>
+
+            <div class="battle-subtitle">
+                JOUEUR 1 • PHASE SECRÈTE
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="player-card">
+
+        <div class="player-avatar">
+            👤
+        </div>
+
+        <div class="player-name">
+            JOUEUR 1
+        </div>
+
+        <div class="player-description">
+            Prépare ton code secret
+        </div>
+
+
+        <div class="secret-box">
+
+            <div class="secret-label">
+                🔐 CODE SECRET
+            </div>
+
+            <div class="secret-dots">
+
+                <span class="secret-lock">●</span>
+                <span class="secret-lock">●</span>
+                <span class="secret-lock">●</span>
+
+            </div>
+
+        </div>
+
+
+        <p style="color:#cbd5e1;line-height:1.5">
+
+            Choisis un nombre de
+            <strong>3 chiffres différents</strong>.
+
+            <br>
+
+            Le Joueur 2 devra le découvrir.
+
+        </p>
+
+
+        <div class="input-row">
+
+            <input id="p1SecretInput"
+                   type="tel"
+                   maxlength="3"
+                   inputmode="numeric"
+                   placeholder="123"
+                   autocomplete="off">
+
+            <button class="action-btn primary"
+                    onclick="saveP1Secret()">
+
+                🔒
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     2 JOUEURS — JOUEUR 2
+     ===================================================== -->
+
+<section id="twoP2SecretScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="quitTwoPlayers()">
+
+            ← Quitter
+
+        </button>
+
+        <h2>
+            DUEL
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="two-battle">
+
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+        <div class="battle-particle"></div>
+
+        <div class="two-battle-content">
+
+            <div class="battle-icon">
+                ⚔️
+            </div>
+
+            <div class="battle-title">
+                DUEL DES CHIFFRES
+            </div>
+
+            <div class="battle-subtitle">
+                JOUEUR 2 • PHASE SECRÈTE
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="player-card player-two">
+
+        <div class="player-avatar">
+            👤
+        </div>
+
+        <div class="player-name">
+            JOUEUR 2
+        </div>
+
+        <div class="player-description">
+            À ton tour de protéger ton code
+        </div>
+
+
+        <div class="secret-box">
+
+            <div class="secret-label">
+                🔐 CODE SECRET
+            </div>
+
+            <div class="secret-dots">
+
+                <span class="secret-lock">●</span>
+                <span class="secret-lock">●</span>
+                <span class="secret-lock">●</span>
+
+            </div>
+
+        </div>
+
+
+        <p style="color:#cbd5e1;line-height:1.5">
+
+            Le Joueur 1 ne doit pas regarder.
+
+            <br>
+
+            Choisis <strong>3 chiffres différents</strong>.
+
+        </p>
+
+
+        <div class="input-row">
+
+            <input id="p2SecretInput"
+                   type="tel"
+                   maxlength="3"
+                   inputmode="numeric"
+                   placeholder="456"
+                   autocomplete="off">
+
+            <button class="action-btn primary"
+                    onclick="saveP2Secret()">
+
+                🔒
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PASSAGE TELEPHONE
+     ===================================================== -->
+
+<section id="twoPassScreen" class="screen">
+
+    <div class="pass-battle">
+
+        <div class="pass-icon">
+            📱
+        </div>
+
+        <h2 id="passTitle">
+            PASSE LE TÉLÉPHONE
+        </h2>
+
+        <p id="passMessage"></p>
+
+        <button class="action-btn primary full"
+                onclick="continueTwoPlayers()">
+
+            ⚡ JE SUIS PRÊT
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     2 JOUEURS — PARTIE
+     ===================================================== -->
+
+<section id="twoGameScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="quitTwoPlayers()">
+
+            ← Quitter
+
+        </button>
+
+        <h2 id="twoTurnTitle">
+            Joueur 1
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div id="twoTurnBanner"
+         class="two-turn-banner">
+
+        <div class="two-turn-dot"></div>
+
+        <div class="two-turn-text">
+
+            <strong id="twoTurnMain">
+                ⚔️ TOUR DU JOUEUR 1
+            </strong>
+
+            <small>
+                Trouve le code de ton adversaire
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="game-info">
+
+        <div class="info two-timer-box">
+
+            <small>
+                ⏳ TEMPS
+            </small>
+
+            <strong id="twoTimer"
+                    class="timer">
+
+                03:00
+
+            </strong>
+
+        </div>
+
+
+        <div class="info">
+
+            <small>
+                🎯 ESSAIS
+            </small>
+
+            <strong id="twoAttemptCount">
+                0
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div style="
+            text-align:center;
+            color:#94a3b8;
+            margin-bottom:8px;
+        ">
+
+            🔮 Déchiffre le code secret
+
+        </div>
+
+
+        <div class="code-display">
+            ???
+        </div>
+
+
+        <div class="input-row">
+
+            <input id="twoGuessInput"
+                   type="tel"
+                   maxlength="3"
+                   inputmode="numeric"
+                   placeholder="123"
+                   autocomplete="off">
+
+
+            <button class="action-btn primary"
+                    onclick="submitTwoGuess()">
+
+                ⚡
+
+            </button>
+
+        </div>
+
+
+        <div class="history-title">
+            📜 Historique du duel
+        </div>
+
+
+        <div id="twoHistory"
+             class="history">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RESULTAT 2 JOUEURS
+     ===================================================== -->
+
+<section id="twoFinalScreen" class="screen">
+
+    <div class="topbar">
+
+        <button class="top-btn"
+                onclick="showScreen('homeScreen')">
+
+            ← Accueil
+
+        </button>
+
+        <h2>
+            DUEL
+        </h2>
+
+        <div></div>
+
+    </div>
+
+
+    <div class="two-final-hero">
+
+        <div class="two-final-trophy">
+            🏆
+        </div>
+
+        <div id="twoWinner"
+             class="two-winner-name">
+
+            Résultat
+
+        </div>
+
+        <div style="
+            color:#94a3b8;
+            margin-top:8px;
+            font-size:12px;
+        ">
+
+            LE DUEL EST TERMINÉ
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div style="
+            text-align:center;
+            color:#cbd5e1;
+            font-size:15px;
+            margin-bottom:10px;
+        ">
+
+            ⚔️ TABLEAU DU DUEL
+
+        </div>
+
+
+        <div id="twoFinalDetails"></div>
+
+
+        <hr>
+
+
+        <button class="action-btn success full"
+                onclick="startTwoPlayers()">
+
+            🔥 NOUVEAU DUEL
+
+        </button>
+
+
+        <br><br>
+
+
+        <button class="action-btn back full"
+                onclick="showScreen('homeScreen')">
+
+            🏠 RETOUR À L'ACCUEIL
+
+        </button>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<!-- =====================================================
+     POPUP
+     ===================================================== -->
+
+<div id="popupOverlay"
+     class="overlay"
+     onclick="closePopup(event)">
+
+    <div class="popup"
+         onclick="event.stopPropagation()">
+
+        <h2 id="popupTitle">
+            Information
+        </h2>
+
+        <p id="popupText"></p>
+
+        <button id="popupButton"
+                class="action-btn primary full"
+                onclick="hidePopup()">
+
+            OK
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DEVINE 3 v5.9.6
+   LOGIQUE SOLO + DUEL
+   ===================================================== */
+
+
+/* ================= DONNEES ================= */
+
+const levels = {
+
+    beginner:{
+        name:"Débutant",
+        time:300,
+        multiplier:1
+    },
+
+    intermediate:{
+        name:"Intermédiaire",
+        time:240,
+        multiplier:1.5
+    },
+
+    pro:{
+        name:"Pro",
+        time:180,
+        multiplier:2
+    },
+
+    expert:{
+        name:"Expert",
+        time:120,
+        multiplier:3
+    }
+
+};
+
+
+/* ================= STATISTIQUES ================= */
+
+let stats =
+    JSON.parse(
+        localStorage.getItem("devine3_stats")
+    ) || {
+
+        games:0,
+        wins:0,
+        losses:0,
+        attempts:0,
+        bestScore:0
+
+    };
+
+
+/* ================= DEFIS ================= */
+
+let challengeData =
+    JSON.parse(
+        localStorage.getItem("devine3_challenges")
+    ) || {
+
+        firstWin:false,
+        fiveWins:false,
+        tenWins:false,
+        expertWin:false,
+        fastWin:false,
+        noMoreTen:false
+
+    };
+
+
+/* ================= SOLO ================= */
+
+let currentLevel = null;
+let secretNumber = "";
+let timerInterval = null;
+let remainingTime = 0;
+let attempts = 0;
+let currentHistory = [];
+let gameActive = false;
+
+
+/* ================= 2 JOUEURS ================= */
+
+let twoPhase = "";
+
+let player1Secret = "";
+let player2Secret = "";
+
+let player1Result = null;
+let player2Result = null;
+
+let player1Attempts = 0;
+let player2Attempts = 0;
+
+let player1Time = 0;
+let player2Time = 0;
+
+let twoTimerInterval = null;
+let twoRemainingTime = 180;
+
+let twoHistory = [];
+let twoGameActive = false;
+
+
+/* =====================================================
+   AUDIO
+   ===================================================== */
+
+let soundEnabled =
+    localStorage.getItem("devine3_sound") !== "off";
+
+let audioContext = null;
+
+
+function initAudio(){
+
+    try{
+
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(!AudioCtx){
+            return null;
+        }
+
+        if(!audioContext){
+            audioContext = new AudioCtx();
+        }
+
+        if(
+            audioContext.state === "suspended"
+        ){
+
+            const resume =
+                audioContext.resume();
+
+            if(
+                resume &&
+                typeof resume.catch === "function"
+            ){
+
+                resume.catch(
+                    function(){}
+                );
+
+            }
+
+        }
+
+        return audioContext;
+
+    }catch(error){
+
+        return null;
+
+    }
+
+}
+
+
+function playSound(type){
+
+    if(!soundEnabled){
+        return;
+    }
+
+    try{
+
+        const ctx =
+            initAudio();
+
+        if(!ctx){
+            return;
+        }
+
+        let frequency = 500;
+        let duration = .08;
+        let volume = .35;
+
+        if(type === "click"){
+
+            frequency = 450;
+            duration = .05;
+            volume = .25;
+
+        }
+
+        else if(type === "success"){
+
+            frequency = 750;
+            duration = .18;
+            volume = .45;
+
+        }
+
+        else if(type === "error"){
+
+            frequency = 180;
+            duration = .20;
+            volume = .40;
+
+        }
+
+        else if(type === "win"){
+
+            frequency = 900;
+            duration = .40;
+            volume = .55;
+
+        }
+
+        else if(type === "loss"){
+
+            frequency = 150;
+            duration = .40;
+            volume = .50;
+
+        }
+
+        const oscillator =
+            ctx.createOscillator();
+
+        const gain =
+            ctx.createGain();
+
+        oscillator.type = "sine";
+
+        oscillator.frequency.setValueAtTime(
+            frequency,
+            ctx.currentTime
+        );
+
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+
+        gain.gain.setValueAtTime(
+            .001,
+            ctx.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            volume,
+            ctx.currentTime + .01
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            ctx.currentTime + duration
+        );
+
+        oscillator.start();
+
+        oscillator.stop(
+            ctx.currentTime + duration
+        );
+
+    }catch(error){}
+
+}
+
+
+function toggleSound(){
+
+    soundEnabled = !soundEnabled;
+
+    localStorage.setItem(
+        "devine3_sound",
+        soundEnabled ? "on" : "off"
+    );
+
+    updateSoundButton();
+
+    if(soundEnabled){
+
+        try{
+            initAudio();
+        }catch(e){}
+
+        setTimeout(
+            function(){
+                playSound("success");
+            },
+            30
+        );
+
+    }
+
+}
+
+
+function updateSoundButton(){
+
+    const button =
+        document.getElementById(
+            "soundButton"
+        );
+
+    if(!button){
+        return;
+    }
+
+    button.textContent =
+        soundEnabled
+            ? "🔊 Sons : ACTIVÉS"
+            : "🔇 Sons : DÉSACTIVÉS";
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+
+function showScreen(id){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            function(screen){
+
+                screen.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+    const target =
+        document.getElementById(id);
+
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+    if(id === "statisticsScreen"){
+        updateStatisticsUI();
+    }
+
+    if(id === "challengesScreen"){
+        updateChallengesUI();
+    }
+
+    if(id === "homeScreen"){
+
+        updateHome();
+        updateSoundButton();
+
+    }
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =====================================================
+   POPUP
+   ===================================================== */
+
+function showPopup(
+    title,
+    text,
+    confirmAction = null,
+    confirmLabel = "OK"
+){
+
+    document.getElementById(
+        "popupTitle"
+    ).textContent = title;
+
+    document.getElementById(
+        "popupText"
+    ).textContent = text;
+
+    const button =
+        document.getElementById(
+            "popupButton"
+        );
+
+    button.textContent =
+        confirmLabel;
+
+    button.onclick =
+        confirmAction || hidePopup;
+
+    document.getElementById(
+        "popupOverlay"
+    ).classList.add("show");
+
+}
+
+
+function hidePopup(){
+
+    document.getElementById(
+        "popupOverlay"
+    ).classList.remove("show");
+
+    const button =
+        document.getElementById(
+            "popupButton"
+        );
+
+    if(button){
+
+        button.onclick =
+            hidePopup;
+
+        button.textContent =
+            "OK";
+
+    }
+
+}
+
+
+function closePopup(event){
+
+    if(
+        event.target.id ===
+        "popupOverlay"
+    ){
+
+        hidePopup();
+
+    }
+
+}
+
+
+/* =====================================================
+   GENERATION
+   ===================================================== */
+
+function generateSecret(){
+
+    let digits = [];
+
+    while(
+        digits.length < 3
+    ){
+
+        const digit =
+            Math.floor(
+                Math.random()*10
+            ).toString();
+
+        if(
+            !digits.includes(digit)
+        ){
+
+            digits.push(digit);
+
+        }
+
+    }
+
+    return digits.join("");
+
+}
+
+
+/* =====================================================
+   VALIDATION
+   ===================================================== */
+
+function isValidCode(code){
+
+    return (
+        /^[0-9]{3}$/.test(code)
+        &&
+        new Set(code).size === 3
+    );
+
+}
+
+
+/* =====================================================
+   CALCUL V/X
+   ===================================================== */
+
+function calculateResult(
+    secret,
+    guess
+){
+
+    let v = 0;
+    let x = 0;
+
+    for(
+        let i=0;
+        i<3;
+        i++
+    ){
+
+        if(
+            guess[i] === secret[i]
+        ){
+
+            v++;
+
+        }
+
+        else if(
+            secret.includes(
+                guess[i]
+            )
+        ){
+
+            x++;
+
+        }
+
+    }
+
+    return {v,x};
+
+}
+
+
+/* =====================================================
+   RESULTAT HTML SOLO
+   ===================================================== */
+
+function resultHTML(result){
+
+    let html = "";
+
+    if(result.v > 0){
+
+        html +=
+            `<span class="v">
+                ${result.v}V
+             </span>`;
+
+    }
+
+    if(result.x > 0){
+
+        html +=
+            `<span class="x">
+                ${result.x}X
+             </span>`;
+
+    }
+
+    if(
+        result.v === 0 &&
+        result.x === 0
+    ){
+
+        html =
+            `<span class="none">
+                0
+             </span>`;
+
+    }
+
+    return html;
+
+}
+
+
+/* =====================================================
+   SOLO
+   ===================================================== */
+
+function showLevels(){
+
+    showScreen(
+        "levelsScreen"
+    );
+
+}
+
+
+function startSolo(levelKey){
+
+    stopSoloTimer();
+
+    currentLevel =
+        levels[levelKey];
+
+    secretNumber =
+        generateSecret();
+
+    attempts = 0;
+
+    currentHistory = [];
+
+    gameActive = true;
+
+    remainingTime =
+        currentLevel.time;
+
+    document.getElementById(
+        "gameLevelName"
+    ).textContent =
+        currentLevel.name;
+
+    document.getElementById(
+        "attemptCount"
+    ).textContent =
+        "0";
+
+    document.getElementById(
+        "history"
+    ).innerHTML =
+        `<div class="empty">
+            Aucun essai pour le moment
+         </div>`;
+
+    const input =
+        document.getElementById(
+            "guessInput"
+        );
+
+    input.value = "";
+
+    showScreen(
+        "gameScreen"
+    );
+
+    updateTimerUI();
+
+    startSoloTimer();
+
+    setTimeout(
+        function(){
+
+            try{
+                input.focus();
+            }catch(e){}
+
+        },
+        300
+    );
+
+}
+
+
+function startSoloTimer(){
+
+    stopSoloTimer();
+
+    timerInterval =
+        setInterval(
+            function(){
+
+                if(!gameActive){
+                    return;
+                }
+
+                remainingTime--;
+
+                updateTimerUI();
+
+                if(
+                    remainingTime <= 0
+                ){
+
+                    remainingTime = 0;
+
+                    updateTimerUI();
+
+                    endSolo(false);
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+function stopSoloTimer(){
+
+    if(timerInterval){
+
+        clearInterval(
+            timerInterval
+        );
+
+        timerInterval = null;
+
+    }
+
+}
+
+
+function updateTimerUI(){
+
+    const timer =
+        document.getElementById(
+            "timer"
+        );
+
+    const minutes =
+        Math.floor(
+            remainingTime / 60
+        );
+
+    const seconds =
+        remainingTime % 60;
+
+    timer.textContent =
+        String(minutes).padStart(2,"0")
+        +
+        ":"
+        +
+        String(seconds).padStart(2,"0");
+
+    if(
+        remainingTime <= 20
+    ){
+
+        timer.classList.add(
+            "danger-time"
+        );
+
+    }else{
+
+        timer.classList.remove(
+            "danger-time"
+        );
+
+    }
+
+}
+
+
+function submitGuess(){
+
+    if(!gameActive){
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            "guessInput"
+        );
+
+    const guess =
+        input.value.trim();
+
+    if(!isValidCode(guess)){
+
+        playSound("error");
+
+        input.classList.remove(
+            "shake"
+        );
+
+        void input.offsetWidth;
+
+        input.classList.add(
+            "shake"
+        );
+
+        showPopup(
+            "Code invalide",
+            "Entre exactement 3 chiffres différents."
+        );
+
+        return;
+
+    }
+
+    attempts++;
+
+    const result =
+        calculateResult(
+            secretNumber,
+            guess
+        );
+
+    currentHistory.push({
+        guess:guess,
+        result:result
+    });
+
+    renderHistory();
+
+    document.getElementById(
+        "attemptCount"
+    ).textContent =
+        attempts;
+
+    input.value = "";
+
+    if(
+        result.v === 3
+    ){
+
+        playSound("win");
+
+        endSolo(true);
+
+    }else{
+
+        playSound(
+            result.v > 0 ||
+            result.x > 0
+                ? "success"
+                : "error"
+        );
+
+    }
+
+}
+
+
+function renderHistory(){
+
+    const container =
+        document.getElementById(
+            "history"
+        );
+
+    container.innerHTML = "";
+
+    if(
+        currentHistory.length === 0
+    ){
+
+        container.innerHTML =
+            `<div class="empty">
+                Aucun essai pour le moment
+             </div>`;
+
+        return;
+
+    }
+
+    [
+        ...currentHistory
+    ]
+    .reverse()
+    .forEach(
+        function(item){
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "history-item";
+
+            div.innerHTML = `
+                <span class="guess">
+                    ${item.guess}
+                </span>
+
+                <span class="result">
+                    ${resultHTML(item.result)}
+                </span>
+            `;
+
+            container.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+function endSolo(won){
+
+    if(!gameActive){
+        return;
+    }
+
+    gameActive = false;
+
+    stopSoloTimer();
+
+    stats.games++;
+
+    stats.attempts += attempts;
+
+    if(won){
+
+        stats.wins++;
+
+        const timeBonus =
+            Math.floor(
+                remainingTime * 2
+            );
+
+        const attemptBonus =
+            Math.max(
+                0,
+                300 - attempts * 25
+            );
+
+        const score =
+            Math.max(
+                50,
+                Math.round(
+                    (
+                        500
+                        +
+                        timeBonus
+                        +
+                        attemptBonus
+                    )
+                    *
+                    currentLevel.multiplier
+                )
+            );
+
+        if(
+            score > stats.bestScore
+        ){
+
+            stats.bestScore =
+                score;
+
+        }
+
+        if(stats.wins >= 1){
+            challengeData.firstWin = true;
+        }
+
+        if(stats.wins >= 5){
+            challengeData.fiveWins = true;
+        }
+
+        if(stats.wins >= 10){
+            challengeData.tenWins = true;
+        }
+
+        if(
+            currentLevel ===
+            levels.expert
+        ){
+
+            challengeData.expertWin = true;
+
+        }
+
+        if(
+            remainingTime >=
+            Math.floor(
+                currentLevel.time * .5
+            )
+        ){
+
+            challengeData.fastWin = true;
+
+        }
+
+        if(
+            attempts <= 10
+        ){
+
+            challengeData.noMoreTen = true;
+
+        }
+
+        saveData();
+
+        document.getElementById(
+            "finalEmoji"
+        ).textContent =
+            "🎉";
+
+        document.getElementById(
+            "finalMessage"
+        ).textContent =
+            "BRAVO ! CODE TROUVÉ";
+
+        document.getElementById(
+            "finalScore"
+        ).textContent =
+            score;
+
+        document.getElementById(
+            "finalDetails"
+        ).textContent =
+            `${attempts} essai(s) • ` +
+            `${formatTime(remainingTime)} restant`;
+
+        const finalCard =
+            document.getElementById(
+                "finalCard"
+            );
+
+        finalCard.classList.remove(
+            "win-animation"
+        );
+
+        void finalCard.offsetWidth;
+
+        finalCard.classList.add(
+            "win-animation"
+        );
+
+    }else{
+
+        stats.losses++;
+
+        saveData();
+
+        document.getElementById(
+            "finalEmoji"
+        ).textContent =
+            "😢";
+
+        document.getElementById(
+            "finalMessage"
+        ).textContent =
+            "TEMPS ÉCOULÉ !";
+
+        document.getElementById(
+            "finalScore"
+        ).textContent =
+            "0";
+
+        document.getElementById(
+            "finalDetails"
+        ).textContent =
+            `${attempts} essai(s)`;
+
+        document.getElementById(
+            "finalCard"
+        ).classList.remove(
+            "win-animation"
+        );
+
+        playSound("loss");
+
+    }
+
+    document.getElementById(
+        "finalSecret"
+    ).textContent =
+        secretNumber;
+
+    showScreen(
+        "finalScreen"
+    );
+
+}
+
+
+function quitSolo(){
+
+    if(!gameActive){
+
+        showScreen(
+            "homeScreen"
+        );
+
+        return;
+
+    }
+
+    showPopup(
+        "⚠️ QUITTER LA PARTIE ?",
+        "La partie Solo en cours sera perdue.",
+        function(){
+
+            hidePopup();
+
+            gameActive = false;
+
+            stopSoloTimer();
+
+            showScreen(
+                "homeScreen"
+            );
+
+        },
+        "QUITTER"
+    );
+
+}
+
+
+/* =====================================================
+   2 JOUEURS — NOUVEAU MODE v5.9.6
+   ===================================================== */
+
+function startTwoPlayers(){
+
+    stopTwoTimer();
+
+    player1Secret = "";
+    player2Secret = "";
+
+    player1Result = null;
+    player2Result = null;
+
+    player1Attempts = 0;
+    player2Attempts = 0;
+
+    player1Time = 0;
+    player2Time = 0;
+
+    twoHistory = [];
+
+    twoRemainingTime = 180;
+
+    twoGameActive = false;
+
+    twoPhase =
+        "p1Secret";
+
+    document.getElementById(
+        "p1SecretInput"
+    ).value = "";
+
+    document.getElementById(
+        "p2SecretInput"
+    ).value = "";
+
+    showScreen(
+        "twoP1SecretScreen"
+    );
+
+    setTimeout(
+        function(){
+
+            try{
+
+                document
+                    .getElementById(
+                        "p1SecretInput"
+                    )
+                    .focus();
+
+            }catch(e){}
+
+        },
+        350
+    );
+
+}
+
+
+function saveP1Secret(){
+
+    const input =
+        document.getElementById(
+            "p1SecretInput"
+        );
+
+    const code =
+        input.value.trim();
+
+    if(!isValidCode(code)){
+
+        playSound("error");
+
+        input.classList.remove(
+            "shake"
+        );
+
+        void input.offsetWidth;
+
+        input.classList.add(
+            "shake"
+        );
+
+        showPopup(
+            "🔐 CODE INVALIDE",
+            "Ton code doit contenir exactement 3 chiffres différents."
+        );
+
+        return;
+
+    }
+
+    player1Secret =
+        code;
+
+    playSound("success");
+
+    twoPhase =
+        "p2Secret";
+
+    input.value = "";
+
+    document.getElementById(
+        "p2SecretInput"
+    ).value = "";
+
+    showScreen(
+        "twoP2SecretScreen"
+    );
+
+    setTimeout(
+        function(){
+
+            try{
+
+                document
+                    .getElementById(
+                        "p2SecretInput"
+                    )
+                    .focus();
+
+            }catch(e){}
+
+        },
+        400
+    );
+
+}
+
+
+function saveP2Secret(){
+
+    const input =
+        document.getElementById(
+            "p2SecretInput"
+        );
+
+    const code =
+        input.value.trim();
+
+    if(!isValidCode(code)){
+
+        playSound("error");
+
+        input.classList.remove(
+            "shake"
+        );
+
+        void input.offsetWidth;
+
+        input.classList.add(
+            "shake"
+        );
+
+        showPopup(
+            "🔐 CODE INVALIDE",
+            "Ton code doit contenir exactement 3 chiffres différents."
+        );
+
+        return;
+
+    }
+
+    player2Secret =
+        code;
+
+    playSound("success");
+
+    twoPhase =
+        "p1Guess";
+
+    showPassScreen(
+        "⚡ JOUEUR 1, À TOI !",
+        "Le code du Joueur 2 est verrouillé. Passe le téléphone au Joueur 1. Tu as 3 minutes pour le découvrir."
+    );
+
+}
+
+
+function showPassScreen(
+    title,
+    message
+){
+
+    document.getElementById(
+        "passTitle"
+    ).textContent =
+        title;
+
+    document.getElementById(
+        "passMessage"
+    ).textContent =
+        message;
+
+    showScreen(
+        "twoPassScreen"
+    );
+
+}
+
+
+function continueTwoPlayers(){
+
+    if(
+        twoPhase ===
+        "p1Guess"
+    ){
+
+        startTwoTurn(1);
+
+    }
+
+    else if(
+        twoPhase ===
+        "p2Guess"
+    ){
+
+        startTwoTurn(2);
+
+    }
+
+}
+
+
+function startTwoTurn(player){
+
+    stopTwoTimer();
+
+    twoHistory = [];
+
+    twoGameActive = true;
+
+    twoRemainingTime = 180;
+
+    document.getElementById(
+        "twoTurnTitle"
+    ).textContent =
+        "Joueur " + player;
+
+    document.getElementById(
+        "twoTurnMain"
+    ).textContent =
+        "⚔️ TOUR DU JOUEUR " + player;
+
+    document.getElementById(
+        "twoAttemptCount"
+    ).textContent =
+        "0";
+
+    document.getElementById(
+        "twoHistory"
+    ).innerHTML =
+        `<div class="empty">
+            🔮 Aucun essai pour le moment
+         </div>`;
+
+    const input =
+        document.getElementById(
+            "twoGuessInput"
+        );
+
+    input.value = "";
+
+    const banner =
+        document.getElementById(
+            "twoTurnBanner"
+        );
+
+    if(player === 1){
+
+        banner.style.borderColor =
+            "rgba(34,211,238,.45)";
+
+    }else{
+
+        banner.style.borderColor =
+            "rgba(236,72,153,.45)";
+
+    }
+
+    showScreen(
+        "twoGameScreen"
+    );
+
+    updateTwoTimerUI();
+
+    startTwoTimer();
+
+    setTimeout(
+        function(){
+
+            try{
+                input.focus();
+            }catch(e){}
+
+        },
+        400
+    );
+
+}
+
+
+function startTwoTimer(){
+
+    stopTwoTimer();
+
+    twoTimerInterval =
+        setInterval(
+            function(){
+
+                if(!twoGameActive){
+                    return;
+                }
+
+                twoRemainingTime--;
+
+                updateTwoTimerUI();
+
+                if(
+                    twoRemainingTime <= 0
+                ){
+
+                    twoRemainingTime = 0;
+
+                    updateTwoTimerUI();
+
+                    if(
+                        twoPhase ===
+                        "p1Guess"
+                    ){
+
+                        player1Time = 180;
+
+                        player1Result = {
+                            won:false,
+                            attempts:
+                                player1Attempts
+                        };
+
+                        twoGameActive = false;
+
+                        twoPhase =
+                            "p2Guess";
+
+                        playSound("loss");
+
+                        showPassScreen(
+                            "⏰ TEMPS ÉCOULÉ !",
+                            "Le Joueur 1 n'a pas trouvé le code. Passe maintenant le téléphone au Joueur 2."
+                        );
+
+                    }else{
+
+                        player2Time = 180;
+
+                        player2Result = {
+                            won:false,
+                            attempts:
+                                player2Attempts
+                        };
+
+                        twoGameActive = false;
+
+                        playSound("loss");
+
+                        finishTwoPlayers();
+
+                    }
+
+                    stopTwoTimer();
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+function stopTwoTimer(){
+
+    if(twoTimerInterval){
+
+        clearInterval(
+            twoTimerInterval
+        );
+
+        twoTimerInterval = null;
+
+    }
+
+}
+
+
+function updateTwoTimerUI(){
+
+    const timer =
+        document.getElementById(
+            "twoTimer"
+        );
+
+    const minutes =
+        Math.floor(
+            twoRemainingTime / 60
+        );
+
+    const seconds =
+        twoRemainingTime % 60;
+
+    timer.textContent =
+        String(minutes).padStart(2,"0")
+        +
+        ":"
+        +
+        String(seconds).padStart(2,"0");
+
+    if(
+        twoRemainingTime <= 20
+    ){
+
+        timer.classList.add(
+            "danger-time"
+        );
+
+    }else{
+
+        timer.classList.remove(
+            "danger-time"
+        );
+
+    }
+
+}
+
+
+function submitTwoGuess(){
+
+    if(!twoGameActive){
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            "twoGuessInput"
+        );
+
+    const guess =
+        input.value.trim();
+
+    if(!isValidCode(guess)){
+
+        playSound("error");
+
+        input.classList.remove(
+            "shake"
+        );
+
+        void input.offsetWidth;
+
+        input.classList.add(
+            "shake"
+        );
+
+        showPopup(
+            "⚠️ CODE INVALIDE",
+            "Entre exactement 3 chiffres différents."
+        );
+
+        return;
+
+    }
+
+    const player =
+        twoPhase === "p1Guess"
+            ? 1
+            : 2;
+
+    const secret =
+        player === 1
+            ? player2Secret
+            : player1Secret;
+
+    const result =
+        calculateResult(
+            secret,
+            guess
+        );
+
+    twoHistory.push({
+        guess:guess,
+        result:result
+    });
+
+    if(player === 1){
+
+        player1Attempts++;
+
+    }else{
+
+        player2Attempts++;
+
+    }
+
+    document.getElementById(
+        "twoAttemptCount"
+    ).textContent =
+        player === 1
+            ? player1Attempts
+            : player2Attempts;
+
+    renderTwoHistory();
+
+    input.value = "";
+
+    if(
+        result.v === 3
+    ){
+
+        playSound("win");
+
+        const elapsed =
+            180 -
+            twoRemainingTime;
+
+        if(player === 1){
+
+            player1Time =
+                elapsed;
+
+            player1Result = {
+                won:true,
+                attempts:
+                    player1Attempts
+            };
+
+            twoGameActive = false;
+
+            stopTwoTimer();
+
+            twoPhase =
+                "p2Guess";
+
+            showPassScreen(
+                "🔥 JOUEUR 1 A TROUVÉ !",
+                "Excellent ! Le Joueur 1 a déchiffré le code. Passe le téléphone au Joueur 2 pour son propre duel."
+            );
+
+        }else{
+
+            player2Time =
+                elapsed;
+
+            player2Result = {
+                won:true,
+                attempts:
+                    player2Attempts
+            };
+
+            twoGameActive = false;
+
+            stopTwoTimer();
+
+            finishTwoPlayers();
+
+        }
+
+        return;
+
+    }
+
+    playSound(
+        result.v > 0 ||
+        result.x > 0
+            ? "success"
+            : "error"
+    );
+
+}
+
+
+function renderTwoHistory(){
+
+    const container =
+        document.getElementById(
+            "twoHistory"
+        );
+
+    container.innerHTML = "";
+
+    [
+        ...twoHistory
+    ]
+    .reverse()
+    .forEach(
+        function(item){
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "history-item result-burst";
+
+            div.innerHTML = `
+
+                <span class="guess">
+                    ${item.guess}
+                </span>
+
+                <span class="result">
+
+                    ${
+                        item.result.v > 0
+                            ? `<span class="v-badge">
+                                ${item.result.v}V
+                               </span>`
+                            : ""
+                    }
+
+                    ${
+                        item.result.x > 0
+                            ? `<span class="x-badge">
+                                ${item.result.x}X
+                               </span>`
+                            : ""
+                    }
+
+                    ${
+                        item.result.v === 0 &&
+                        item.result.x === 0
+                            ? `<span class="none">
+                                0
+                               </span>`
+                            : ""
+                    }
+
+                </span>
+            `;
+
+            container.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+function finishTwoPlayers(){
+
+    /*
+     * SÉCURITÉ :
+     * Le résultat final ne peut apparaître que lorsque
+     * les deux joueurs ont terminé leur tour.
+     */
+    if(
+        !player1Result ||
+        !player2Result
+    ){
+        return;
+    }
+
+    stopTwoTimer();
+
+    twoGameActive = false;
+
+    let winner = "";
+
+    /*
+     * LES DEUX JOUEURS ONT GAGNÉ
+     */
+    if(
+        player1Result.won &&
+        player2Result.won
+    ){
+
+        if(
+            player1Time <
+            player2Time
+        ){
+
+            winner =
+                "👑 JOUEUR 1 CHAMPION !";
+
+        }
+
+        else if(
+            player2Time <
+            player1Time
+        ){
+
+            winner =
+                "👑 JOUEUR 2 CHAMPION !";
+
+        }
+
+        else{
+
+            winner =
+                "🤝 ÉGALITÉ PARFAITE !";
+
+        }
+
+    }
+
+    /*
+     * SEUL LE JOUEUR 1 A GAGNÉ
+     */
+    else if(
+        player1Result.won
+    ){
+
+        winner =
+            "👑 JOUEUR 1 CHAMPION !";
+
+    }
+
+    /*
+     * SEUL LE JOUEUR 2 A GAGNÉ
+     */
+    else if(
+        player2Result.won
+    ){
+
+        winner =
+            "👑 JOUEUR 2 CHAMPION !";
+
+    }
+
+    /*
+     * PERSONNE N'A GAGNÉ
+     */
+    else{
+
+        winner =
+            "⚔️ AUCUN VAINQUEUR";
+
+    }
+
+
+    document.getElementById(
+        "twoWinner"
+    ).textContent =
+        winner;
+
+
+    const p1Status =
+        player1Result.won
+            ? "🏆 VICTOIRE"
+            : "❌ ÉCHEC";
+
+
+    const p2Status =
+        player2Result.won
+            ? "🏆 VICTOIRE"
+            : "❌ ÉCHEC";
+
+
+    document.getElementById(
+        "twoFinalDetails"
+    ).innerHTML = `
+
+        <div class="duel-score">
+
+            <div class="duel-player">
+
+                <strong>
+                    👤 JOUEUR 1
+                </strong>
+
+                <span>
+                    ${p1Status}
+                </span>
+
+                <small>
+                    ${player1Attempts} essai(s)
+                    <br>
+                    ⏱ ${formatTime(player1Time)}
+                </small>
+
+            </div>
+
+
+            <div class="duel-player">
+
+                <strong>
+                    👤 JOUEUR 2
+                </strong>
+
+                <span>
+                    ${p2Status}
+                </span>
+
+                <small>
+                    ${player2Attempts} essai(s)
+                    <br>
+                    ⏱ ${formatTime(player2Time)}
+                </small>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    playSound(
+        winner.includes("AUCUN")
+            ? "loss"
+            : winner.includes("ÉGALITÉ")
+                ? "success"
+                : "win"
+    );
+
+
+    twoPhase = "finished";
+
+
+    showScreen(
+        "twoFinalScreen"
+    );
+
+}
+
+
+function quitTwoPlayers(){
+
+    const duelInProgress =
+        twoPhase !== "" ||
+        twoGameActive ||
+        player1Secret !== "" ||
+        player2Secret !== "";
+
+    if(!duelInProgress){
+
+        showScreen(
+            "homeScreen"
+        );
+
+        return;
+
+    }
+
+    showPopup(
+        "⚠️ QUITTER LE DUEL ?",
+        "La partie 2 joueurs en cours sera perdue.",
+        function(){
+
+            hidePopup();
+
+            stopTwoTimer();
+
+            twoGameActive = false;
+
+            twoPhase = "";
+
+            player1Secret = "";
+            player2Secret = "";
+
+            player1Result = null;
+            player2Result = null;
+
+            player1Attempts = 0;
+            player2Attempts = 0;
+
+            player1Time = 0;
+            player2Time = 0;
+
+            twoHistory = [];
+
+            showScreen(
+                "homeScreen"
+            );
+
+        },
+        "QUITTER"
+    );
+
+}
+
+
+/* =====================================================
+   FORMAT TEMPS
+   ===================================================== */
+
+function formatTime(seconds){
+
+    const min =
+        Math.floor(
+            seconds / 60
+        );
+
+    const sec =
+        seconds % 60;
+
+    return (
+        `${min}m ` +
+        `${String(sec).padStart(2,"0")}s`
+    );
+
+}
+
+
+/* =====================================================
+   SAUVEGARDE
+   ===================================================== */
+
+function saveData(){
+
+    localStorage.setItem(
+        "devine3_stats",
+        JSON.stringify(stats)
+    );
+
+    localStorage.setItem(
+        "devine3_challenges",
+        JSON.stringify(challengeData)
+    );
+
+}
+
+
+/* =====================================================
+   ACCUEIL
+   ===================================================== */
+
+function updateHome(){
+
+    document.getElementById(
+        "homeBestScore"
+    ).textContent =
+        stats.bestScore;
+
+}
+
+
+/* =====================================================
+   STATISTIQUES
+   ===================================================== */
+
+function updateStatisticsUI(){
+
+    document.getElementById(
+        "statGames"
+    ).textContent =
+        stats.games;
+
+    document.getElementById(
+        "statWins"
+    ).textContent =
+        stats.wins;
+
+    document.getElementById(
+        "statLosses"
+    ).textContent =
+        stats.losses;
+
+    document.getElementById(
+        "statBest"
+    ).textContent =
+        stats.bestScore;
+
+    document.getElementById(
+        "statAttempts"
+    ).textContent =
+        stats.attempts;
+
+    const rate =
+        stats.games > 0
+            ? Math.round(
+                stats.wins /
+                stats.games *
+                100
+            )
+            : 0;
+
+    document.getElementById(
+        "statWinRate"
+    ).textContent =
+        rate + "%";
+
+    const performance =
+        document.getElementById(
+            "performanceText"
+        );
+
+    if(
+        stats.games === 0
+    ){
+
+        performance.textContent =
+            "Commence à jouer pour voir tes performances.";
+
+    }
+
+    else if(
+        rate >= 80
+    ){
+
+        performance.textContent =
+            "🔥 Exceptionnel ! Tu fais partie des joueurs très performants.";
+
+    }
+
+    else if(
+        rate >= 60
+    ){
+
+        performance.textContent =
+            "💪 Très bon niveau. Continue à améliorer ton temps et ton nombre d'essais.";
+
+    }
+
+    else if(
+        rate >= 40
+    ){
+
+        performance.textContent =
+            "👍 Tu progresses. La réflexion et la rapidité feront la différence.";
+
+    }
+
+    else{
+
+        performance.textContent =
+            "🧠 Continue de jouer. Chaque partie te permettra de mieux maîtriser le jeu.";
+
+    }
+
+}
+
+
+/* =====================================================
+   RESET
+   ===================================================== */
+
+function resetStatistics(){
+
+    const confirmation =
+        confirm(
+            "Réinitialiser toutes les statistiques et récompenses ?"
+        );
+
+    if(!confirmation){
+        return;
+    }
+
+    stats = {
+
+        games:0,
+        wins:0,
+        losses:0,
+        attempts:0,
+        bestScore:0
+
+    };
+
+    challengeData = {
+
+        firstWin:false,
+        fiveWins:false,
+        tenWins:false,
+        expertWin:false,
+        fastWin:false,
+        noMoreTen:false
+
+    };
+
+    saveData();
+
+    updateStatisticsUI();
+
+    updateChallengesUI();
+
+    updateHome();
+
+}
+
+
+/* =====================================================
+   DEFIS
+   ===================================================== */
+
+const challenges = [
+
+    {
+        id:"firstWin",
+        icon:"🥉",
+        title:"Première victoire",
+        description:"Gagner ta première partie.",
+        condition:"Gagner au moins 1 partie."
+    },
+
+    {
+        id:"fiveWins",
+        icon:"🥈",
+        title:"En forme",
+        description:"Obtenir 5 victoires.",
+        condition:"Gagner 5 parties."
+    },
+
+    {
+        id:"tenWins",
+        icon:"🥇",
+        title:"Champion",
+        description:"Obtenir 10 victoires.",
+        condition:"Gagner 10 parties."
+    },
+
+    {
+        id:"expertWin",
+        icon:"💎",
+        title:"Expert",
+        description:"Gagner au niveau Expert.",
+        condition:"Gagner au niveau Expert."
+    },
+
+    {
+        id:"fastWin",
+        icon:"⚡",
+        title:"Éclair",
+        description:"Gagner très rapidement.",
+        condition:"Gagner avec au moins la moitié du temps restant."
+    },
+
+    {
+        id:"noMoreTen",
+        icon:"🧠",
+        title:"Réflexion",
+        description:"Trouver le code en 10 essais ou moins.",
+        condition:"Réussir une partie en 10 essais maximum."
+    }
+
+];
+
+
+function updateChallengesUI(){
+
+    const container =
+        document.getElementById(
+            "challengeList"
+        );
+
+    container.innerHTML = "";
+
+    challenges.forEach(
+        function(challenge){
+
+            const unlocked =
+                challengeData[
+                    challenge.id
+                ];
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                `card challenge ${
+                    unlocked
+                        ? ""
+                        : "locked"
+                }`;
+
+            div.innerHTML = `
+
+                <div class="challenge-top">
+
+                    <div>
+
+                        <h3>
+
+                            <span>
+                                ${challenge.icon}
+                            </span>
+
+                            ${challenge.title}
+
+                        </h3>
+
+                        <p>
+                            ${challenge.description}
+                        </p>
+
+                    </div>
+
+
+                    <div class="badge ${
+                        unlocked
+                            ? "unlocked"
+                            : ""
+                    }">
+
+                        ${
+                            unlocked
+                                ? "✓ Débloqué"
+                                : "🔒 Verrouillé"
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div style="
+                        width:${
+                            unlocked
+                                ? 100
+                                : 0
+                        }%;
+                    "></div>
+
+                </div>
+
+            `;
+
+            div.onclick =
+                function(){
+
+                    showPopup(
+                        challenge.icon +
+                        " " +
+                        challenge.title,
+
+                        challenge.condition +
+                        (
+                            unlocked
+                                ? " Félicitations, défi réussi !"
+                                : " Ce défi est encore verrouillé."
+                        )
+                    );
+
+                };
+
+            container.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CLICS — SON
+   ===================================================== */
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const button =
+            event.target.closest(
+                "button"
+            );
+
+        if(!button){
+            return;
+        }
+
+        if(
+            button.id ===
+            "soundButton"
+        ){
+
+            return;
+
+        }
+
+        if(!soundEnabled){
+            return;
+        }
+
+        setTimeout(
+            function(){
+
+                try{
+
+                    playSound(
+                        "click"
+                    );
+
+                }catch(e){}
+
+            },
+            10
+        );
+
+    }
+);
+
+
+/* =====================================================
+   SAISIE
+   ===================================================== */
+
+document.addEventListener(
+    "input",
+    function(event){
+
+        const input =
+            event.target;
+
+        if(
+            input.matches(
+                "#guessInput, #twoGuessInput, #p1SecretInput, #p2SecretInput"
+            )
+        ){
+
+            input.classList.remove(
+                "numberPop"
+            );
+
+            void input.offsetWidth;
+
+            if(
+                input.value.length > 0
+            ){
+
+                input.classList.add(
+                    "number-pop"
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   ENTER
+   ===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key !== "Enter"
+        ){
+
+            return;
+
+        }
+
+        const active =
+            document.querySelector(
+                ".screen.active"
+            );
+
+        if(!active){
+            return;
+        }
+
+        if(
+            active.id ===
+            "gameScreen"
+        ){
+
+            submitGuess();
+
+        }
+
+        else if(
+            active.id ===
+            "twoGameScreen"
+        ){
+
+            submitTwoGuess();
+
+        }
+
+        else if(
+            active.id ===
+            "twoP1SecretScreen"
+        ){
+
+            saveP1Secret();
+
+        }
+
+        else if(
+            active.id ===
+            "twoP2SecretScreen"
+        ){
+
+            saveP2Secret();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INITIALISATION
+   ===================================================== */
+
+updateHome();
+
+updateStatisticsUI();
+
+updateChallengesUI();
+
+updateSoundButton();
+/* =====================================================
+   PWA — SERVICE WORKER
+   ===================================================== */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        function(){
+
+            navigator.serviceWorker
+                .register("./service-worker.js")
+                .then(function(){
+
+                    console.log(
+                        "DEVINE 3 : Service Worker activé."
+                    );
+
+                })
+                .catch(function(error){
+
+                    console.log(
+                        "DEVINE 3 : erreur Service Worker",
+                        error
+                    );
+
+                });
+
+        }
+    );
+
+}
+</script>
+
+</body>
+</html>
