@@ -1,0 +1,22 @@
+{
+  "name": "DEVINE 3",
+  "short_name": "DEVINE 3",
+  "description": "Jeu de logique et de réflexion à 3 chiffres",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
