@@ -3397,3 +3397,359 @@ body::after {
         0 0 25px rgba(0, 0, 0, 0.45),
         inset 0 0 20px rgba(212, 175, 55, 0.035);
 }
+/* =========================================================
+   RESPONSIVE — PETITS ÉCRANS
+   Optimisation de l'écran de jeu en ligne
+   ========================================================= */
+
+@media (max-width: 430px) and (max-height: 850px) {
+
+    .screen {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .two-game-container {
+        width: 100%;
+    }
+
+    .two-game-container .two-turn-banner {
+        margin-bottom: 8px;
+        min-height: 34px;
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    #onlineTimer {
+        font-size: 36px;
+        margin: 4px 0 8px;
+    }
+
+    .two-container h2 {
+        font-size: 24px;
+        margin: 6px 0;
+    }
+
+    .two-instruction {
+        margin: 6px auto 12px;
+        font-size: 12px;
+    }
+
+    .online-history {
+        margin: 12px 0;
+    }
+
+}
+/* =========================================================
+   MODE EN LIGNE — ADAPTATION À LA HAUTEUR RÉELLE DE L'ÉCRAN
+   iPhone / clavier ouvert
+   ========================================================= */
+
+#twoGameScreen {
+    min-height: 100dvh;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+#twoGameScreen .two-game-container {
+    width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+#twoGameScreen .onlineTimer {
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+
+#twoGameScreen .online-history-list {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+#twoGameScreen .online-chat {
+    max-height: 80px;
+    overflow-y: auto;
+}
+/* =========================================================
+   MODE EN LIGNE — PRIORITÉ AU JEU QUAND LE CLAVIER EST OUVERT
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    #twoGameScreen {
+        justify-content: flex-start;
+        overflow: hidden;
+    }
+
+    #twoGameScreen .two-turn-banner {
+        margin-bottom: 4px;
+        min-height: 30px;
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    #twoGameScreen .onlineTimer {
+        font-size: 30px;
+        line-height: 1;
+        margin: 2px 0 4px;
+    }
+
+    #twoGameScreen .two-instruction {
+        margin: 3px auto 6px;
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    #twoGameScreen .online-history {
+        margin: 6px 0;
+    }
+
+    #twoGameScreen .online-history-list {
+        max-height: 70px;
+    }
+
+    #twoGameScreen .online-chat {
+        max-height: 55px;
+        overflow-y: auto;
+    }
+
+    #twoGameScreen .online-chat-input {
+        margin-top: 4px;
+    }
+
+}
+/* Compteur des parties gratuites */
+.free-games-counter {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #d4af37;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    margin: 4px 0;
+}
+/* =================================================
+   ÉCRAN : PARTIES GRATUITES ÉPUISÉES
+   ================================================= */
+
+.free-games-limit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(212, 175, 55, 0.12),
+            rgba(0, 0, 0, 0.96) 70%
+        );
+}
+
+.free-games-limit-box {
+    width: min(92%, 420px);
+
+    padding: 28px 22px;
+
+    text-align: center;
+
+    background: linear-gradient(
+        145deg,
+        #151515,
+        #050505
+    );
+
+    border: 1px solid #d4af37;
+    border-radius: 18px;
+
+    box-shadow:
+        0 0 25px rgba(212, 175, 55, 0.25),
+        inset 0 0 20px rgba(212, 175, 55, 0.05);
+}
+
+.free-games-limit-icon {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.free-games-limit-box h2 {
+    margin: 8px 0 16px;
+
+    color: #d4af37;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.free-games-limit-box p {
+    margin: 10px 0;
+
+    color: #ffffff;
+
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.free-games-limit-box strong {
+    color: #d4af37;
+}
+
+.free-games-limit-offer {
+    margin: 18px 0 !important;
+}
+
+#continuePaidGameBtn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#closeFreeGamesLimitBtn {
+    margin-top: 14px;
+}
+/* =================================================
+   ÉCRAN : PAIEMENT
+   ================================================= */
+
+#paymentScreen {
+    min-height: 100%;
+}
+
+#paymentScreen .screen-container {
+    text-align: center;
+}
+
+#paymentScreen h2 {
+    color: #d4af37;
+    font-size: 24px;
+    font-weight: 800;
+    margin: 30px 0 12px;
+}
+
+.payment-price {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 900;
+    margin: 10px 0 16px;
+}
+
+.payment-description {
+    color: #ffffff;
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+.payment-international {
+    color: #bdbdbd;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 8px auto 24px;
+    max-width: 380px;
+}
+
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.payment-method-btn {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 18px;
+
+    border: 1px solid #d4af37;
+    border-radius: 12px;
+
+    background: linear-gradient(
+        145deg,
+        #171717,
+        #050505
+    );
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.payment-method-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 15px rgba(212, 175, 55, 0.25);
+}
+
+#backFromPaymentBtn {
+    margin-bottom: 10px;
+}
+/* Positionnement de l'écran de paiement */
+#paymentScreen {
+    padding-top: 10px !important;
+}
+
+#paymentScreen .screen-container {
+    padding-top: 0 !important;
+}
+/* 🌍 SÉLECTEUR DE LANGUE — FR / EN */
+
+.language-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 16px;
+}
+
+.language-btn {
+    min-width: 72px;
+    padding: 8px 14px;
+    border: 1px solid #6f6240;
+    border-radius: 20px;
+    background: #111;
+    color: #9b9176;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.language-btn.active {
+    background: #d4af37;
+    color: #111;
+    border-color: #d4af37;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.language-btn:not(.active):hover {
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.language-btn:active {
+    transform: scale(0.95);
+}
