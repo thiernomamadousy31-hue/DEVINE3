@@ -48,8 +48,9 @@ function generateRoomCode() {
 
 async function createOnlineGame() {
 
-    if (!currentUser) {
-        console.error("❌ Aucun joueur connecté.");
+    await cleanupOldOnlineRealtimeChannels();
+
+    if (!currentUser) {        console.error("❌ Aucun joueur connecté.");
         return;
     }
 
@@ -440,6 +441,111 @@ let history = [];
 let currentOnlineGame = null;
 let onlinePlayer1Secret = null;
 let onlinePlayer2Secret = null;
+// =========================================================
+// 🧹 NETTOYAGE DES ANCIENS CANAUX REALTIME DES PARTIES
+// =========================================================
+
+async function cleanupOldOnlineRealtimeChannels() {
+
+    console.log("🧹 NETTOYAGE DES ANCIENS CANAUX REALTIME");
+
+    const channels = supabaseClient.getChannels();
+
+    for (const channel of channels) {
+
+        const topic = channel.topic || "";
+
+        if (
+            topic.startsWith("realtime:online-game-") ||
+            topic.startsWith("realtime:online-secrets-") ||
+            topic.startsWith("realtime:online-chat-") ||
+            topic === "realtime:online-guesses-history" 
+        ) {
+
+            console.log(
+                "🗑️ SUPPRESSION ANCIEN CANAL :",
+                topic
+            );
+
+            await supabaseClient.removeChannel(channel);
+        }
+    }
+
+    console.log("✅ ANCIENS CANAUX REALTIME NETTOYÉS");
+}
+function resetOnlineGameState() {
+
+    console.log("🧹 NETTOYAGE DE L'ANCIENNE PARTIE EN LIGNE");
+        // 🧹 Nettoyer l'affichage de l'ancienne partie
+    const onlineGameMessage =
+        document.getElementById("onlineGameMessage");
+
+    if (onlineGameMessage) {
+        onlineGameMessage.textContent = "";
+        onlineGameMessage.className = "message";
+    }
+
+    const onlineMyHistory =
+        document.getElementById("onlineMyHistory");
+
+    const onlineOpponentHistory =
+        document.getElementById("onlineOpponentHistory");
+
+    if (onlineMyHistory) {
+        onlineMyHistory.innerHTML = "";
+    }
+
+    if (onlineOpponentHistory) {
+        onlineOpponentHistory.innerHTML = "";
+    }
+
+    // Ancienne partie
+    currentOnlineGame = null;
+    const joinRoomInput =
+    document.getElementById("joinRoomCode");
+
+if (joinRoomInput) {
+    joinRoomInput.value = "";
+}
+    // =========================================================
+
+    // Anciens secrets
+    onlinePlayer1Secret = null;
+    onlinePlayer2Secret = null;
+
+    // Arrêter le chrono
+    if (onlineTurnTimer) {
+        clearInterval(onlineTurnTimer);
+        onlineTurnTimer = null;
+    }
+
+    onlineTurnSeconds = 15;
+
+    // Réinitialiser l'écran de saisie du secret
+    const secretInput =
+        document.getElementById("onlineSecretInput");
+
+    const secretStatus =
+        document.getElementById("onlineSecretStatus");
+
+    const secretButton =
+        document.getElementById("onlineSecretBtn");
+
+    if (secretInput) {
+        secretInput.value = "";
+        secretInput.disabled = false;
+    }
+
+    if (secretStatus) {
+        secretStatus.textContent = "";
+    }
+
+    if (secretButton) {
+        secretButton.disabled = false;
+    }
+
+    console.log("✅ ÉTAT EN LIGNE RÉINITIALISÉ");
+}
 
 
 /* =========================================================
@@ -684,7 +790,28 @@ function initAudio() {
         audioContext.resume();
     }
 }
+/* =========================================================
+   REPRISE AUDIO APRÈS RETOUR SUR LA PAGE
+   ========================================================= */
 
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (
+            document.visibilityState === "visible" &&
+            audioContext &&
+            audioContext.state === "suspended"
+        ) {
+
+            console.log(
+                "🔊 REPRISE AUDIO APRÈS RETOUR SUR LA PAGE"
+            );
+
+            audioContext.resume();
+        }
+    }
+);
 
 /* =========================================================
    SONS
@@ -849,64 +976,17 @@ function playWinSound() {
         return;
     }
 
-    const notes = [660, 880, 1100];
+    const now = audioContext.currentTime;
 
-    notes.forEach((frequency, index) => {
+    // 🏆 FANFARE DE VICTOIRE
+    const notes = [
+        { frequency: 523.25, time: 0.00 },
+        { frequency: 659.25, time: 0.12 },
+        { frequency: 783.99, time: 0.24 },
+        { frequency: 1046.50, time: 0.38 }
+    ];
 
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-        oscillator.type = "triangle";
-
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-
-        const startTime =
-            audioContext.currentTime + index * 0.12;
-
-        oscillator.frequency.setValueAtTime(
-            frequency,
-            startTime
-        );
-
-        gain.gain.setValueAtTime(
-            0.0001,
-            startTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.35,
-            startTime + 0.01
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.0001,
-            startTime + 0.28
-        );
-
-        oscillator.start(startTime);
-
-        oscillator.stop(startTime + 0.28);
-    });
-}
-function playLossSound() {
-
-    if (!soundEnabled) {
-        return;
-    }
-
-    initAudio();
-
-    if (!audioContext) {
-        return;
-    }
-
-    const notes = [440, 330, 220];
-
-    notes.forEach((frequency, index) => {
+    notes.forEach(note => {
 
         const oscillator =
             audioContext.createOscillator();
@@ -920,10 +1000,10 @@ function playLossSound() {
         gain.connect(audioContext.destination);
 
         const startTime =
-            audioContext.currentTime + index * 0.16;
+            now + note.time;
 
         oscillator.frequency.setValueAtTime(
-            frequency,
+            note.frequency,
             startTime
         );
 
@@ -933,7 +1013,7 @@ function playLossSound() {
         );
 
         gain.gain.exponentialRampToValueAtTime(
-            0.85,
+            0.30,
             startTime + 0.01
         );
 
@@ -945,6 +1025,137 @@ function playLossSound() {
         oscillator.start(startTime);
         oscillator.stop(startTime + 0.32);
     });
+
+    // ✨ NOTE FINALE BRILLANTE
+    const finalOscillator =
+        audioContext.createOscillator();
+
+    const finalGain =
+        audioContext.createGain();
+
+    finalOscillator.type = "sine";
+
+    finalOscillator.connect(finalGain);
+    finalGain.connect(audioContext.destination);
+
+    finalOscillator.frequency.setValueAtTime(
+        1567.98,
+        now + 0.38
+    );
+
+    finalGain.gain.setValueAtTime(
+        0.0001,
+        now + 0.38
+    );
+
+    finalGain.gain.exponentialRampToValueAtTime(
+        0.18,
+        now + 0.40
+    );
+
+    finalGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.75
+    );
+
+    finalOscillator.start(now + 0.38);
+    finalOscillator.stop(now + 0.75);
+}
+function playLossSound() {
+    console.log("🔴 SON DE DÉFAITE DÉCLENCHÉ");
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    initAudio();
+
+    if (!audioContext) {
+        return;
+    }
+
+    const now = audioContext.currentTime;
+
+    // ❌ SON DE DÉFAITE
+    const notes = [
+        { frequency: 392.00, time: 0.00 },
+        { frequency: 329.63, time: 0.18 },
+        { frequency: 261.63, time: 0.36 }
+    ];
+
+    notes.forEach(note => {
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        oscillator.type = "triangle";
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        const startTime =
+            now + note.time;
+
+        oscillator.frequency.setValueAtTime(
+            note.frequency,
+            startTime
+        );
+
+        gain.gain.setValueAtTime(
+            0.0001,
+            startTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+    1.20,
+    startTime + 0.02
+);
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            startTime + 0.38
+        );
+
+        oscillator.start(startTime);
+        oscillator.stop(startTime + 0.38);
+    });
+
+    // 🔻 NOTE FINALE
+    const finalOscillator =
+        audioContext.createOscillator();
+
+    const finalGain =
+        audioContext.createGain();
+
+    finalOscillator.type = "sine";
+
+    finalOscillator.connect(finalGain);
+    finalGain.connect(audioContext.destination);
+
+    finalOscillator.frequency.setValueAtTime(
+        196.00,
+        now + 0.36
+    );
+
+    finalGain.gain.setValueAtTime(
+        0.0001,
+        now + 0.36
+    );
+
+    finalGain.gain.exponentialRampToValueAtTime(
+    0.40,
+    now + 0.39
+);
+
+    finalGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.85
+    );
+
+    finalOscillator.start(now + 0.36);
+    finalOscillator.stop(now + 0.85);
 }
 
 /* =========================================================
@@ -1298,37 +1509,55 @@ document.getElementById("onlineVerdictOpponentCode").textContent =
                 ? opponentHistory.innerHTML
                 : "";
     }
-    // 🏆 TITRE
-    document.getElementById("onlineVerdictTitle").textContent =
-        isWinner ? "🏆 VICTOIRE !" : "💥 DÉFAITE !";
-        if (isWinner) {
+    const isEnglish =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active");
+   // 🏆 TITRE
+document.getElementById("onlineVerdictTitle").textContent =
+    isEnglish
+        ? (isWinner ? "🏆 VICTORY!" : "💥 DEFEAT!")
+        : (isWinner ? "🏆 VICTOIRE !" : "💥 DÉFAITE !");
+
+if (isWinner) {
     playWinSound();
 } else {
     playLossSound();
 }
 
-    // 📝 SOUS-TITRE
-    document.getElementById("onlineVerdictSubtitle").textContent =
-        isWinner
+// 📝 SOUS-TITRE
+document.getElementById("onlineVerdictSubtitle").textContent =
+    isEnglish
+        ? (isWinner
+            ? "YOU FOUND THE CODE!"
+            : "YOUR OPPONENT FOUND THE CODE!")
+        : (isWinner
             ? "TU AS TROUVÉ LE CODE !"
-            : "TON ADVERSAIRE A TROUVÉ LE CODE !";
+            : "TON ADVERSAIRE A TROUVÉ LE CODE !");
 
-    // 💬 MESSAGE
-    document.getElementById("onlineVerdictMessage").textContent =
-        isWinner
+// 💬 MESSAGE
+document.getElementById("onlineVerdictMessage").textContent =
+    isEnglish
+        ? (isWinner
+            ? "Congratulations!"
+            : "Better luck next game!")
+        : (isWinner
             ? "Félicitations !"
-            : "La prochaine partie sera la bonne !";
+            : "La prochaine partie sera la bonne !");
 
-    // 👑 / 💥 ICÔNE
-    document.getElementById("onlineVerdictIcon").textContent =
-        isWinner ? "👑" : "💥";
+// 👑 / 💥 ICÔNE
+document.getElementById("onlineVerdictIcon").textContent =
+    isWinner ? "👑" : "💥";
 
-    // RÉSULTAT
-    document.getElementById("onlineVerdictMyResult").textContent =
-        isWinner ? "GAGNANT" : "PERDANT";
+// RÉSULTAT
+document.getElementById("onlineVerdictMyResult").textContent =
+    isEnglish
+        ? (isWinner ? "WINNER" : "LOSER")
+        : (isWinner ? "GAGNANT" : "PERDANT");
 
-    document.getElementById("onlineVerdictOpponentResult").textContent =
-        isWinner ? "PERDANT" : "GAGNANT";
+document.getElementById("onlineVerdictOpponentResult").textContent =
+    isEnglish
+        ? (isWinner ? "LOSER" : "WINNER")
+        : (isWinner ? "PERDANT" : "GAGNANT");
 // 📜 HISTORIQUE : fermé au début
 const verdictHistory =
     document.getElementById("onlineVerdictHistory");
@@ -1336,15 +1565,13 @@ const verdictHistory =
 if (verdictHistory) {
     verdictHistory.style.display = "none";
 }
-// 📜 OUVRIR / FERMER L'HISTORIQUE DU VERDICT
-const onlineVerdictHistoryBtn =
-    document.getElementById("onlineVerdictHistoryBtn");
+    // 📜 OUVRIR / FERMER L'HISTORIQUE DU VERDICT
+    const onlineVerdictHistoryBtn =
+        document.getElementById("onlineVerdictHistoryBtn");
 
-if (onlineVerdictHistoryBtn) {
+    if (onlineVerdictHistoryBtn) {
 
-    onlineVerdictHistoryBtn.addEventListener(
-        "click",
-        () => {
+        onlineVerdictHistoryBtn.onclick = () => {
 
             const history =
                 document.getElementById("onlineVerdictHistory");
@@ -1356,19 +1583,24 @@ if (onlineVerdictHistoryBtn) {
                 history.style.display = "block";
 
                 onlineVerdictHistoryBtn.textContent =
-                    "📕 FERMER L'HISTORIQUE";
+                    isEnglish
+                        ? "📕 CLOSE HISTORY"
+                        : "📕 FERMER L'HISTORIQUE";
 
             } else {
 
                 history.style.display = "none";
 
                 onlineVerdictHistoryBtn.textContent =
-                    "📜 HISTORIQUE";
+                    isEnglish
+                        ? "📜 HISTORY"
+                        : "📜 HISTORIQUE";
             }
-        }
-    );
-}
+        };
+    }
+
     // AFFICHER LE VERDICT
+
     document.getElementById("onlineVerdictOverlay").style.display =
         "flex";
 }
@@ -1495,14 +1727,19 @@ if (timerElement) {
             currentOnlineGame.current_turn === playerNumber
                 ? "🎮 C'EST VOTRE TOUR"
                 : "⏳ TOUR DE L'ADVERSAIRE";
-          if (
+   if (
     currentOnlineGame.current_turn === playerNumber &&
     onlinePlayer1Secret &&
     onlinePlayer2Secret
 ) {
 
     // 🎮 C'EST MON TOUR
-    document.getElementById("onlineGuessInput").disabled = false;
+    const onlineGuessInput =
+        document.getElementById("onlineGuessInput");
+
+    onlineGuessInput.value = "";
+    onlineGuessInput.disabled = false;
+
     document.getElementById("onlineGuessBtn").disabled = false;
 
     document.getElementById("onlineCurrentPlayer").textContent =
@@ -1511,7 +1748,6 @@ if (timerElement) {
     startOnlineTurnTimer();
 
 } else {
-
     // ⏳ TOUR DE L'ADVERSAIRE
     clearInterval(onlineTurnTimer);
 
@@ -1569,7 +1805,7 @@ function listenToOnlineSecrets(gameId) {
                 onlinePlayer1Secret = secretData.player1_secret;
                 onlinePlayer2Secret = secretData.player2_secret;
 
-               if (
+        if (
     secretData.player1_secret &&
     secretData.player2_secret
 ) {
@@ -1578,8 +1814,15 @@ function listenToOnlineSecrets(gameId) {
         "🎯 LES DEUX SECRETS SONT PRÊTS !"
     );
 
-    showScreen("onlineGameScreen");
+    // 🧹 Nouvelle partie : vider l'ancien code testé
+    const onlineGuessInput =
+        document.getElementById("onlineGuessInput");
 
+    if (onlineGuessInput) {
+        onlineGuessInput.value = "";
+    }
+
+    showScreen("onlineGameScreen");
     const playerNumber =
         currentOnlineGame.player1_id === currentUser.id
             ? 1
@@ -1823,7 +2066,42 @@ function showLevels() {
 
 function startSolo(level) {
 
-    currentLevel = level;
+    // 🎁 COMPTEUR DES PARTIES GRATUITES
+    let freeGames =
+        Number(localStorage.getItem("devine3_free_games")) || 0;
+
+    // 🔒 LIMITE DE 10 PARTIES GRATUITES
+   if (freeGames >= 10) {
+
+    const limitOverlay =
+        document.getElementById(
+            "freeGamesLimitOverlay"
+        );
+
+    if (limitOverlay) {
+        limitOverlay.style.display = "flex";
+    }
+
+    return;
+}
+    freeGames++;
+
+    localStorage.setItem(
+        "devine3_free_games",
+        freeGames
+    );
+    console.log(
+        "🎁 PARTIES GRATUITES UTILISÉES :",
+        freeGames,
+        "/ 10"
+    );
+    const freeGamesCounter =
+    document.getElementById("freeGamesCounter");
+
+if (freeGamesCounter) {
+    freeGamesCounter.textContent =
+        `🎁 Parties gratuites : ${freeGames} / 10`;
+}
 
     const config =
         levels[currentLevel];
@@ -2594,6 +2872,7 @@ function quitSolo() {
 function startTwoPlayers() {
 
     clearInterval(twoTimerInterval);
+    document.getElementById("continueTwoBtn").onclick = null;
 
 
     player1Secret = "";
@@ -2756,16 +3035,18 @@ function saveP2Secret() {
 
 
     document.getElementById(
-        "passTitle"
-    ).textContent =
-        "Passe le téléphone";
+    "passTitle"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Pass the phone"
+        : "Passe le téléphone";
 
-
-    document.getElementById(
-        "passMessage"
-    ).textContent =
-        "Le Joueur 1 doit maintenant prendre le téléphone.";
-
+document.getElementById(
+    "passMessage"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Player 1 must now take the phone."
+        : "Le Joueur 1 doit maintenant prendre le téléphone.";
 
     showScreen(
         "twoPassScreen"
@@ -2806,11 +3087,13 @@ function startTwoTurn(player) {
     twoGameOver = false;
 
 
-    document.getElementById(
-        "twoCurrentPlayer"
-    ).textContent =
-        `JOUEUR ${player}`;
-
+   document.getElementById(
+    "twoCurrentPlayer"
+).textContent =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active")
+        ? `PLAYER ${player}`
+        : `JOUEUR ${player}`;
 
     document.getElementById(
         "twoGuessInput"
@@ -3078,17 +3361,19 @@ function finishTwoPlayerTurn() {
             resultData;
 
 
-        document.getElementById(
-            "passTitle"
-        ).textContent =
-            "Passe le téléphone";
+       document.getElementById(
+    "passTitle"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Pass the phone"
+        : "Passe le téléphone";
 
-
-        document.getElementById(
-            "passMessage"
-        ).textContent =
-            "Le Joueur 2 peut maintenant prendre le téléphone.";
-
+document.getElementById(
+    "passMessage"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Player 2 can now take the phone."
+        : "Le Joueur 2 peut maintenant prendre le téléphone.";
 
         showScreen(
             "twoPassScreen"
@@ -3144,17 +3429,19 @@ function twoPlayerTimeout() {
             resultData;
 
 
-        document.getElementById(
-            "passTitle"
-        ).textContent =
-            "Temps écoulé";
+       document.getElementById(
+    "passTitle"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Pass the phone"
+        : "Passe le téléphone";
 
-
-        document.getElementById(
-            "passMessage"
-        ).textContent =
-            "Le Joueur 1 n'a pas trouvé le code. Passe le téléphone au Joueur 2.";
-
+document.getElementById(
+    "passMessage"
+).textContent =
+    enLanguageBtn.classList.contains("active")
+        ? "Player 1 must now take the phone."
+        : "Le Joueur 1 doit maintenant prendre le téléphone.";
 
         showScreen(
             "twoPassScreen"
@@ -3195,7 +3482,6 @@ function finishTwoPlayers() {
     let title =
         "Résultat du duel";
 
-
     let message =
         "";
 
@@ -3203,9 +3489,13 @@ function finishTwoPlayers() {
     const p1 =
         player1Result;
 
-
     const p2 =
         player2Result;
+
+
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
 
     if (p1.found && p2.found) {
@@ -3213,52 +3503,72 @@ function finishTwoPlayers() {
         if (p1.time < p2.time) {
 
             title =
-                "🏆 Joueur 1 gagne !";
+                isEnglish
+                    ? "🏆 Player 1 wins!"
+                    : "🏆 Joueur 1 gagne !";
 
         } else if (p2.time < p1.time) {
 
             title =
-                "🏆 Joueur 2 gagne !";
+                isEnglish
+                    ? "🏆 Player 2 wins!"
+                    : "🏆 Joueur 2 gagne !";
 
         } else {
 
             title =
-                "🤝 Égalité !";
+                isEnglish
+                    ? "🤝 Draw!"
+                    : "🤝 Égalité !";
         }
 
 
         message =
-            "Les deux joueurs ont trouvé le code.";
-    
+            isEnglish
+                ? "Both players found the code."
+                : "Les deux joueurs ont trouvé le code.";
+
 
     } else if (p1.found) {
 
         title =
-            "🏆 Joueur 1 gagne !";
+            isEnglish
+                ? "🏆 Player 1 wins!"
+                : "🏆 Joueur 1 gagne !";
 
 
         message =
-            "Le Joueur 1 a trouvé le code.";
-    
+            isEnglish
+                ? "Player 1 found the code."
+                : "Le Joueur 1 a trouvé le code.";
+
 
     } else if (p2.found) {
 
         title =
-            "🏆 Joueur 2 gagne !";
+            isEnglish
+                ? "🏆 Player 2 wins!"
+                : "🏆 Joueur 2 gagne !";
 
 
         message =
-            "Le Joueur 2 a trouvé le code.";
-    
+            isEnglish
+                ? "Player 2 found the code."
+                : "Le Joueur 2 a trouvé le code.";
+
 
     } else {
 
         title =
-            "🤝 Aucun gagnant";
+            isEnglish
+                ? "🤝 No winner"
+                : "🤝 Aucun gagnant";
 
 
         message =
-            "Aucun joueur n'a trouvé le code.";
+            isEnglish
+                ? "Neither player found the code."
+                : "Aucun joueur n'a trouvé le code.";
     }
 
 
@@ -3301,17 +3611,24 @@ function formatPlayerResult(result) {
         return "—";
     }
 
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
     if (!result.found) {
-
-        return "Temps écoulé";
+        return isEnglish
+            ? "Time expired"
+            : "Temps écoulé";
     }
-
 
     return (
         `${result.time}s • ` +
-        `${result.attempts} essai` +
-        (result.attempts > 1 ? "s" : "")
+        `${result.attempts} ` +
+        (
+            isEnglish
+                ? (result.attempts > 1 ? "attempts" : "attempt")
+                : (result.attempts > 1 ? "essais" : "essai")
+        )
     );
 }
 
@@ -3857,13 +4174,16 @@ document
         }
     );
 
-document
-    .getElementById("continueTwoBtn")
-    .addEventListener(
-        "click",
-        continueTwoPlayers
-    );
+document.getElementById("continueTwoBtn")
+    .addEventListener("click", event => {
+        const button = event.currentTarget;
 
+        if (button.onclick) {
+            return;
+        }
+
+        continueTwoPlayers();
+    });
 
 document
     .getElementById("twoPlayAgainBtn")
@@ -4023,26 +4343,102 @@ document.addEventListener(
 /* =========================================================
    BOUTONS DU VERDICT EN LIGNE
    ========================================================= */
+document.getElementById("quitOnlineGameBtn")
+    ?.addEventListener("click", () => {
 
+        showPopup(
+            "Quitter la partie ?",
+            "La partie en cours sera abandonnée.",
+            async () => {
+
+    const game = currentOnlineGame;
+
+    if (!game || !currentUser) {
+        resetOnlineGameState();
+
+        const overlay =
+            document.getElementById("onlineVerdictOverlay");
+
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+
+        showScreen("homeScreen");
+        playSound("click");
+        return;
+    }
+
+    const playerNumber =
+        game.player1_id === currentUser.id ? 1 : 2;
+
+    const opponentNumber =
+        playerNumber === 1 ? 2 : 1;
+
+    console.log(
+        "🚪 QUITTER LA PARTIE — GAGNANT : JOUEUR",
+        opponentNumber
+    );
+
+   const { data, error } =
+    await supabaseClient.rpc(
+        "quit_online_game",
+        {
+            p_game_id: game.id
+        }
+    );
+
+console.log(
+    "🚪 RÉSULTAT QUITTER :",
+    data,
+    error
+);
+    if (error) {
+        console.error(
+            "❌ ERREUR ENREGISTREMENT ABANDON :",
+            error
+        );
+        return;
+    }
+
+    resetOnlineGameState();
+
+    const overlay =
+        document.getElementById("onlineVerdictOverlay");
+
+    if (overlay) {
+        overlay.style.display = "none";
+    }
+
+    showScreen("homeScreen");
+
+    playSound("click");
+}
+        );
+
+    });
 document.getElementById("onlineVerdictReplayBtn")
     ?.addEventListener("click", () => {
 
         console.log("🔄 REJOUER : retour au lobby en ligne");
 
+        resetOnlineGameState();
+
         document.getElementById("onlineVerdictOverlay").style.display = "none";
 
         showScreen("onlineScreen");
     });
-    document.getElementById("onlineVerdictHomeBtn")
+
+document.getElementById("onlineVerdictHomeBtn")
     ?.addEventListener("click", () => {
 
         console.log("🏠 RETOUR AU MENU DEPUIS LE VERDICT");
 
+        resetOnlineGameState();
+
         document.getElementById("onlineVerdictOverlay").style.display = "none";
 
         showScreen("homeScreen");
-    });
-    // =================================================
+    });    // =================================================
 // OUVERTURE D'UNE PARTIE VIA LIEN DE PARTAGE
 // =================================================
 
@@ -4120,7 +4516,856 @@ async function joinSharedRoom() {
     }
 }
 joinSharedRoom();
-    /* =========================================================
+/* =========================================================
+   DÉTECTION DE LA HAUTEUR VISIBLE — CLAVIER MOBILE
+   ========================================================= */
+
+if (window.visualViewport) {
+
+    function updateKeyboardState() {
+
+        const visibleHeight =
+            window.visualViewport.height;
+
+        const screenHeight =
+            window.innerHeight;
+
+        const keyboardOpen =
+            screenHeight - visibleHeight > 150;
+
+        document.body.classList.toggle(
+            "keyboard-open",
+            keyboardOpen
+        );
+
+        console.log(
+            "📱 HAUTEUR ÉCRAN :",
+            screenHeight,
+            "| HAUTEUR VISIBLE :",
+            Math.round(visibleHeight),
+            "| CLAVIER :",
+            keyboardOpen ? "OUVERT" : "FERMÉ"
+        );
+    }
+
+    window.visualViewport.addEventListener(
+        "resize",
+        updateKeyboardState
+    );
+
+    window.visualViewport.addEventListener(
+        "scroll",
+        updateKeyboardState
+    );
+
+    updateKeyboardState();
+}
+// ← RETOUR depuis l'écran des parties gratuites épuisées
+const closeFreeGamesLimitBtn =
+    document.getElementById(
+        "closeFreeGamesLimitBtn"
+    );
+
+if (closeFreeGamesLimitBtn) {
+
+    closeFreeGamesLimitBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "🟢 BOUTON RETOUR PARTIES GRATUITES CLIQUÉ"
+            );
+
+            document
+                .getElementById("freeGamesLimitOverlay")
+                .style.display = "none";
+
+            showScreen("levelsScreen");
+        }
+    );
+
+}
+// 🔓 BOUTON CONTINUER À JOUER — 1 000 FCFA
+const continuePaidGameBtn =
+    document.getElementById("continuePaidGameBtn");
+
+if (continuePaidGameBtn) {
+
+    continuePaidGameBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "💰 CONTINUER À JOUER — 1 000 FCFA CLIQUÉ"
+            );
+
+            document
+                .getElementById("freeGamesLimitOverlay")
+                .style.display = "none";
+
+            showScreen("paymentScreen");
+
+        }
+    );
+}
+// ← RETOUR depuis l'écran de paiement
+const backFromPaymentBtn =
+    document.getElementById("backFromPaymentBtn");
+
+if (backFromPaymentBtn) {
+
+    backFromPaymentBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "🟢 RETOUR DEPUIS L'ÉCRAN PAIEMENT"
+            );
+
+            document
+                .getElementById("paymentScreen")
+                .classList.remove("active");
+
+            document
+                .getElementById("freeGamesLimitOverlay")
+                .style.display = "flex";
+
+        }
+    );
+
+}
+// 💳 BOUTON CARTE BANCAIRE
+const cardPaymentBtn =
+    document.getElementById("cardPaymentBtn");
+
+if (cardPaymentBtn) {
+
+    cardPaymentBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "💳 PAIEMENT PAR CARTE CLIQUÉ"
+            );
+
+            document
+                .getElementById("paymentScreen")
+                .classList.remove("active");
+
+            document
+                .getElementById("cardPaymentScreen")
+                .classList.add("active");
+
+        }
+    );
+
+}
+// ← RETOUR depuis le paiement par carte
+const backFromCardPaymentBtn =
+    document.getElementById("backFromCardPaymentBtn");
+
+if (backFromCardPaymentBtn) {
+
+    backFromCardPaymentBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "🟢 RETOUR DEPUIS PAIEMENT PAR CARTE"
+            );
+
+            document
+                .getElementById("cardPaymentScreen")
+                .classList.remove("active");
+
+            document
+                .getElementById("paymentScreen")
+                .classList.add("active");
+
+        }
+    );
+
+}
+// 🌍 SÉLECTEUR DE LANGUE
+const frLanguageBtn =
+    document.getElementById("frLanguageBtn");
+
+const enLanguageBtn =
+    document.getElementById("enLanguageBtn");
+
+if (frLanguageBtn && enLanguageBtn) {
+
+    frLanguageBtn.addEventListener(
+        "click",
+        () => {
+            // 🏆 VERDICT DU DUEL EN LIGNE — FRANÇAIS
+
+document.getElementById("onlineVerdictSubtitle").textContent =
+    "TU AS TROUVÉ LE CODE !";
+
+document.getElementById("onlineVerdictMessage").textContent =
+    "Félicitations !";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.winner-code .verdict-code-label"
+).textContent =
+    "TON CODE";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.opponent-code .verdict-code-label"
+).textContent =
+    "CODE DE TON ADVERSAIRE";
+
+document.getElementById("onlineVerdictHistoryBtn").textContent =
+    "📜 HISTORIQUE";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-history-title"
+).textContent =
+    "🎯 TES ESSAIS";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-history-title"
+)[1].textContent =
+    "⚔️ ESSAIS DE L'ADVERSAIRE";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-summary-title"
+).textContent =
+    "RÉSUMÉ DE LA PARTIE";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-player strong"
+)[0].textContent =
+    "TOI";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-player strong"
+)[1].textContent =
+    "ADVERSAIRE";
+
+document.getElementById("onlineVerdictReplayBtn").textContent =
+    "🔄 REJOUER";
+
+document.getElementById("onlineVerdictHomeBtn").textContent =
+    "🏠 RETOUR AU MENU";
+
+            console.log("🇫🇷 LANGUE : FRANÇAIS");
+
+            frLanguageBtn.classList.add("active");
+            enLanguageBtn.classList.remove("active");
+                        // 🌐 ÉCRAN CRÉER UNE PARTIE — FRANÇAIS
+
+            document.querySelector(
+                "#createOnlineScreen .back-btn"
+            ).textContent =
+                "← Retour";
+
+            document.querySelector(
+                "#createOnlineScreen h2"
+            ).textContent =
+                "🎮 Créer une partie";
+
+            document.querySelector(
+                "#createOnlineScreen .two-instruction"
+            ).textContent =
+                "Crée une partie et invite ton adversaire.";
+
+            document.querySelector(
+                "#createOnlineScreen .room-code-label"
+            ).textContent =
+                "CODE DE LA PARTIE";
+
+            document.getElementById(
+                "shareOnlineGameBtn"
+            ).textContent =
+                "🔗 TRANSFÉRER LE LIEN";
+
+            document.querySelector(
+                "#createOnlineScreen .room-info"
+            ).textContent =
+                "Donne ce code à ton adversaire pour qu'il puisse rejoindre la partie.";
+
+            document.getElementById(
+                "cancelCreateOnlineBtn"
+            ).textContent =
+                "← Annuler";
+
+            // ⭐ ÉCRAN DES NIVEAUX — FRANÇAIS
+
+            document.querySelector("#levelsScreen h2").textContent =
+                "Choisis ton niveau";
+
+            document.querySelector("#levelsScreen .back-btn").textContent =
+                "← Retour";
+
+            document.querySelector(
+                '#levelsScreen [data-level="beginner"] strong'
+            ).textContent = "Débutant";
+
+            document.querySelector(
+                '#levelsScreen [data-level="beginner"] small'
+            ).textContent = "5 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="intermediate"] strong'
+            ).textContent = "Intermédiaire";
+
+            document.querySelector(
+                '#levelsScreen [data-level="intermediate"] small'
+            ).textContent = "4 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="pro"] strong'
+            ).textContent = "Pro";
+
+            document.querySelector(
+                '#levelsScreen [data-level="pro"] small'
+            ).textContent = "3 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="expert"] strong'
+            ).textContent = "Expert";
+
+            document.querySelector(
+                '#levelsScreen [data-level="expert"] small'
+            ).textContent = "2 minutes";
+
+
+            // 🏠 ÉCRAN D'ACCUEIL — FRANÇAIS
+
+            document.getElementById("soloBtn").textContent =
+                "🎯 SOLO";
+
+            document.getElementById("twoPlayersBtn").textContent =
+                "👥 2 JOUEURS — DUEL";
+
+            document.getElementById("onlineBtn").textContent =
+                "🌐 JOUER EN LIGNE";
+
+            document.getElementById("statisticsBtn").textContent =
+                "📊 STATISTIQUES";
+
+            document.getElementById("challengesBtn").textContent =
+                "🏆 DÉFIS";
+
+            document.getElementById("levelsBtn").textContent =
+                "⭐ NIVEAUX";
+
+            document.getElementById("rulesBtn").textContent =
+                "📖 RÈGLES";
+
+            document.querySelector(".tagline").textContent =
+                "Trouve le code. Bat le chrono.";
+
+            document.querySelector(".best-score-box span").textContent =
+                "🏆 Meilleur score";
+
+
+            // 👥 DUEL 2 JOUEURS — FRANÇAIS
+
+            document.querySelector(
+                "#twoGameScreen .two-turn-banner span"
+            ).textContent =
+                "JOUEUR 1";
+
+            document.querySelector(
+                "#twoGameScreen .timer-label"
+            ).textContent =
+                "TEMPS";
+
+            document.querySelector(
+                "#twoGameScreen .game-title h2"
+            ).textContent =
+                "Trouve le code";
+
+            document.querySelector(
+                "#twoGameScreen .game-title p"
+            ).textContent =
+                "Les 3 chiffres sont différents.";
+
+            document.querySelector(
+                "#twoGameScreen .guess-btn"
+            ).textContent =
+                "DEVINER";
+
+            document.querySelector(
+                "#twoGameScreen .rules-mini span:nth-child(1)"
+            ).innerHTML =
+                '<b class="v-color">V</b> = bien placé';
+
+            document.querySelector(
+                "#twoGameScreen .rules-mini span:nth-child(2)"
+            ).innerHTML =
+                '<b class="x-color">X</b> = mal placé';
+
+            document.querySelector(
+                "#twoGameScreen .section-title"
+            ).textContent =
+                "Historique";
+
+            document.getElementById("quitTwoGameBtn").textContent =
+                "← Abandonner";
+
+
+            // 👥 DUEL 2 JOUEURS — CODES SECRETS — FRANÇAIS
+
+            document.querySelector(
+                "#twoP1SecretScreen .two-turn-banner"
+            ).textContent =
+                "👤 JOUEUR 1";
+
+            document.querySelector(
+                "#twoP1SecretScreen h2"
+            ).textContent =
+                "Choisis ton code secret";
+
+            document.querySelector(
+                "#twoP1SecretScreen .two-instruction"
+            ).textContent =
+                "Le joueur 2 devra deviner ton code.";
+
+            document.querySelector(
+                "#twoP1SecretScreen .guess-btn"
+            ).textContent =
+                "VALIDER";
+
+            document.getElementById("quitTwoFromP1").textContent =
+                "← Quitter";
+
+
+            document.querySelector(
+                "#twoP2SecretScreen .two-turn-banner"
+            ).textContent =
+                "👤 JOUEUR 2";
+
+            document.querySelector(
+                "#twoP2SecretScreen h2"
+            ).textContent =
+                "Choisis ton code secret";
+
+            document.querySelector(
+                "#twoP2SecretScreen .two-instruction"
+            ).textContent =
+                "Le joueur 1 devra deviner ton code.";
+
+            document.querySelector(
+                "#twoP2SecretScreen .guess-btn"
+            ).textContent =
+                "VALIDER";
+
+            document.getElementById("quitTwoFromP2").textContent =
+                "← Quitter";
+
+
+            // 🏆 ÉCRAN FINAL DU DUEL — FRANÇAIS
+
+            document.getElementById("twoPlayAgainBtn").textContent =
+                "🔄 Nouveau duel";
+
+            document.getElementById("twoHomeBtn").textContent =
+                "🏠 Accueil";
+
+            document.querySelector(
+                "#twoFinalScreen .player-result-card:nth-child(1) span"
+            ).textContent =
+                "👤 Joueur 1";
+
+            document.querySelector(
+                "#twoFinalScreen .player-result-card:nth-child(2) span"
+            ).textContent =
+                "👤 Joueur 2";
+
+
+            // 📱 ÉCRAN PASSE LE TÉLÉPHONE — FRANÇAIS
+
+            document.getElementById("continueTwoBtn").textContent =
+                "CONTINUER";
+
+            document.getElementById("quitTwoPassBtn").textContent =
+                "← Quitter";
+                // 🌐 DUEL EN LIGNE — FRANÇAIS
+
+document.getElementById("quitOnlineGameBtn").textContent =
+    "← Quitter";
+
+document.querySelector(
+    "#onlineGameScreen .timer-label"
+).textContent =
+    "TEMPS";
+
+document.querySelector(
+    "#onlineGameScreen .game-title h2"
+).textContent =
+    "Trouve le code";
+
+document.querySelector(
+    "#onlineGameScreen .game-title p"
+).textContent =
+    "Les 3 chiffres sont différents.";
+
+document.getElementById("onlineChatInput").placeholder =
+    "Écris un message...";
+
+document.getElementById("onlineChatSendBtn").textContent =
+    "ENVOYER";
+
+document.querySelector(
+    "#onlineGameScreen .online-history-title"
+).textContent =
+    "👤 TOI";
+
+document.querySelectorAll(
+    "#onlineGameScreen .online-history-title"
+)[1].textContent =
+    "👤 ADVERSAIRE";
+
+document.getElementById("onlineGuessInput").setAttribute(
+    "aria-label",
+    "Entre une proposition à trois chiffres"
+);
+
+document.getElementById("onlineGuessBtn").textContent =
+    "DEVINER";
+
+document.querySelector(
+    "#onlineGameScreen .rules-mini span:nth-child(1)"
+).innerHTML =
+    '<b class="v-color">V</b> = bien placé';
+
+document.querySelector(
+    "#onlineGameScreen .rules-mini span:nth-child(2)"
+).innerHTML =
+    '<b class="x-color">X</b> = mal placé';
+
+document.querySelector(
+    "#onlineGameScreen .section-title"
+).textContent =
+    "Historique";
+
+        }
+    );
+
+
+    enLanguageBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log("🇬🇧 LANGUE : ANGLAIS");
+
+            enLanguageBtn.classList.add("active");
+            frLanguageBtn.classList.remove("active");
+
+
+            // ⭐ LEVELS SCREEN — ENGLISH
+
+            document.querySelector("#levelsScreen h2").textContent =
+                "Choose your level";
+
+            document.querySelector("#levelsScreen .back-btn").textContent =
+                "← Back";
+
+            document.querySelector(
+                '#levelsScreen [data-level="beginner"] strong'
+            ).textContent = "Beginner";
+
+            document.querySelector(
+                '#levelsScreen [data-level="beginner"] small'
+            ).textContent = "5 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="intermediate"] strong'
+            ).textContent = "Intermediate";
+
+            document.querySelector(
+                '#levelsScreen [data-level="intermediate"] small'
+            ).textContent = "4 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="pro"] strong'
+            ).textContent = "Pro";
+
+            document.querySelector(
+                '#levelsScreen [data-level="pro"] small'
+            ).textContent = "3 minutes";
+
+            document.querySelector(
+                '#levelsScreen [data-level="expert"] strong'
+            ).textContent = "Expert";
+
+            document.querySelector(
+                '#levelsScreen [data-level="expert"] small'
+            ).textContent = "2 minutes";
+
+
+            // 🏠 HOME SCREEN — ENGLISH
+
+            document.getElementById("soloBtn").textContent =
+                "🎯 SOLO";
+
+            document.getElementById("twoPlayersBtn").textContent =
+                "👥 2 PLAYERS — DUEL";
+
+            document.getElementById("onlineBtn").textContent =
+                "🌐 PLAY ONLINE";
+
+            document.getElementById("statisticsBtn").textContent =
+                "📊 STATISTICS";
+
+            document.getElementById("challengesBtn").textContent =
+                "🏆 CHALLENGES";
+
+            document.getElementById("levelsBtn").textContent =
+                "⭐ LEVELS";
+
+            document.getElementById("rulesBtn").textContent =
+                "📖 RULES";
+
+            document.querySelector(".tagline").textContent =
+                "Find the code. Beat the clock.";
+
+            document.querySelector(".best-score-box span").textContent =
+                "🏆 Best score";
+
+
+            // 👥 2-PLAYER DUEL — ENGLISH
+
+            document.querySelector(
+                "#twoGameScreen .two-turn-banner span"
+            ).textContent =
+                "PLAYER 1";
+
+            document.querySelector(
+                "#twoGameScreen .timer-label"
+            ).textContent =
+                "TIME";
+
+            document.querySelector(
+                "#twoGameScreen .game-title h2"
+            ).textContent =
+                "Find the code";
+
+            document.querySelector(
+                "#twoGameScreen .game-title p"
+            ).textContent =
+                "The 3 digits are different.";
+
+            document.querySelector(
+                "#twoGameScreen .guess-btn"
+            ).textContent =
+                "GUESS";
+
+            document.querySelector(
+                "#twoGameScreen .rules-mini span:nth-child(1)"
+            ).innerHTML =
+                '<b class="v-color">V</b> = correct position';
+
+            document.querySelector(
+                "#twoGameScreen .rules-mini span:nth-child(2)"
+            ).innerHTML =
+                '<b class="x-color">X</b> = wrong position';
+
+            document.querySelector(
+                "#twoGameScreen .section-title"
+            ).textContent =
+                "History";
+
+            document.getElementById("quitTwoGameBtn").textContent =
+                "← Quit";
+
+
+            // 👥 2-PLAYER DUEL — SECRET CODE SCREENS — ENGLISH
+
+            document.querySelector(
+                "#twoP1SecretScreen .two-turn-banner"
+            ).textContent =
+                "👤 PLAYER 1";
+
+            document.querySelector(
+                "#twoP1SecretScreen h2"
+            ).textContent =
+                "Choose your secret code";
+
+            document.querySelector(
+                "#twoP1SecretScreen .two-instruction"
+            ).textContent =
+                "Player 2 will have to guess your code.";
+
+            document.querySelector(
+                "#twoP1SecretScreen .guess-btn"
+            ).textContent =
+                "CONFIRM";
+
+            document.getElementById("quitTwoFromP1").textContent =
+                "← Quit";
+
+
+            document.querySelector(
+                "#twoP2SecretScreen .two-turn-banner"
+            ).textContent =
+                "👤 PLAYER 2";
+
+            document.querySelector(
+                "#twoP2SecretScreen h2"
+            ).textContent =
+                "Choose your secret code";
+
+            document.querySelector(
+                "#twoP2SecretScreen .two-instruction"
+            ).textContent =
+                "Player 1 will have to guess your code.";
+
+            document.querySelector(
+                "#twoP2SecretScreen .guess-btn"
+            ).textContent =
+                "CONFIRM";
+
+            document.getElementById("quitTwoFromP2").textContent =
+                "← Quit";
+
+
+            // 🏆 FINAL DUEL SCREEN — ENGLISH
+
+            document.getElementById("twoPlayAgainBtn").textContent =
+                "🔄 New duel";
+
+            document.getElementById("twoHomeBtn").textContent =
+                "🏠 Home";
+
+            document.querySelector(
+                "#twoFinalScreen .player-result-card:nth-child(1) span"
+            ).textContent =
+                "👤 Player 1";
+
+            document.querySelector(
+                "#twoFinalScreen .player-result-card:nth-child(2) span"
+            ).textContent =
+                "👤 Player 2";
+
+
+            // 📱 PASS THE PHONE SCREEN — ENGLISH
+
+            document.getElementById("continueTwoBtn").textContent =
+                "CONTINUE";
+
+            document.getElementById("quitTwoPassBtn").textContent =
+                "← Quit";
+                // 🌐 ONLINE DUEL — ENGLISH
+
+document.getElementById("quitOnlineGameBtn").textContent =
+    "← Quit";
+
+document.querySelector(
+    "#onlineGameScreen .timer-label"
+).textContent =
+    "TIME";
+
+document.querySelector(
+    "#onlineGameScreen .game-title h2"
+).textContent =
+    "Find the code";
+
+document.querySelector(
+    "#onlineGameScreen .game-title p"
+).textContent =
+    "The 3 digits are different.";
+
+document.getElementById("onlineChatInput").placeholder =
+    "Write a message...";
+
+document.getElementById("onlineChatSendBtn").textContent =
+    "SEND";
+
+document.querySelector(
+    "#onlineGameScreen .online-history-title"
+).textContent =
+    "👤 YOU";
+
+document.querySelectorAll(
+    "#onlineGameScreen .online-history-title"
+)[1].textContent =
+    "👤 OPPONENT";
+
+document.getElementById("onlineGuessInput").setAttribute(
+    "aria-label",
+    "Enter a three-digit guess"
+);
+
+document.getElementById("onlineGuessBtn").textContent =
+    "GUESS";
+
+document.querySelector(
+    "#onlineGameScreen .rules-mini span:nth-child(1)"
+).innerHTML =
+    '<b class="v-color">V</b> = correct position';
+
+document.querySelector(
+    "#onlineGameScreen .rules-mini span:nth-child(2)"
+).innerHTML =
+    '<b class="x-color">X</b> = wrong position';
+
+document.querySelector(
+    "#onlineGameScreen .section-title"
+).textContent =
+    "History";
+    // 🏆 VERDICT DU DUEL EN LIGNE — ENGLISH
+
+document.getElementById("onlineVerdictSubtitle").textContent =
+    "YOU FOUND THE CODE!";
+
+document.getElementById("onlineVerdictMessage").textContent =
+    "Congratulations!";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.winner-code .verdict-code-label"
+).textContent =
+    "YOUR CODE";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.opponent-code .verdict-code-label"
+).textContent =
+    "YOUR OPPONENT'S CODE";
+
+document.getElementById("onlineVerdictHistoryBtn").textContent =
+    "📜 HISTORY";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-history-title"
+).textContent =
+    "🎯 YOUR GUESSES";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-history-title"
+)[1].textContent =
+    "⚔️ OPPONENT'S GUESSES";
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-summary-title"
+).textContent =
+    "GAME SUMMARY";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-player strong"
+)[0].textContent =
+    "YOU";
+
+document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-player strong"
+)[1].textContent =
+    "OPPONENT";
+
+document.getElementById("onlineVerdictReplayBtn").textContent =
+    "🔄 PLAY AGAIN";
+
+document.getElementById("onlineVerdictHomeBtn").textContent =
+    "🏠 BACK TO MENU";
+
+        }
+    );
+
+}
+
+        /* =========================================================
    INITIALISATION
    ========================================================= */
 
