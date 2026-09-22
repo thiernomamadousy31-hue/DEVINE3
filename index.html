@@ -54,7 +54,25 @@
 
                 </div>
 
+<div class="language-selector">
 
+    <button
+        id="frLanguageBtn"
+        type="button"
+        class="language-btn active"
+    >
+        🇫🇷 FR
+    </button>
+
+    <button
+        id="enLanguageBtn"
+        type="button"
+        class="language-btn"
+    >
+        🇬🇧 EN
+    </button>
+
+</div>
                 <div class="home-menu">
 
                     <button
@@ -294,7 +312,12 @@
                         </span>
 
                     </div>
-
+<div
+    id="freeGamesCounter"
+    class="free-games-counter"
+>
+    🎁 Parties gratuites : 0 / 10
+</div>
                 </div>
 
 
@@ -1348,12 +1371,13 @@
             >
                 ------
             </div>
+
             <button
-    id="shareOnlineGameBtn"
-    type="button"
->
-    🔗 TRANSFÉRER LE LIEN
-</button>
+                id="shareOnlineGameBtn"
+                type="button"
+            >
+                🔗 TRANSFÉRER LE LIEN
+            </button>
 
             <p class="room-info">
                 Donne ce code à ton adversaire
@@ -1889,8 +1913,114 @@
             </div>
 
         </div>
+<!-- =================================================
+     ÉCRAN : PAIEMENT
+     ================================================= -->
 
+<section
+    id="paymentScreen"
+    class="screen"
+>
 
+    <div class="screen-container">
+        <button
+    id="backFromPaymentBtn"
+    class="back-btn"
+    type="button"
+>
+    ← Retour
+</button>
+
+       
+        <h2>💰 CONTINUER À JOUER</h2>
+
+        <p class="payment-price">
+            1 000 FCFA
+        </p>
+
+        <p class="payment-description">
+            Choisissez votre moyen de paiement.
+        </p>
+
+        <p class="payment-international">
+            🌍 Paiement disponible selon les moyens
+            proposés dans votre pays.
+        </p>
+
+        <div class="payment-methods">
+
+            <button
+                id="orangeMoneyBtn"
+                class="payment-method-btn"
+                type="button"
+            >
+                🟠 Orange Money
+            </button>
+
+            <button
+                id="waveBtn"
+                class="payment-method-btn"
+                type="button"
+            >
+                🟡 Wave
+            </button>
+
+            <button
+                id="cardPaymentBtn"
+                class="payment-method-btn"
+                type="button"
+            >
+                💳 Carte bancaire
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =================================================
+   <!-- =================================================
+     ÉCRAN : PAIEMENT PAR CARTE
+     ================================================= -->
+
+<section
+    id="cardPaymentScreen"
+    class="screen"
+>
+
+    <div class="screen-container">
+
+        <button
+            id="backFromCardPaymentBtn"
+            class="back-btn"
+            type="button"
+        >
+            ← Retour
+        </button>
+
+        <h2>💳 PAIEMENT PAR CARTE</h2>
+
+        <p class="payment-price">
+            1 000 FCFA
+        </p>
+
+       <p class="payment-description">
+    🔒 Paiement sécurisé
+</p>
+
+<p class="payment-international">
+    Vous serez redirigé vers une plateforme de paiement sécurisée
+    pour finaliser votre achat de 1 000 FCFA.
+</p>
+
+    </div>
+
+</section>
+<!-- =================================================
+     ÉCRAN : PAIEMENT
+     ================================================= -->
+
+<section
     </main>
 
 
@@ -1905,8 +2035,58 @@
 
 </script>
 
-<script src="./script.js?v=20260918"></script>
+<script src="./script.js?v=20260918" defer></script>
 <script>
 </script>
+<!-- =================================================
+     ÉCRAN : PARTIES GRATUITES ÉPUISÉES
+     ================================================= -->
+
+<div
+    id="freeGamesLimitOverlay"
+    class="free-games-limit-overlay"
+    style="display: none;"
+>
+
+    <div class="free-games-limit-box">
+
+        <div class="free-games-limit-icon">
+            🎁
+        </div>
+
+        <h2>
+            PARTIES GRATUITES ÉPUISÉES
+        </h2>
+
+        <p>
+            Vous avez utilisé vos
+            <strong>10 parties gratuites</strong>.
+        </p>
+
+        <p class="free-games-limit-offer">
+            Continuez à jouer pour seulement
+            <strong>1 000 FCFA</strong>.
+        </p>
+
+        <button
+            id="continuePaidGameBtn"
+            class="guess-btn"
+            type="button"
+        >
+            🔓 CONTINUER À JOUER — 1 000 FCFA
+        </button>
+
+        <button
+            id="closeFreeGamesLimitBtn"
+            class="back-btn"
+            type="button"
+        >
+            ← RETOUR
+        </button>
+
+    </div>
+
+</div>
+
 </body>
 </html>
