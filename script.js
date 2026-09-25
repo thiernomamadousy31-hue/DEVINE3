@@ -1725,8 +1725,12 @@ if (timerElement) {
 
         document.getElementById("onlineCurrentPlayer").textContent =
             currentOnlineGame.current_turn === playerNumber
-                ? "🎮 C'EST VOTRE TOUR"
-                : "⏳ TOUR DE L'ADVERSAIRE";
+                currentLanguage === "en"
+    ? "IT'S YOUR TURN"
+    : "C'EST VOTRE TOUR"
+                currentLanguage === "en"
+    ? "IT'S YOUR OPPONENT'S TURN"
+    : "C'EST LE TOUR DE L'ADVERSAIRE"
    if (
     currentOnlineGame.current_turn === playerNumber &&
     onlinePlayer1Secret &&
@@ -1743,8 +1747,9 @@ if (timerElement) {
     document.getElementById("onlineGuessBtn").disabled = false;
 
     document.getElementById("onlineCurrentPlayer").textContent =
-        "🎮 C'EST VOTRE TOUR";
-
+    currentLanguage === "en"
+        ? "🎮 IT'S YOUR TURN"
+        : "🎮 C'EST VOTRE TOUR";
     startOnlineTurnTimer();
 
 } else {
@@ -1755,8 +1760,9 @@ if (timerElement) {
     document.getElementById("onlineGuessBtn").disabled = true;
 
     document.getElementById("onlineCurrentPlayer").textContent =
-        "⏳ EN ATTENTE DU TOUR DE L'ADVERSAIRE…";
-
+    currentLanguage === "en"
+        ? "⏳ WAITING FOR YOUR OPPONENT'S TURN…"
+        : "⏳ EN ATTENTE DU TOUR DE L'ADVERSAIRE…";
 }
 
         if (!wasPlaying) {
@@ -1837,9 +1843,10 @@ function listenToOnlineSecrets(gameId) {
         document.getElementById("onlineGuessBtn").disabled = false;
 
         document.getElementById("onlineCurrentPlayer").textContent =
-            "🎮 C'EST VOTRE TOUR";
-
-        startOnlineTurnTimer();
+    currentLanguage === "en"
+        ? "🎮 IT'S YOUR TURN"
+        : "🎮 C'EST VOTRE TOUR";
+                startOnlineTurnTimer();
     }
 }
             }
@@ -2099,8 +2106,15 @@ function startSolo(level) {
     document.getElementById("freeGamesCounter");
 
 if (freeGamesCounter) {
+
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
+
     freeGamesCounter.textContent =
-        `🎁 Parties gratuites : ${freeGames} / 10`;
+        isEnglish
+            ? `🎁 Free games: ${freeGames} / 10`
+            : `🎁 Parties gratuites : ${freeGames} / 10`;
 }
 
     const config =
@@ -2122,11 +2136,22 @@ if (freeGamesCounter) {
     gameOver = false;
 
 
-    document.getElementById(
-        "currentLevelName"
-    ).textContent =
-        config.name;
+    const isEnglish =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active");
 
+document.getElementById(
+    "currentLevelName"
+).textContent =
+    isEnglish
+        ? (
+            currentLevel === "beginner"
+                ? "Beginner"
+                : currentLevel === "intermediate"
+                    ? "Intermediate"
+                    : config.name
+        )
+        : config.name;
 
     document.getElementById(
         "guessInput"
@@ -2150,6 +2175,57 @@ if (freeGamesCounter) {
 
 
     updateTimerUI();
+    document.getElementById(
+    "quitGameLabel"
+).textContent =
+    isEnglish
+        ? "← Quit"
+        : "← Quitter";
+        document.getElementById(
+    "timerLabel"
+).textContent =
+    isEnglish
+        ? "TIME"
+        : "TEMPS";
+        document.getElementById(
+    "gameTitleLabel"
+).textContent =
+    isEnglish
+        ? "Guess the code"
+        : "Devine le code";
+
+        document.getElementById(
+    "gameInstructionLabel"
+).textContent =
+    isEnglish
+        ? "Find the 3 different digits."
+        : "Trouve les 3 chiffres différents.";
+        document.getElementById(
+    "guessLabel"
+).textContent =
+    isEnglish
+        ? "GUESS"
+        : "DEVINER";
+        document.getElementById(
+    "wellPlacedLabel"
+).textContent =
+    isEnglish
+        ? "= well placed"
+        : "= bien placé";
+
+
+document.getElementById(
+    "wrongPlacedLabel"
+).textContent =
+    isEnglish
+        ? "= misplaced"
+        : "= mal placé";
+        document.getElementById(
+    "historyLabel"
+).textContent =
+    isEnglish
+        ? "History"
+        : "Historique";
 
 
     showScreen("gameScreen");
@@ -2300,11 +2376,16 @@ function submitSoloGuess() {
         input.value.trim();
 
 
-    if (!isValidCode(guess)) {
+   if (!isValidCode(guess)) {
 
-        message.textContent =
-            "⚠️ Entre exactement 3 chiffres différents.";
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
+    message.textContent =
+        isEnglish
+            ? "⚠️ Enter exactly 3 different digits."
+            : "⚠️ Entre exactement 3 chiffres différents.";
         message.className =
             "message error";
 
@@ -2459,6 +2540,9 @@ function winSoloGame() {
     clearInterval(timerInterval);
 
     gameOver = true;
+        const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
 
     const config =
@@ -2511,28 +2595,55 @@ function winSoloGame() {
     ).textContent = "🎉";
 
 
-    document.getElementById(
+       document.getElementById(
         "finalTitle"
     ).textContent =
-        "BRAVO !";
+        isEnglish
+            ? "CONGRATULATIONS!"
+            : "BRAVO !";     
 
 
-    document.getElementById(
+        document.getElementById(
         "finalMessage"
     ).textContent =
-        `Code trouvé en ${attempts} essai${attempts > 1 ? "s" : ""}.`;
-
+        isEnglish
+            ? `Code found in ${attempts} attempt${attempts > 1 ? "s" : ""}.`
+            : `Code trouvé en ${attempts} essai${attempts > 1 ? "s" : ""}.`;
 
     document.getElementById(
         "secret"
     ).textContent =
         secretNumber;
+        document.getElementById(
+    "secretLabel"
+).textContent =
+    isEnglish
+        ? "The code was"
+        : "Le code était";
 
 
     document.getElementById(
         "finalScore"
     ).textContent =
         score;
+        document.getElementById(
+    "scoreLabel"
+).textContent =
+    isEnglish
+        ? "Score"
+        : "Score";
+        document.getElementById(
+    "playAgainLabel"
+).textContent =
+    isEnglish
+        ? "🔄 Play Again"
+        : "🔄 Rejouer";
+        document.getElementById(
+    "finalHomeLabel"
+).textContent =
+    isEnglish
+        ? "🏠 Home"
+        : "🏠 Accueil";
 
 
     updateHome();
@@ -2563,6 +2674,9 @@ function loseSoloGame() {
     clearInterval(timerInterval);
 
     gameOver = true;
+        const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
 
     stats.games++;
@@ -2578,22 +2692,46 @@ function loseSoloGame() {
     ).textContent = "😔";
 
 
-    document.getElementById(
+       document.getElementById(
         "finalTitle"
     ).textContent =
-        "Temps écoulé !";
+        isEnglish
+            ? "TIME'S UP!"
+            : "Temps écoulé !";
 
-
-    document.getElementById(
+        document.getElementById(
         "finalMessage"
     ).textContent =
-        "Tu n'as pas trouvé le code à temps.";
-
+        isEnglish
+            ? "You didn't find the code in time."
+            : "Tu n'as pas trouvé le code à temps.";
 
     document.getElementById(
         "secret"
     ).textContent =
         secretNumber;
+        document.getElementById(
+    "secretLabel"
+).textContent =
+    isEnglish
+        ? "The code was"
+        : "Le code était";
+
+
+document.getElementById(
+    "playAgainLabel"
+).textContent =
+    isEnglish
+        ? "🔄 Play Again"
+        : "🔄 Rejouer";
+
+
+document.getElementById(
+    "finalHomeLabel"
+).textContent =
+    isEnglish
+        ? "🏠 Home"
+        : "🏠 Accueil";
 
 
     document.getElementById(
@@ -2782,8 +2920,13 @@ function updateStatisticsUI() {
 function resetStatistics() {
 
     showPopup(
-        "Réinitialiser ?",
-        "Toutes tes statistiques seront supprimées.",
+    currentLanguage === "en"
+        ? "Reset?"
+        : "Réinitialiser ?",
+
+    currentLanguage === "en"
+        ? "All your statistics will be deleted."
+        : "Toutes tes statistiques seront supprimées.",
         () => {
 
             stats = {
@@ -2838,6 +2981,10 @@ function updateHome() {
    QUITTER LE SOLO
    ========================================================= */
 
+/* =========================================================
+   QUITTER LE SOLO
+   ========================================================= */
+
 function quitSolo() {
 
     if (gameOver) {
@@ -2848,9 +2995,20 @@ function quitSolo() {
     }
 
 
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
+
+
     showPopup(
-        "Quitter la partie ?",
-        "Ta partie en cours sera abandonnée.",
+        isEnglish
+            ? "Quit the game?"
+            : "Quitter la partie ?",
+
+        isEnglish
+            ? "Your current game will be abandoned."
+            : "Ta partie en cours sera abandonnée.",
+
         () => {
 
             clearInterval(timerInterval);
@@ -2863,7 +3021,6 @@ function quitSolo() {
         }
     );
 }
-
 
 /* =========================================================
    MODE 2 JOUEURS
@@ -3264,8 +3421,9 @@ function submitTwoGuess() {
 
     if (!isValidCode(guess)) {
 
-        message.textContent =
-            "⚠️ Entre exactement 3 chiffres différents.";
+        const isEnglish =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active");
 
         message.className =
             "message error";
@@ -3640,8 +3798,13 @@ function formatPlayerResult(result) {
 function quitTwoPlayers() {
 
     showPopup(
-        "Quitter le duel ?",
-        "La partie en cours sera abandonnée.",
+    currentLanguage === "en"
+        ? "Quit the duel?"
+        : "Quitter le duel ?",
+
+    currentLanguage === "en"
+        ? "The current game will be abandoned."
+        : "La partie en cours sera abandonnée.",
         () => {
 
             clearInterval(
@@ -4347,8 +4510,13 @@ document.getElementById("quitOnlineGameBtn")
     ?.addEventListener("click", () => {
 
         showPopup(
-            "Quitter la partie ?",
-            "La partie en cours sera abandonnée.",
+    currentLanguage === "en"
+        ? "Quit the game?"
+        : "Quitter la partie ?",
+
+    currentLanguage === "en"
+        ? "The current game will be abandoned."
+        : "La partie en cours sera abandonnée.",
             async () => {
 
     const game = currentOnlineGame;
@@ -4686,6 +4854,7 @@ if (backFromCardPaymentBtn) {
     );
 
 }
+let currentLanguage = "fr";
 // 🌍 SÉLECTEUR DE LANGUE
 const frLanguageBtn =
     document.getElementById("frLanguageBtn");
@@ -4698,6 +4867,12 @@ if (frLanguageBtn && enLanguageBtn) {
     frLanguageBtn.addEventListener(
         "click",
         () => {
+            currentLanguage = "fr";
+            document.getElementById("popupConfirm").textContent =
+    "Confirmer";
+
+document.getElementById("popupCancel").textContent =
+    "Annuler";
             // 🏆 VERDICT DU DUEL EN LIGNE — FRANÇAIS
 
 document.getElementById("onlineVerdictSubtitle").textContent =
@@ -4860,6 +5035,66 @@ document.getElementById("onlineVerdictHomeBtn").textContent =
 
             document.querySelector(".best-score-box span").textContent =
                 "🏆 Meilleur score";
+                // 🎯 SOLO — FRANÇAIS
+
+document.getElementById(
+    "quitGameLabel"
+).textContent =
+    "← Quitter";
+
+document.getElementById(
+    "timerLabel"
+).textContent =
+    "TEMPS";
+
+document.getElementById(
+    "gameTitleLabel"
+).textContent =
+    "Devine le code";
+
+document.getElementById(
+    "gameInstructionLabel"
+).textContent =
+    "Trouve les 3 chiffres différents.";
+
+document.getElementById(
+    "guessLabel"
+).textContent =
+    "DEVINER";
+
+document.getElementById(
+    "wellPlacedLabel"
+).textContent =
+    "= bien placé";
+
+document.getElementById(
+    "wrongPlacedLabel"
+).textContent =
+    "= mal placé";
+
+document.getElementById(
+    "historyLabel"
+).textContent =
+    "Historique";
+    // 🎁 COMPTEUR DES PARTIES GRATUITES — FRANÇAIS
+
+const freeGamesCounter =
+    document.getElementById(
+        "freeGamesCounter"
+    );
+
+if (freeGamesCounter) {
+
+    const freeGames =
+        Number(
+            localStorage.getItem(
+                "devine3_free_games"
+            )
+        ) || 0;
+
+    freeGamesCounter.textContent =
+        `🎁 Parties gratuites : ${freeGames} / 10`;
+}
 
 
             // 👥 DUEL 2 JOUEURS — FRANÇAIS
@@ -5050,8 +5285,14 @@ document.querySelector(
     enLanguageBtn.addEventListener(
         "click",
         () => {
+            currentLanguage = "en";
 
             console.log("🇬🇧 LANGUE : ANGLAIS");
+            document.getElementById("popupConfirm").textContent =
+    "Confirm";
+
+document.getElementById("popupCancel").textContent =
+    "Cancel";
 
             enLanguageBtn.classList.add("active");
             frLanguageBtn.classList.remove("active");
@@ -5172,6 +5413,64 @@ document.querySelector(
 
             document.getElementById("quitTwoGameBtn").textContent =
                 "← Quit";
+                // 🎯 SOLO — ENGLISH
+
+document.getElementById(
+    "quitGameLabel"
+).textContent =
+    "← Quit";
+
+document.getElementById(
+    "timerLabel"
+).textContent =
+    "TIME";
+
+document.getElementById(
+    "gameTitleLabel"
+).textContent =
+    "Guess the code";
+
+document.getElementById(
+    "gameInstructionLabel"
+).textContent =
+    "Find the 3 different digits.";
+
+document.getElementById(
+    "guessLabel"
+).textContent =
+    "GUESS";
+
+document.getElementById(
+    "wellPlacedLabel"
+).textContent =
+    "= well placed";
+
+document.getElementById(
+    "wrongPlacedLabel"
+).textContent =
+    "= misplaced";
+
+document.getElementById(
+    "historyLabel"
+).textContent =
+    "History";
+    const freeGamesCounter =
+    document.getElementById(
+        "freeGamesCounter"
+    );
+
+if (freeGamesCounter) {
+
+    const freeGames =
+        Number(
+            localStorage.getItem(
+                "devine3_free_games"
+            )
+        ) || 0;
+
+    freeGamesCounter.textContent =
+        `🎁 Free games: ${freeGames} / 10`;
+}
 
 
             // 👥 2-PLAYER DUEL — SECRET CODE SCREENS — ENGLISH
