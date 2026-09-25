@@ -301,7 +301,7 @@
                         class="back-btn"
                         type="button"
                     >
-                        ← Quitter
+                        <span id="quitGameLabel">← Quitter</span>
                     </button>
 
 
@@ -323,10 +323,12 @@
 
                 <div class="timer-box">
 
-                    <span class="timer-label">
-                        TEMPS
+                    <span
+                       id="timerLabel"
+                       class="timer-label"
+>
+                            TEMPS
                     </span>
-
                     <strong id="timer">
                         05:00
                     </strong>
@@ -336,14 +338,12 @@
 
                 <div class="game-title">
 
-                    <h2>
-                        Devine le code
+                    <h2 id="gameTitleLabel">
+                         Devine le code
                     </h2>
-
-                    <p>
-                        Trouve les 3 chiffres différents.
+                    <p id="gameInstructionLabel">
+                            Trouve les 3 chiffres différents.
                     </p>
-
                 </div>
 
 
@@ -369,7 +369,7 @@
                         maxlength="3"
                         autocomplete="off"
                         placeholder="000"
-                        aria-label="Entre un code à trois chiffres"
+                        aria-label="Enter a three-digit code"
                     >
 
 
@@ -378,7 +378,7 @@
                         class="guess-btn"
                         type="submit"
                     >
-                        DEVINER
+                        <span id="guessLabel">DEVINER</span>
                     </button>
 
                 </form>
@@ -386,25 +386,27 @@
 
                 <div class="rules-mini">
 
-                    <span>
-                        <b class="v-color">V</b>
-                        = bien placé
-                    </span>
+    <span>
+        <b class="v-color">V</b>
+        <span id="wellPlacedLabel">= bien placé</span>
+    </span>
 
-                    <span>
-                        <b class="x-color">X</b>
-                        = mal placé
-                    </span>
+    <span>
+        <b class="x-color">X</b>
+        <span id="wrongPlacedLabel">= mal placé</span>
+    </span>
 
-                </div>
+</div>
 
 
                 <div class="history-section">
 
-                    <div class="section-title">
+                  <div
+                       id="historyLabel"
+                       class="section-title"
+>
                         Historique
-                    </div>
-
+                  </div>
 
                     <div
                         id="history"
@@ -910,8 +912,8 @@
 
                 <div class="secret-result">
 
-                    <span>
-                        Le code était
+                    <span id="secretLabel">
+                           Le code était
                     </span>
 
                     <strong id="secret">
@@ -923,10 +925,9 @@
 
                 <div class="score-result">
 
-                    <span>
-                        Score
-                    </span>
-
+                   <span id="scoreLabel">
+                              Score
+                   </span>
                     <strong id="finalScore">
                         0
                     </strong>
@@ -941,7 +942,7 @@
                         class="menu-btn primary-btn"
                         type="button"
                     >
-                        🔄 Rejouer
+                       <span id="playAgainLabel">🔄 Rejouer</span>
                     </button>
 
 
@@ -950,7 +951,7 @@
                         class="menu-btn"
                         type="button"
                     >
-                        🏠 Accueil
+                        <span id="finalHomeLabel">🏠 Accueil</span>
                     </button>
 
                 </div>
