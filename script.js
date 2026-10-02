@@ -2196,6 +2196,7 @@ function updateFreeGamesLimitPopup() {
 }
 function startSolo(level) {
    currentLevel = level;
+   console.log("🎯 NIVEAU CHOISI :", level, "| currentLevel :", currentLevel);
 
     // 🎁 COMPTEUR DES PARTIES GRATUITES
     let freeGames =
