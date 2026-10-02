@@ -3753,3 +3753,260 @@ body::after {
 .language-btn:active {
     transform: scale(0.95);
 }
+/* 🎨 ÉCLABOUSSURE MULTICOLORE AU CLIC */
+#closeFreeGamesLimitBtn {
+    position: relative;
+    overflow: hidden;
+}
+
+#closeFreeGamesLimitBtn::after {
+    content: "";
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    left: 50%;
+    top: 50%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(circle at 20% 30%, #ff3b30 0%, transparent 35%),
+        radial-gradient(circle at 80% 25%, #ffd60a 0%, transparent 35%),
+        radial-gradient(circle at 30% 80%, #30d158 0%, transparent 35%),
+        radial-gradient(circle at 75% 75%, #0a84ff 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, #bf5af2 0%, transparent 55%);
+
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+#closeFreeGamesLimitBtn.clicked::after {
+    animation: splashClick 0.22s ease-out;
+}
+
+@keyframes splashClick {
+
+    0% {
+        transform:
+            translate(-50%, -50%)
+            scale(0);
+        opacity: 0.95;
+    }
+
+    45% {
+        transform:
+            translate(-50%, -50%)
+            scale(3);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform:
+            translate(-50%, -50%)
+            scale(8);
+        opacity: 0;
+    }
+}
+/* 🎨 ÉCLABOUSSURE MULTICOLORE — BOUTONS INTERFACE PRINCIPALE */
+
+#homeScreen button {
+    position: relative;
+    overflow: hidden;
+}
+
+#homeScreen button::after {
+    content: "";
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    left: 50%;
+    top: 50%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(circle at 20% 30%, #ff3b30 0%, transparent 35%),
+        radial-gradient(circle at 80% 25%, #ffd60a 0%, transparent 35%),
+        radial-gradient(circle at 30% 80%, #30d158 0%, transparent 35%),
+        radial-gradient(circle at 75% 75%, #0a84ff 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, #bf5af2 0%, transparent 55%);
+
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+#homeScreen button.clicked::after {
+    animation: splashClickHome 0.22s ease-out;
+}
+
+@keyframes splashClickHome {
+
+    0% {
+        transform:
+            translate(-50%, -50%)
+            scale(0);
+        opacity: 0.95;
+    }
+
+    45% {
+        transform:
+            translate(-50%, -50%)
+            scale(3);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform:
+            translate(-50%, -50%)
+            scale(8);
+        opacity: 0;
+    }
+}
+/* 🎨 ÉCLABOUSSURE MULTICOLORE — CLIC GLOBAL */
+
+.click-splash {
+    position: fixed;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 99999;
+
+    background:
+        radial-gradient(circle at 20% 30%, #ff3b30 0%, transparent 35%),
+        radial-gradient(circle at 80% 25%, #ffd60a 0%, transparent 35%),
+        radial-gradient(circle at 30% 80%, #30d158 0%, transparent 35%),
+        radial-gradient(circle at 75% 75%, #0a84ff 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, #bf5af2 0%, transparent 55%);
+
+    transform: translate(-50%, -50%) scale(0);
+
+    opacity: 0.95;
+
+    animation: globalClickSplash 0.28s ease-out forwards;
+}
+
+@keyframes globalClickSplash {
+
+    0% {
+        transform:
+            translate(-50%, -50%)
+            scale(0);
+        opacity: 0.95;
+    }
+
+    35% {
+        transform:
+            translate(-50%, -50%)
+            scale(2.5);
+        opacity: 0.9;
+    }
+
+    100% {
+        transform:
+            translate(-50%, -50%)
+            scale(7);
+        opacity: 0;
+    }
+}
+.payment-logo {
+    width: 45%;
+    height: 90%;
+    object-fit: contain;
+    display: block;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+#orangeMoneyBtn,
+#waveBtn,
+#cardPaymentBtn {
+    height: 105px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.payment-label {
+    flex: 1;
+    text-align: right;
+    color: white;
+}
+
+#waveBtn .payment-label {
+    white-space: nowrap;
+}
+.payment-label {
+    margin-left: auto;
+    text-align: right;
+    color: white;
+}
+
+#orangeMoneyBtn .payment-label {
+    width: 100px;
+    line-height: 1.2;
+}
+
+#waveBtn .payment-label {
+    width: 100px;
+}
+#cardPaymentBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+#orangeMoneyBtn {
+    justify-content: flex-start;
+}
+
+#orangeMoneyBtn .payment-logo {
+
+    width: 55%;
+    height: 55%;
+    transform: translateX(+10px);
+
+}
+#orangeMoneyBtn .payment-logo {
+    width: 75%;
+    height: 75%;
+}
+#orangeMoneyBtn {
+    padding-left: 0;
+}
+#cardPaymentBtn {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+#cardPaymentBtn {
+    gap: 8px;
+}
+
+.card-payment-icon,
+.card-payment-label {
+    display: inline-flex;
+    align-items: center;
+}
+.card-payment-icon {
+    font-size: 80px;
+    flex-shrink: 0;
+}
+.card-payment-icon,
+.card-payment-label {
+    display: inline-flex;
+    align-items: center;
+}
