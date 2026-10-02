@@ -45,7 +45,8 @@ function generateRoomCode() {
 
     return code;
 }
-
+console.log("🟢 SCRIPT ACTUEL CHARGÉ");
+window.TEST_SCRIPT_DEVINE3 = "NOUVEAU SCRIPT";
 async function createOnlineGame() {
 
     await cleanupOldOnlineRealtimeChannels();
@@ -240,7 +241,9 @@ document
         ) {
 
             status.textContent =
-                "❌ Les 3 chiffres doivent être différents.";
+    currentLanguage === "en"
+        ? "❌ The 3 digits must be different."
+        : "❌ Les 3 chiffres doivent être différents.";
 
             return;
         }
@@ -248,7 +251,9 @@ document
         if (!currentUser) {
 
             status.textContent =
-                "❌ Joueur non connecté.";
+    currentLanguage === "en"
+        ? "❌ Player not connected."
+        : "❌ Joueur non connecté.";
 
             return;
         }
@@ -256,7 +261,9 @@ document
         if (!currentOnlineGame) {
 
             status.textContent =
-                "❌ Aucune partie en ligne active.";
+    currentLanguage === "en"
+        ? "❌ No active online game."
+        : "❌ Aucune partie en ligne active.";
 
             return;
         }
@@ -284,8 +291,9 @@ document
             );
 
             status.textContent =
-                "❌ Impossible d'enregistrer le secret.";
-
+    currentLanguage === "en"
+        ? "❌ Unable to save the secret."
+        : "❌ Impossible d'enregistrer le secret.";
             return;
         }
 
@@ -295,7 +303,9 @@ document
         );
 
         status.textContent =
-            "✅ Ton secret est enregistré. En attente de l'autre joueur...";
+    currentLanguage === "en"
+        ? "✅ Your secret is saved. Waiting for the other player..."
+        : "✅ Ton secret est enregistré. En attente de l'autre joueur...";
         input.value = "";    
         input.disabled = true;
 
@@ -964,6 +974,63 @@ function playCountdownSound() {
         startTime + 0.16
     );
 }
+function playOnlineTurnChangeSound() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    initAudio();
+
+    if (!audioContext) {
+        return;
+    }
+
+    const now = audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type = "triangle";
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    // 🔔 SON DE CHANGEMENT DE JOUEUR
+    oscillator.frequency.setValueAtTime(
+        660,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        990,
+        now + 0.12
+    );
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.75,
+        now + 0.01
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.45
+    );
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now + 0.45
+    );
+}
 function playWinSound() {
 
     if (!soundEnabled) {
@@ -1061,6 +1128,7 @@ function playWinSound() {
     finalOscillator.start(now + 0.38);
     finalOscillator.stop(now + 0.75);
 }
+
 function playLossSound() {
     console.log("🔴 SON DE DÉFAITE DÉCLENCHÉ");
 
@@ -1365,6 +1433,7 @@ async function startOnlineTurnTimer() {
     if (!timerElement) return;
 
     timerElement.textContent = "15";
+    playOnlineTurnChangeSound();
 
     onlineTurnTimer = setInterval(async () => {
 
@@ -1416,6 +1485,29 @@ timerElement.textContent =
 }
 
     }, 1000);
+}
+// 🎁 COMPTER UN DUEL EN LIGNE TERMINÉ
+
+function countCompletedOnlineGame() {
+
+    let onlineGames =
+        Number(
+            localStorage.getItem(
+                "devine3_online_games"
+            )
+        ) || 0;
+
+    onlineGames++;
+
+    localStorage.setItem(
+        "devine3_online_games",
+        onlineGames
+    );
+
+    console.log(
+        "🌐 DUELS EN LIGNE TERMINÉS :",
+        onlineGames
+    );
 }
 function showOnlineVerdict(winnerNumber) {
 
@@ -1621,8 +1713,7 @@ function listenToOnlineGame(gameId) {
                 table: "online_games",
                 filter: "id=eq." + gameId
             },
-            (payload) => {
-
+           async (payload) => {
     console.log(
         "🔵 CHANGEMENT REALTIME :",
         payload
@@ -1632,8 +1723,8 @@ function listenToOnlineGame(gameId) {
         currentOnlineGame &&
         currentOnlineGame.status === "playing";
 
-    currentOnlineGame = payload.new;
-loadOnlineHistory();
+   currentOnlineGame = payload.new;
+await loadOnlineHistory();
 
 if (
     payload.new.status === "finished"
@@ -1643,6 +1734,7 @@ if (
         "🏁 PARTIE TERMINÉE — GAGNANT :",
         payload.new.winner
     );
+    countCompletedOnlineGame();
 
     const playerNumber =
         currentOnlineGame.player1_id === currentUser.id
@@ -1671,7 +1763,9 @@ if (
         document
             .getElementById("onlineGameMessage")
             .textContent =
-                "💥 DÉFAITE !";
+    currentLanguage === "en"
+        ? "💥 DEFEAT!"
+        : "💥 DÉFAITE !";
     }
     showOnlineVerdict(payload.new.winner);
 
@@ -1835,19 +1929,30 @@ function listenToOnlineSecrets(gameId) {
             : 2;
 
     if (
-        currentOnlineGame.status === "playing" &&
-        currentOnlineGame.current_turn === playerNumber
-    ) {
+    currentOnlineGame.status === "playing" &&
+    currentOnlineGame.current_turn === playerNumber
+) {
 
-        document.getElementById("onlineGuessInput").disabled = false;
-        document.getElementById("onlineGuessBtn").disabled = false;
+    document.getElementById("onlineGuessInput").disabled = false;
+    document.getElementById("onlineGuessBtn").disabled = false;
 
-        document.getElementById("onlineCurrentPlayer").textContent =
+    document.getElementById("onlineCurrentPlayer").textContent =
     currentLanguage === "en"
         ? "🎮 IT'S YOUR TURN"
         : "🎮 C'EST VOTRE TOUR";
-                startOnlineTurnTimer();
-    }
+
+    startOnlineTurnTimer();
+
+} else {
+
+    document.getElementById("onlineGuessInput").disabled = true;
+    document.getElementById("onlineGuessBtn").disabled = true;
+
+    document.getElementById("onlineCurrentPlayer").textContent =
+    currentLanguage === "en"
+        ? "⏳ WAITING FOR YOUR OPPONENT'S TURN…"
+        : "⏳ EN ATTENTE DU TOUR DE L'ADVERSAIRE…";
+}
 }
             }
         )
@@ -2070,15 +2175,35 @@ function showLevels() {
     showScreen("levelsScreen");
 }
 
+// 🎁 CONTEXTE DU POPUP DE LIMITE
+let freeGamesLimitMode = null;
+// 🎁 MET À JOUR LE NOMBRE DE PARTIES DU POPUP
+function updateFreeGamesLimitPopup() {
 
+    const limitNumber =
+        freeGamesLimitMode === "solo" ? 15 : 10;
+
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
+
+    document.getElementById(
+        "freeGamesLimitText"
+    ).innerHTML =
+        isEnglish
+            ? `You have used your <strong>${limitNumber} free games</strong>.`
+            : `Vous avez utilisé vos <strong>${limitNumber} parties gratuites</strong>.`;
+}
 function startSolo(level) {
 
     // 🎁 COMPTEUR DES PARTIES GRATUITES
     let freeGames =
         Number(localStorage.getItem("devine3_free_games")) || 0;
 
-    // 🔒 LIMITE DE 10 PARTIES GRATUITES
-   if (freeGames >= 10) {
+    // 🔒 LIMITE DE 15 PARTIES GRATUITES
+   if (freeGames >= 15) {
+
+    freeGamesLimitMode = "solo";
 
     const limitOverlay =
         document.getElementById(
@@ -2086,22 +2211,14 @@ function startSolo(level) {
         );
 
     if (limitOverlay) {
+        updateFreeGamesLimitPopup();
+
         limitOverlay.style.display = "flex";
     }
 
     return;
 }
-    freeGames++;
-
-    localStorage.setItem(
-        "devine3_free_games",
-        freeGames
-    );
-    console.log(
-        "🎁 PARTIES GRATUITES UTILISÉES :",
-        freeGames,
-        "/ 10"
-    );
+   
     const freeGamesCounter =
     document.getElementById("freeGamesCounter");
 
@@ -2113,8 +2230,8 @@ if (freeGamesCounter) {
 
     freeGamesCounter.textContent =
         isEnglish
-            ? `🎁 Free games: ${freeGames} / 10`
-            : `🎁 Parties gratuites : ${freeGames} / 10`;
+            ? `🎁 Free games: ${freeGames} / 15`
+            : `🎁 Parties gratuites : ${freeGames} / 15`;
 }
 
     const config =
@@ -2444,14 +2561,23 @@ function submitSoloGuess() {
         "number-pop"
     );
 
-
+console.log("🎯 RESULTAT FINAL :", result);
     if (result.v === 3) {
 
-        winSoloGame();
+    console.log(
+        "🏆 AVANT winSoloGame() — gameOver =",
+        gameOver
+    );
 
-        return;
-    }
+    winSoloGame();
 
+    console.log(
+        "🏆 APRÈS winSoloGame() — gameOver =",
+        gameOver
+    );
+
+    return;
+}
 
     message.textContent =
         `${result.v}V — ${result.x}X`;
@@ -2529,7 +2655,29 @@ function addHistoryItem(
 /* =========================================================
    VICTOIRE SOLO
    ========================================================= */
+// 🎁 COMPTER UNE PARTIE SOLO TERMINÉE
 
+function countCompletedSoloGame() {
+
+    let freeGames =
+        Number(
+            localStorage.getItem(
+                "devine3_free_games"
+            )
+        ) || 0;
+
+    freeGames++;
+
+    localStorage.setItem(
+        "devine3_free_games",
+        freeGames
+    );
+
+    console.log(
+        "🎁 PARTIES SOLO TERMINÉES :",
+        freeGames
+    );
+}
 function winSoloGame() {
 
     if (gameOver) {
@@ -2540,6 +2688,9 @@ function winSoloGame() {
     clearInterval(timerInterval);
 
     gameOver = true;
+    console.log(
+    "🏆 winSoloGame() EXÉCUTÉ — gameOver passé à true"
+);
         const isEnglish =
         enLanguageBtn &&
         enLanguageBtn.classList.contains("active");
@@ -2652,12 +2803,23 @@ function winSoloGame() {
 
     updateChallengesUI();
 
+countCompletedSoloGame();
+   showScreen("finalScreen");
 
-    showScreen("finalScreen");
+console.log(
+    "🎉 ÉCRAN FINAL DEMANDÉ — finalScreen"
+);
 
+console.log(
+    "👀 finalScreen active =",
+    document
+        .getElementById("finalScreen")
+        ?.classList.contains("active")
+);
 
     playWinSound();
 }
+console.log("🏆 winSoloGame() EXECUTÉE");
 
 
 /* =========================================================
@@ -2742,10 +2904,11 @@ document.getElementById(
 
     updateHome();
 
-    updateStatisticsUI();
+updateStatisticsUI();
 
+countCompletedSoloGame();
 
-    showScreen("finalScreen");
+showScreen("finalScreen");
 
 
     playLossSound();
@@ -3873,13 +4036,35 @@ document
     .getElementById("createOnlineGameBtn")
     .addEventListener(
         "click",
-        async () => {
+       async () => {
 
-            showScreen(
-                "createOnlineScreen"
-            );
+    const onlineGames =
+        Number(
+            localStorage.getItem(
+                "devine3_online_games"
+            )
+        ) || 0;
 
-            const game = await createOnlineGame();
+    if (onlineGames >= 10) {
+        freeGamesLimitMode = "online";
+
+        console.log(
+            "🔒 LIMITE DE 10 DUELS EN LIGNE ATTEINTE"
+        );
+        updateFreeGamesLimitPopup();
+
+        document
+            .getElementById("freeGamesLimitOverlay")
+            .style.display = "flex";
+
+        return;
+    }
+
+    showScreen(
+        "createOnlineScreen"
+    );
+
+    const game = await createOnlineGame();
             console.log("🟢 GAME CRÉÉE :", game);
             console.log("🟣 ID DE LA SALLE :", game.id);
            listenToOnlineGame(game.id);
@@ -3924,7 +4109,29 @@ document
 
                 return;
             }
+            const onlineGames =
+    Number(
+        localStorage.getItem(
+            "devine3_online_games"
+        )
+    ) || 0;
 
+if (onlineGames >= 10) {
+
+    freeGamesLimitMode = "online";
+
+    console.log(
+        "🔒 LIMITE DE 10 DUELS EN LIGNE ATTEINTE"
+    );
+
+    updateFreeGamesLimitPopup();
+
+    document
+        .getElementById("freeGamesLimitOverlay")
+        .style.display = "flex";
+
+    return;
+}
             const game = await joinOnlineGame(roomCode);
 
 if (game) {
@@ -4320,10 +4527,11 @@ document
     console.log("🏆 VICTOIRE ! CODE TROUVÉ :", guess);
 
     document
-        .getElementById("onlineGameMessage")
-        .textContent =
-            `🏆 BRAVO ! Tu as trouvé le code ${guess} !`;
-
+    .getElementById("onlineGameMessage")
+    .textContent =
+        currentLanguage === "en"
+            ? `🏆 CONGRATULATIONS! You found the code ${guess}!`
+            : `🏆 BRAVO ! Tu as trouvé le code ${guess} !`;
     return;
 }
 
@@ -4739,16 +4947,27 @@ if (closeFreeGamesLimitBtn) {
     closeFreeGamesLimitBtn.addEventListener(
         "click",
         () => {
+           closeFreeGamesLimitBtn.classList.add("clicked");
 
-            console.log(
-                "🟢 BOUTON RETOUR PARTIES GRATUITES CLIQUÉ"
-            );
+setTimeout(() => {
 
-            document
-                .getElementById("freeGamesLimitOverlay")
-                .style.display = "none";
+    closeFreeGamesLimitBtn.classList.remove("clicked");
 
-            showScreen("levelsScreen");
+    console.log(
+        "🟢 BOUTON RETOUR PARTIES GRATUITES CLIQUÉ"
+    );
+
+    document
+        .getElementById("freeGamesLimitOverlay")
+        .style.display = "none";
+
+    showScreen(
+        freeGamesLimitMode === "online"
+            ? "onlineScreen"
+            : "levelsScreen"
+    );
+
+}, 220);
         }
     );
 
@@ -4771,7 +4990,7 @@ if (continuePaidGameBtn) {
                 .getElementById("freeGamesLimitOverlay")
                 .style.display = "none";
 
-            showScreen("paymentScreen");
+            showScreen("ageRangeScreen");
 
         }
     );
@@ -4794,9 +5013,7 @@ if (backFromPaymentBtn) {
                 .getElementById("paymentScreen")
                 .classList.remove("active");
 
-            document
-                .getElementById("freeGamesLimitOverlay")
-                .style.display = "flex";
+            showScreen("offerScreen");
 
         }
     );
@@ -4867,6 +5084,38 @@ if (frLanguageBtn && enLanguageBtn) {
     frLanguageBtn.addEventListener(
         "click",
         () => {
+            // 👤 TRANCHE D'ÂGE — FRANÇAIS
+
+document.getElementById(
+    "backFromAgeRangeBtn"
+).textContent =
+    "← Retour";
+
+document.getElementById(
+    "ageRangeScreenTitle"
+).textContent =
+    "👤 CHOISISSEZ VOTRE TRANCHE D’ÂGE";
+
+document.getElementById(
+    "ageRangeScreenDescription"
+).textContent =
+    "Sélectionnez votre tranche d’âge pour continuer.";
+
+document.getElementById(
+    "age10to24Btn"
+).textContent =
+    "10–24 ans";
+
+document.getElementById(
+    "age25to39Btn"
+).textContent =
+    "25–39 ans";
+
+document.getElementById(
+    "age40PlusBtn"
+).textContent =
+    "40 ans et +";
+        
             currentLanguage = "fr";
             document.getElementById("popupConfirm").textContent =
     "Confirmer";
@@ -4928,6 +5177,32 @@ document.getElementById("onlineVerdictHomeBtn").textContent =
             console.log("🇫🇷 LANGUE : FRANÇAIS");
 
             frLanguageBtn.classList.add("active");
+            // 🌐 MODE EN LIGNE — FRANÇAIS
+
+document.querySelector(
+    "#onlineScreen .back-btn"
+).textContent =
+    "← Retour";
+
+document.querySelector(
+    "#onlineScreen h2"
+).textContent =
+    "🌐 Mode en ligne";
+
+document.querySelector(
+    "#onlineScreen .two-instruction"
+).textContent =
+    "Joue contre un autre joueur, même à distance.";
+
+document.getElementById(
+    "createOnlineGameBtn"
+).textContent =
+    "🎮 CRÉER UNE PARTIE";
+
+document.getElementById(
+    "joinOnlineGameBtn"
+).textContent =
+    "🔗 REJOINDRE UNE PARTIE";
             enLanguageBtn.classList.remove("active");
                         // 🌐 ÉCRAN CRÉER UNE PARTIE — FRANÇAIS
 
@@ -4965,6 +5240,77 @@ document.getElementById("onlineVerdictHomeBtn").textContent =
                 "cancelCreateOnlineBtn"
             ).textContent =
                 "← Annuler";
+                // 🏆 DÉFIS — FRANÇAIS
+
+document.querySelector(
+    "#challengesScreen .back-btn"
+).textContent =
+    "← Retour";
+
+document.querySelector(
+    "#challengesScreen h2"
+).textContent =
+    "🏆 Défis";
+
+document.querySelector(
+    "#challengeFirstWin strong"
+).textContent =
+    "Première victoire";
+
+document.querySelector(
+    "#challengeFirstWin small"
+).textContent =
+    "Gagne ta première partie";
+
+document.querySelector(
+    "#challengeFiveWins strong"
+).textContent =
+    "5 victoires";
+
+document.querySelector(
+    "#challengeFiveWins small"
+).textContent =
+    "Remporte 5 parties";
+
+document.querySelector(
+    "#challengeTenWins strong"
+).textContent =
+    "10 victoires";
+
+document.querySelector(
+    "#challengeTenWins small"
+).textContent =
+    "Remporte 10 parties";
+
+document.querySelector(
+    "#challengeExpert strong"
+).textContent =
+    "Maître Expert";
+
+document.querySelector(
+    "#challengeExpert small"
+).textContent =
+    "Gagne une partie en Expert";
+
+document.querySelector(
+    "#challengeFast strong"
+).textContent =
+    "Éclair";
+
+document.querySelector(
+    "#challengeFast small"
+).textContent =
+    "Trouve le code très rapidement";
+
+document.querySelector(
+    "#challengeNoMoreTen strong"
+).textContent =
+    "Sans perdre de temps";
+
+document.querySelector(
+    "#challengeNoMoreTen small"
+).textContent =
+    "Gagne avec moins de 10 essais";
 
             // ⭐ ÉCRAN DES NIVEAUX — FRANÇAIS
 
@@ -5020,6 +5366,28 @@ document.getElementById("onlineVerdictHomeBtn").textContent =
 
             document.getElementById("statisticsBtn").textContent =
                 "📊 STATISTIQUES";
+                // 📊 STATISTIQUES — FRANÇAIS
+
+document.getElementById("statisticsTitle").textContent =
+    "📊 Statistiques";
+
+document.getElementById("statGamesLabel").textContent =
+    "Parties";
+
+document.getElementById("statWinsLabel").textContent =
+    "Victoires";
+
+document.getElementById("statLossesLabel").textContent =
+    "Défaites";
+
+document.getElementById("statAttemptsLabel").textContent =
+    "Essais";
+
+document.getElementById("statBestScoreLabel").textContent =
+    "Meilleur score";
+
+document.getElementById("resetStatsLabel").textContent =
+    "Réinitialiser les statistiques";
 
             document.getElementById("challengesBtn").textContent =
                 "🏆 DÉFIS";
@@ -5093,10 +5461,35 @@ if (freeGamesCounter) {
         ) || 0;
 
     freeGamesCounter.textContent =
-        `🎁 Parties gratuites : ${freeGames} / 10`;
+        `🎁 Parties gratuites : ${freeGames} / 15`;
 }
 
+// 🎁 POPUP PARTIES GRATUITES ÉPUISÉES — FRANÇAIS
 
+document.getElementById(
+    "freeGamesLimitTitle"
+).textContent =
+    "PARTIES GRATUITES ÉPUISÉES";
+
+const limitNumber =
+    freeGamesLimitMode === "solo" ? 15 : 10;
+
+document.getElementById(
+    "freeGamesLimitText"
+).innerHTML =
+    `Vous avez utilisé vos <strong>${limitNumber} parties gratuites</strong>.`;
+document.getElementById(
+    "freeGamesLimitOffer"
+).textContent =
+    "Choisissez votre offre pour continuer à jouer.";
+document.getElementById(
+    "continuePaidGameBtn"
+).textContent =
+    "🔓 CONTINUER À JOUER";
+document.getElementById(
+    "closeFreeGamesLimitBtn"
+).textContent =
+    "← RETOUR";
             // 👥 DUEL 2 JOUEURS — FRANÇAIS
 
             document.querySelector(
@@ -5277,14 +5670,125 @@ document.querySelector(
     "#onlineGameScreen .section-title"
 ).textContent =
     "Historique";
+    // 📖 RÈGLES DU JEU — FRANÇAIS
 
-        }
+document.getElementById("rulesTitle").textContent =
+    "📖 Règles du jeu";
+
+document.getElementById("ruleGoalTitle").textContent =
+    "🎯 Le but";
+
+document.getElementById("ruleGoalText").textContent =
+    "Le téléphone choisit secrètement un nombre composé de 3 chiffres différents.";
+
+document.getElementById("ruleObjectiveTitle").textContent =
+    "🔢 Ton objectif";
+
+document.getElementById("ruleObjectiveText").textContent =
+    "Tu dois trouver le code secret avant la fin du chronomètre.";
+
+document.getElementById("ruleVTitle").textContent =
+    "🟢 V — Bien placé";
+
+document.getElementById("ruleVText").textContent =
+    "Un chiffre est correct et se trouve exactement à la bonne position.";
+
+document.getElementById("ruleXTitle").textContent =
+    "🟠 X — Mal placé";
+
+document.getElementById("ruleXText").textContent =
+    "Un chiffre appartient au code secret, mais il n'est pas à la bonne position.";
+
+document.getElementById("ruleWarningTitle").textContent =
+    "⚠️ Attention";
+
+document.getElementById("ruleWarningText").textContent =
+    "Les 3 chiffres de ton code doivent toujours être différents.";
+
+document.getElementById("ruleScoreTitle").textContent =
+    "🏆 Le score";
+
+document.getElementById("ruleScoreText").textContent =
+    "Plus tu trouves rapidement le code avec peu d'essais, plus ton score est élevé.";
+// 💡 EXEMPLE DES RÈGLES — FRANÇAIS
+
+document.getElementById(
+    "ruleExampleTitle"
+).textContent =
+    "💡 Exemple";
+
+document.getElementById(
+    "ruleExampleText"
+).innerHTML =
+    "Code secret : <strong>527</strong><br>" +
+    "Ton essai : <strong>572</strong><br><br>" +
+    "🟢 <strong>5 → V</strong> : bon chiffre, bonne position.<br>" +
+    "🟠 <strong>7 → X</strong> : bon chiffre, mauvaise position.<br>" +
+    "🟠 <strong>2 → X</strong> : bon chiffre, mauvaise position.";
+    // 💰 ÉCRAN PAIEMENT — FRANÇAIS
+
+document.querySelector(
+    "#paymentScreen h2"
+).textContent =
+    "💰 CONTINUER À JOUER";
+
+document.querySelector(
+    "#paymentScreen .payment-description"
+).textContent =
+    "Choisissez votre moyen de paiement.";
+
+document.querySelector(
+    "#paymentScreen .payment-international"
+).textContent =
+    "🌍 Paiement disponible selon les moyens proposés dans votre pays.";
+    // 💳 BOUTONS PAIEMENT — FRANÇAIS
+
+document.getElementById(
+    "backFromPaymentBtn"
+).textContent =
+    "← Retour";
+
+document.querySelector(
+    "#cardPaymentBtn .card-payment-label"
+).textContent =
+    "Carte bancaire";        }
     );
 
 
     enLanguageBtn.addEventListener(
         "click",
         () => {
+            // 👤 AGE RANGE — ENGLISH
+
+document.getElementById(
+    "backFromAgeRangeBtn"
+).textContent =
+    "← Back";
+
+document.getElementById(
+    "ageRangeScreenTitle"
+).textContent =
+    "👤 CHOOSE YOUR AGE RANGE";
+
+document.getElementById(
+    "ageRangeScreenDescription"
+).textContent =
+    "Select your age range to continue.";
+
+document.getElementById(
+    "age10to24Btn"
+).textContent =
+    "10–24 years";
+
+document.getElementById(
+    "age25to39Btn"
+).textContent =
+    "25–39 years";
+
+document.getElementById(
+    "age40PlusBtn"
+).textContent =
+    "40 years and older";
             currentLanguage = "en";
 
             console.log("🇬🇧 LANGUE : ANGLAIS");
@@ -5296,8 +5800,167 @@ document.getElementById("popupCancel").textContent =
 
             enLanguageBtn.classList.add("active");
             frLanguageBtn.classList.remove("active");
+            // 🌐 MODE EN LIGNE — ANGLAIS
 
+document.querySelector(
+    "#onlineScreen .back-btn"
+).textContent =
+    "← Back";
 
+document.querySelector(
+    "#onlineScreen h2"
+).textContent =
+    "🌐 Online Mode";
+
+document.querySelector(
+    "#onlineScreen .two-instruction"
+).textContent =
+    "Play against another player, even from a distance.";
+
+document.getElementById(
+    "createOnlineGameBtn"
+).textContent =
+    "🎮 CREATE A GAME";
+
+document.getElementById(
+    "joinOnlineGameBtn"
+).textContent =
+    "🔗 JOIN A GAME";
+
+            // 🌐 CREATE GAME SCREEN — ENGLISH
+
+            document.querySelector(
+                "#createOnlineScreen .back-btn"
+            ).textContent =
+                "← Back";
+
+            document.querySelector(
+                "#createOnlineScreen h2"
+            ).textContent =
+                "🎮 Create a game";
+
+            document.querySelector(
+                "#createOnlineScreen .two-instruction"
+            ).textContent =
+                "Create a game and invite your opponent.";
+
+            document.querySelector(
+                "#createOnlineScreen .room-code-label"
+            ).textContent =
+                "GAME CODE";
+
+            document.getElementById(
+                "shareOnlineGameBtn"
+            ).textContent =
+                "🔗 TRANSFER LINK";
+
+            document.querySelector(
+                "#createOnlineScreen .room-info"
+            ).textContent =
+                "Give this code to your opponent so they can join the game.";
+
+            document.getElementById(
+                "cancelCreateOnlineBtn"
+            ).textContent =
+                "← Cancel";
+                // 🌐 ÉCRAN REJOINDRE UNE PARTIE — ANGLAIS
+
+document.querySelector(
+    "#joinOnlineScreen .back-btn"
+).textContent =
+    "← Back";
+
+document.querySelector(
+    "#joinOnlineScreen h2"
+).textContent =
+    "🔗 Join a game";
+
+document.querySelector(
+    "#joinOnlineScreen .two-instruction"
+).textContent =
+    "Enter the code given by your opponent.";
+
+document.querySelector(
+    "#joinOnlineScreen .room-code-label"
+).textContent =
+    "GAME CODE";
+
+document.getElementById(
+    "confirmJoinOnlineBtn"
+).textContent =
+    "🔗 JOIN";
+    // 🏆 DÉFIS — ANGLAIS
+
+document.querySelector(
+    "#challengesScreen .back-btn"
+).textContent =
+    "← Back";
+
+document.querySelector(
+    "#challengesScreen h2"
+).textContent =
+    "🏆 Challenges";
+    // 🏆 DÉFIS — TEXTES ANGLAIS
+
+document.querySelector(
+    "#challengeFirstWin strong"
+).textContent =
+    "First Victory";
+
+document.querySelector(
+    "#challengeFirstWin small"
+).textContent =
+    "Win your first game";
+
+document.querySelector(
+    "#challengeFiveWins strong"
+).textContent =
+    "5 Victories";
+
+document.querySelector(
+    "#challengeFiveWins small"
+).textContent =
+    "Win 5 games";
+
+document.querySelector(
+    "#challengeTenWins strong"
+).textContent =
+    "10 Victories";
+
+document.querySelector(
+    "#challengeTenWins small"
+).textContent =
+    "Win 10 games";
+
+document.querySelector(
+    "#challengeExpert strong"
+).textContent =
+    "Expert Master";
+
+document.querySelector(
+    "#challengeExpert small"
+).textContent =
+    "Win a game in Expert mode";
+
+document.querySelector(
+    "#challengeFast strong"
+).textContent =
+    "Lightning";
+
+document.querySelector(
+    "#challengeFast small"
+).textContent =
+    "Find the code very quickly";
+
+document.querySelector(
+    "#challengeNoMoreTen strong"
+).textContent =
+    "No Time to Waste";
+
+document.querySelector(
+    "#challengeNoMoreTen small"
+).textContent =
+    "Win with fewer than 10 attempts";
             // ⭐ LEVELS SCREEN — ENGLISH
 
             document.querySelector("#levelsScreen h2").textContent =
@@ -5352,6 +6015,28 @@ document.getElementById("popupCancel").textContent =
 
             document.getElementById("statisticsBtn").textContent =
                 "📊 STATISTICS";
+                // 📊 STATISTICS — ENGLISH
+
+document.getElementById("statisticsTitle").textContent =
+    "📊 Statistics";
+
+document.getElementById("statGamesLabel").textContent =
+    "Games";
+
+document.getElementById("statWinsLabel").textContent =
+    "Wins";
+
+document.getElementById("statLossesLabel").textContent =
+    "Losses";
+
+document.getElementById("statAttemptsLabel").textContent =
+    "Attempts";
+
+document.getElementById("statBestScoreLabel").textContent =
+    "Best score";
+
+document.getElementById("resetStatsLabel").textContent =
+    "Reset statistics";
 
             document.getElementById("challengesBtn").textContent =
                 "🏆 CHALLENGES";
@@ -5469,7 +6154,7 @@ if (freeGamesCounter) {
         ) || 0;
 
     freeGamesCounter.textContent =
-        `🎁 Free games: ${freeGames} / 10`;
+        `🎁 Free games: ${freeGames} / 15`;
 }
 
 
@@ -5607,6 +6292,34 @@ document.querySelector(
     "#onlineGameScreen .section-title"
 ).textContent =
     "History";
+    // 🌐 ÉCRAN CODE SECRET — ANGLAIS
+
+document.querySelector(
+    "#onlineSecretScreen .back-btn"
+).textContent =
+    "← Quit";
+
+document.querySelector(
+    "#onlineSecretScreen .game-title h2"
+).textContent =
+    "Prepare your duel";
+
+document.getElementById(
+    "onlineSecretMessage"
+).textContent =
+    "Enter your 3-digit secret code.";
+
+document.getElementById(
+    "onlineSecretInput"
+).setAttribute(
+    "aria-label",
+    "Enter your three-digit secret code"
+);
+
+document.getElementById(
+    "onlineSecretBtn"
+).textContent =
+    "VALIDATE MY SECRET";
     // 🏆 VERDICT DU DUEL EN LIGNE — ENGLISH
 
 document.getElementById("onlineVerdictSubtitle").textContent =
@@ -5658,12 +6371,841 @@ document.getElementById("onlineVerdictReplayBtn").textContent =
 
 document.getElementById("onlineVerdictHomeBtn").textContent =
     "🏠 BACK TO MENU";
+    // 🎁 FREE GAMES LIMIT POPUP — ENGLISH
+
+document.getElementById(
+    "freeGamesLimitTitle"
+).textContent =
+    "FREE GAMES USED UP";
+
+const limitNumber =
+    freeGamesLimitMode === "solo" ? 15 : 10;
+
+document.getElementById(
+    "freeGamesLimitText"
+).innerHTML =
+    `You have used your <strong>${limitNumber} free games</strong>.`;
+
+document.getElementById(
+    "freeGamesLimitOffer"
+).textContent =
+    "Choose your offer to continue playing.";
+document.getElementById(
+    "continuePaidGameBtn"
+).textContent =
+    "🔓 CONTINUE PLAYING";
+document.getElementById(
+    "closeFreeGamesLimitBtn"
+).textContent =
+    "← BACK";
+// 📖 RÈGLES DU JEU — ENGLISH
+
+document.getElementById(
+    "rulesTitle"
+).textContent =
+    "📖 Game Rules";
+
+document.getElementById(
+    "ruleGoalTitle"
+).textContent =
+    "🎯 The Goal";
+
+document.getElementById(
+    "ruleGoalText"
+).textContent =
+    "The phone secretly chooses a number made of 3 different digits.";
+
+document.getElementById(
+    "ruleObjectiveTitle"
+).textContent =
+    "🔢 Your Objective";
+
+document.getElementById(
+    "ruleObjectiveText"
+).textContent =
+    "You must find the secret code before the timer runs out.";
+
+document.getElementById(
+    "ruleVTitle"
+).textContent =
+    "🟢 V — Correct Position";
+
+document.getElementById(
+    "ruleVText"
+).textContent =
+    "A digit is correct and is in exactly the right position.";
+
+document.getElementById(
+    "ruleXTitle"
+).textContent =
+    "🟠 X — Wrong Position";
+
+document.getElementById(
+    "ruleXText"
+).textContent =
+    "A digit belongs to the secret code, but it is not in the right position.";
+
+document.getElementById(
+    "ruleWarningTitle"
+).textContent =
+    "⚠️ Attention";
+
+document.getElementById(
+    "ruleWarningText"
+).textContent =
+    "The 3 digits of your code must always be different.";
+
+document.getElementById(
+    "ruleScoreTitle"
+).textContent =
+    "🏆 The Score";
+
+document.getElementById(
+    "ruleScoreText"
+).textContent =
+    "The faster you find the code with fewer attempts, the higher your score.";
+    // 💡 EXEMPLE DES RÈGLES — ENGLISH
+
+document.getElementById(
+    "ruleExampleTitle"
+).textContent =
+    "💡 Example";
+
+document.getElementById(
+    "ruleExampleText"
+).innerHTML =
+    "Secret code: <strong>527</strong><br>" +
+    "Your guess: <strong>572</strong><br><br>" +
+    "🟢 <strong>5 → V</strong>: correct digit, correct position.<br>" +
+    "🟠 <strong>7 → X</strong>: correct digit, wrong position.<br>" +
+       "🟠 <strong>2 → X</strong>: correct digit, wrong position.";
+       // 💰 ÉCRAN PAIEMENT — ENGLISH
+
+document.querySelector(
+    "#paymentScreen h2"
+).textContent =
+    "💰 CONTINUE PLAYING";
+
+document.querySelector(
+    "#paymentScreen .payment-description"
+).textContent =
+    "Choose your payment method.";
+
+document.querySelector(
+    "#paymentScreen .payment-international"
+).textContent =
+    "🌍 Payment availability depends on the methods offered in your country.";
+// 💳 PAYMENT BUTTONS — ENGLISH
+
+document.getElementById(
+    "backFromPaymentBtn"
+).textContent =
+    "← Back";
+
+document.querySelector(
+    "#cardPaymentBtn .card-payment-label"
+).textContent =
+    "Bank card";        }
+    );
+
+} 
+    
+console.log(
+    "🔎 WIN SOLO À LA FIN DU SCRIPT :",
+    winSoloGame.toString().length,
+    winSoloGame.toString().includes("🏆 winSoloGame() EXECUTÉE")
+);
+// 🔒 TRANCHE D'ÂGE — CHOIX DÉFINITIF
+
+
+const backFromAgeRangeBtn =
+    document.getElementById("backFromAgeRangeBtn");
+
+
+async function selectAgeRange(ageRange) {
+
+    const savedAgeRange =
+        localStorage.getItem("devine3_age_range");
+
+    // 🔒 Si un âge est déjà enregistré,
+    // empêcher seulement le changement de tranche
+    if (savedAgeRange) {
+
+        if (savedAgeRange !== ageRange) {
+
+            console.log(
+                "🔒 TRANCHE D'ÂGE DÉJÀ ENREGISTRÉE :",
+                savedAgeRange
+            );
+
+            return;
+        }
+
+        console.log(
+            "🔓 TRANCHE D'ÂGE CONFIRMÉE :",
+            ageRange
+        );
+
+    } else {
+
+        // 💾 Premier choix : enregistrer définitivement l'âge
+        localStorage.setItem(
+            "devine3_age_range",
+            ageRange
+        );
+
+        console.log(
+            "🔒 TRANCHE D'ÂGE ENREGISTRÉE :",
+            ageRange
+        );
+    }
+
+    const country =
+        await detectPlayerCountry();
+
+    if (!country) {
+        return;
+    }
+
+    determinePlayerOffer();
+
+    showPlayerOffer();
+}
+// 👤 CLIC SUR LES TRANCHES D'ÂGE
+
+
+
+if (age10to24Btn) {
+
+    age10to24Btn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "👤 CLIC : 10–24 ans"
+            );
+
+            console.log("🟠 APPEL DE selectAgeRange");
+selectAgeRange("10-24");
 
         }
     );
 
 }
 
+
+if (age25to39Btn) {
+
+    age25to39Btn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "👤 CLIC : 25–39 ans"
+            );
+
+            selectAgeRange("25-39");
+
+        }
+    );
+
+}
+
+
+if (age40PlusBtn) {
+
+    age40PlusBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "👤 CLIC : 40 ans et +"
+            );
+
+            selectAgeRange("40-plus");
+
+        }
+    );
+
+}
+// 🌍 DÉTECTION DU PAYS DU JOUEUR
+
+async function detectPlayerCountry() {
+
+    try {
+
+        console.log(
+            "🌍 DÉTECTION DU PAYS EN COURS..."
+        );
+
+        const response =
+            await fetch(
+                "https://countries.dev/ip"
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Impossible de détecter le pays"
+            );
+        }
+
+        const data =
+            await response.json();
+
+        if (
+            !data.countryCode ||
+            !data.country ||
+            !data.country.name
+        ) {
+
+            throw new Error(
+                "Pays non détecté"
+            );
+        }
+
+        const countryCode =
+            data.countryCode.toUpperCase();
+
+        const countryName =
+            data.country.name;
+
+        localStorage.setItem(
+            "devine3_country_code",
+            countryCode
+        );
+
+        localStorage.setItem(
+            "devine3_country_name",
+            countryName
+        );
+
+        console.log(
+            "🌍 PAYS DÉTECTÉ :",
+            countryName,
+            "(" + countryCode + ")"
+        );
+
+        return {
+            code: countryCode,
+            name: countryName
+        };
+
+    } catch (error) {
+
+        console.error(
+            "❌ ERREUR DÉTECTION DU PAYS :",
+            error
+        );
+
+        return null;
+    }
+}
+// 💱 DEVISE D'AFFICHAGE SELON LE PAYS DU JOUEUR
+
+function getPlayerCurrency() {
+
+    const countryCode =
+        localStorage.getItem("devine3_country_code");
+
+    if (!countryCode) {
+
+        return {
+            code: "XOF",
+            symbol: "FCFA"
+        };
+    }
+
+    // 🌍 Pays africains : affichage en FCFA
+    const africanCountries = [
+
+        "DZ", "AO", "BJ", "BW", "BF", "BI",
+        "CM", "CV", "CF", "TD", "KM", "CG",
+        "CD", "CI", "DJ", "EG", "GQ", "ER",
+        "SZ", "ET", "GA", "GM", "GH", "GN",
+        "GW", "KE", "LS", "LR", "LY", "MG",
+        "MW", "ML", "MR", "MU", "MA", "MZ",
+        "NA", "NE", "NG", "RW", "ST", "SN",
+        "SC", "SL", "SO", "ZA", "SS", "SD",
+        "TZ", "TG", "TN", "UG", "ZM", "ZW"
+    ];
+
+    if (africanCountries.includes(countryCode)) {
+
+        return {
+            code: "XOF",
+            symbol: "FCFA"
+        };
+    }
+
+    const currencies = {
+
+        "FR": { code: "EUR", symbol: "€" },
+        "BE": { code: "EUR", symbol: "€" },
+        "DE": { code: "EUR", symbol: "€" },
+        "ES": { code: "EUR", symbol: "€" },
+        "IT": { code: "EUR", symbol: "€" },
+        "PT": { code: "EUR", symbol: "€" },
+        "NL": { code: "EUR", symbol: "€" },
+
+        "US": { code: "USD", symbol: "$" },
+
+        "GB": { code: "GBP", symbol: "£" },
+
+        "CA": { code: "CAD", symbol: "$" },
+
+        "CH": { code: "CHF", symbol: "CHF" },
+
+        "AU": { code: "AUD", symbol: "$" },
+
+        "JP": { code: "JPY", symbol: "¥" }
+    };
+
+    return currencies[countryCode] || {
+        code: "EUR",
+        symbol: "€"
+    };
+}
+// 💱 CONVERSION DU PRIX FCFA VERS LA DEVISE DU JOUEUR
+
+function convertFCFAToPlayerCurrency(
+    amountFCFA
+) {
+
+    const currency =
+        getPlayerCurrency();
+
+    const rates = {
+
+        XOF: 1,
+
+        EUR: 655.957,
+        USD: 580.60,
+        GBP: 768.34,
+        CAD: 407.55,
+        CHF: 695.09,
+        AUD: 403.54,
+        JPY: 3.675
+    };
+
+    const rate =
+        rates[currency.code] || 655.957;
+
+    const converted =
+        amountFCFA / rate;
+
+    return {
+        code: currency.code,
+        symbol: currency.symbol,
+        amount: converted
+    };
+}
+
+// 💰 DÉTERMINATION DE L'OFFRE SELON L'ÂGE ET LE PAYS
+
+function determinePlayerOffer() {
+
+    const ageRange =
+        localStorage.getItem("devine3_age_range");
+
+    const countryCode =
+        localStorage.getItem("devine3_country_code");
+
+    console.log(
+        "💰 DÉTERMINATION DE L'OFFRE..."
+    );
+
+    console.log(
+        "👤 TRANCHE D'ÂGE :",
+        ageRange
+    );
+
+    console.log(
+        "🌍 PAYS :",
+        countryCode
+    );
+
+    if (!ageRange || !countryCode) {
+
+        console.error(
+            "❌ INFORMATIONS INSUFFISANTES POUR DÉTERMINER L'OFFRE"
+        );
+
+        return null;
+    }
+
+    // 🌍 PAYS D'AFRIQUE
+    const africanCountries = [
+
+        "DZ", "AO", "BJ", "BW", "BF", "BI",
+        "CM", "CV", "CF", "TD", "KM", "CG",
+        "CD", "CI", "DJ", "EG", "GQ", "ER",
+        "SZ", "ET", "GA", "GM", "GH", "GN",
+        "GW", "KE", "LS", "LR", "LY", "MG",
+        "MW", "ML", "MR", "MU", "MA", "MZ",
+        "NA", "NE", "NG", "RW", "ST", "SN",
+        "SC", "SL", "SO", "ZA", "SS", "SD",
+        "TZ", "TG", "TN", "UG", "ZM", "ZW"
+    ];
+
+    const isAfrica =
+        africanCountries.includes(
+            countryCode
+        );
+
+    let offer;
+
+    // 👤 10–24 ANS
+    if (ageRange === "10-24") {
+
+        if (isAfrica) {
+
+            offer = {
+                type: "monthly_yearly",
+                monthlyPrice: 200,
+                yearlyPrice: 1000
+            };
+
+        } else {
+
+            offer = {
+                type: "yearly",
+                yearlyPrice: 1000
+            };
+        }
+
+    }
+
+    // 👤 25–39 ANS
+    else if (ageRange === "25-39") {
+
+        offer = {
+            type: "yearly",
+            yearlyPrice: 1000
+        };
+
+    }
+
+    // 👤 40 ANS ET +
+    else if (ageRange === "40-plus") {
+
+        offer = {
+            type: "yearly",
+            yearlyPrice: 1000
+        };
+
+    }
+
+    else {
+
+        console.error(
+            "❌ TRANCHE D'ÂGE INCONNUE :",
+            ageRange
+        );
+
+        return null;
+    }
+
+    // 💾 Enregistrer l'offre
+    localStorage.setItem(
+        "devine3_offer_type",
+        offer.type
+    );
+
+    localStorage.setItem(
+        "devine3_monthly_price",
+        offer.monthlyPrice || ""
+    );
+
+    localStorage.setItem(
+        "devine3_yearly_price",
+        offer.yearlyPrice
+    );
+
+    console.log(
+        "💰 OFFRE DÉTERMINÉE :",
+        offer
+    );
+
+    return offer;
+}
+// 💰 AFFICHAGE DE L'OFFRE DU JOUEUR
+
+function showPlayerOffer() {
+
+    const offerType =
+        localStorage.getItem("devine3_offer_type");
+
+    const monthlyPrice =
+        localStorage.getItem("devine3_monthly_price");
+
+    const yearlyPrice =
+        localStorage.getItem("devine3_yearly_price");
+        const monthlyDisplay =
+    monthlyPrice
+        ? convertFCFAToPlayerCurrency(
+            Number(monthlyPrice)
+        )
+        : null;
+
+const yearlyDisplay =
+    convertFCFAToPlayerCurrency(
+        Number(yearlyPrice)
+    );
+
+    if (!offerType || !yearlyPrice) {
+
+        console.error(
+            "❌ OFFRE IMPOSSIBLE À AFFICHER"
+        );
+
+        return;
+    }
+
+    const frLanguageBtn =
+        document.getElementById("frLanguageBtn");
+
+    const isFrench =
+        frLanguageBtn &&
+        frLanguageBtn.classList.contains("active");
+
+    const title =
+        document.getElementById("offerScreenTitle");
+
+    const description =
+        document.getElementById("offerScreenDescription");
+
+    const monthlyBtn =
+        document.getElementById("monthlyOfferBtn");
+
+    const yearlyBtn =
+        document.getElementById("yearlyOfferBtn");
+
+    if (isFrench) {
+
+        title.textContent =
+            "💰 CHOISISSEZ VOTRE OFFRE";
+
+        description.textContent =
+            "Choisissez votre formule pour continuer à jouer.";
+
+       monthlyBtn.innerHTML =
+    monthlyDisplay
+        ? `<span id="monthlyOfferPrice">${
+            monthlyDisplay.code === "XOF"
+                ? `${monthlyPrice} FCFA`
+                : `${monthlyDisplay.symbol}${monthlyDisplay.amount.toFixed(2)}`
+        } / mois</span>`
+        : "";
+
+yearlyBtn.innerHTML =
+    `<span id="yearlyOfferPrice">${
+        yearlyDisplay.code === "XOF"
+            ? `${yearlyPrice} FCFA`
+            : `${yearlyDisplay.symbol}${yearlyDisplay.amount.toFixed(2)}`
+    } / an</span>`;
+   } else {
+
+    title.textContent =
+        "💰 CHOOSE YOUR OFFER";
+
+    description.textContent =
+        "Choose your plan to continue playing.";
+
+    monthlyBtn.innerHTML =
+        monthlyDisplay
+            ? `<span id="monthlyOfferPrice">${
+                monthlyDisplay.code === "XOF"
+                    ? `${monthlyPrice} FCFA`
+                    : `${monthlyDisplay.symbol}${monthlyDisplay.amount.toFixed(2)}`
+            } / month</span>`
+            : "";
+
+    yearlyBtn.innerHTML =
+        `<span id="yearlyOfferPrice">${
+            yearlyDisplay.code === "XOF"
+                ? `${yearlyPrice} FCFA`
+                : `${yearlyDisplay.symbol}${yearlyDisplay.amount.toFixed(2)}`
+        } / year</span>`;
+}
+    // 👤 Si le joueur n'a pas droit au forfait mensuel
+    if (offerType === "yearly") {
+
+        monthlyBtn.style.display =
+            "none";
+
+    } else {
+
+        monthlyBtn.style.display =
+            "block";
+    }
+
+    showScreen("offerScreen");
+
+    console.log(
+        "💰 ÉCRAN D'OFFRE AFFICHÉ :",
+        offerType
+    );
+}
+
+if (age10to24Btn) {
+
+    age10to24Btn.addEventListener(
+        "click",
+        () => {
+            selectAgeRange("10-24");
+        }
+    );
+}
+
+
+if (age25to39Btn) {
+
+    age25to39Btn.addEventListener(
+        "click",
+        () => {
+            selectAgeRange("25-39");
+        }
+    );
+}
+
+
+if (age40PlusBtn) {
+
+    age40PlusBtn.addEventListener(
+        "click",
+        () => {
+            selectAgeRange("40-plus");
+        }
+    );
+}
+// 💰 CLIC SUR L'OFFRE MENSUELLE
+
+if (monthlyOfferBtn) {
+
+    monthlyOfferBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "💰 OFFRE MENSUELLE SÉLECTIONNÉE : 200 FCFA"
+            );
+            document
+                .getElementById("paymentPrice")
+                .textContent = "200 FCFA";
+
+            showScreen("paymentScreen");
+
+        }
+    );
+}
+// 💰 CLIC SUR L'OFFRE ANNUELLE
+
+if (yearlyOfferBtn) {
+
+    yearlyOfferBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "💰 OFFRE ANNUELLE SÉLECTIONNÉE : 1 000 FCFA"
+            );
+
+            document
+                .getElementById("paymentPrice")
+                .textContent = "1 000 FCFA";
+
+            showScreen("paymentScreen");
+
+        }
+    );
+}
+// ← RETOUR DEPUIS L'ÉCRAN DE CHOIX DE L'OFFRE
+
+const backFromOfferBtn =
+    document.getElementById("backFromOfferBtn");
+
+if (backFromOfferBtn) {
+
+    backFromOfferBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "🟢 RETOUR DEPUIS L'ÉCRAN D'OFFRE"
+            );
+
+            console.log(
+    "🟢 AVANT showScreen :",
+    document.querySelector(".screen.active")?.id
+);
+
+showScreen("ageRangeScreen");
+
+console.log(
+    "🟢 APRÈS showScreen :",
+    document.querySelector(".screen.active")?.id
+);
+
+        }
+    );
+}
+
+// ← RETOUR depuis la sélection de la tranche d'âge
+if (backFromAgeRangeBtn) {
+
+    backFromAgeRangeBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log(
+                "🟢 RETOUR DEPUIS LA TRANCHE D'ÂGE"
+            );
+
+            showScreen(
+                freeGamesLimitMode === "online"
+                    ? "onlineScreen"
+                    : "levelsScreen"
+            );
+
+        }
+    );
+}
+// 🎨 ÉCLABOUSSURE MULTICOLORE — CLIC SUR LES BOUTONS PRINCIPAUX
+
+document.addEventListener(
+    "click",
+    (event) => {
+
+        const button =
+            event.target.closest(
+                "#soloBtn, #twoPlayersBtn, #onlineBtn, #statisticsBtn, #challengesBtn, #levelsBtn, #rulesBtn, #soundBtn"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const splash =
+            document.createElement("div");
+
+        splash.className =
+            "click-splash";
+
+        splash.style.left =
+            `${event.clientX}px`;
+
+        splash.style.top =
+            `${event.clientY}px`;
+
+        document.body.appendChild(splash);
+
+        setTimeout(() => {
+            splash.remove();
+        }, 300);
+
+    }
+);
         /* =========================================================
    INITIALISATION
    ========================================================= */
