@@ -979,37 +979,37 @@
                 </button>
 
 
-                <h2>📊 Statistiques</h2>
+                <h2 id="statisticsTitle">📊 Statistiques</h2>
 
 
                 <div class="stats-grid">
 
                     <div class="stat-card">
-                        <span>Parties</span>
+                        <span id="statGamesLabel">Parties</span>
                         <strong id="statGames">0</strong>
                     </div>
 
 
                     <div class="stat-card">
-                        <span>Victoires</span>
+                        <span id="statWinsLabel">Victoires</span>
                         <strong id="statWins">0</strong>
                     </div>
 
 
                     <div class="stat-card">
-                        <span>Défaites</span>
+                        <span id="statLossesLabel">Défaites</span>
                         <strong id="statLosses">0</strong>
                     </div>
 
 
                     <div class="stat-card">
-                        <span>Essais</span>
+                        <span id="statAttemptsLabel">Essais</span>
                         <strong id="statAttempts">0</strong>
                     </div>
 
 
                     <div class="stat-card wide">
-                        <span>Meilleur score</span>
+                        <span id="statBestScoreLabel">Meilleur score</span>
                         <strong id="statBestScore">0</strong>
                     </div>
 
@@ -1021,7 +1021,7 @@
                     class="danger-btn"
                     type="button"
                 >
-                    🗑️ Réinitialiser les statistiques
+                   🗑️ <span id="resetStatsLabel">Réinitialiser les statistiques</span>
                 </button>
 
             </div>
@@ -1202,29 +1202,42 @@
                 </button>
 
 
-                <h2>📖 Règles du jeu</h2>
+                <h2 id="rulesTitle">📖 Règles du jeu</h2>
 
 
                 <div class="rules-content">
 
                     <div class="rule-card">
 
-                        <h3>🎯 Le but</h3>
+                        <h3 id="ruleGoalTitle">🎯 Le but</h3>
 
-                        <p>
+                        <p id="ruleGoalText">
                             Le téléphone choisit secrètement
                             un nombre composé de 3 chiffres
                             différents.
                         </p>
 
                     </div>
+<div class="rule-card">
 
+    <h3 id="ruleExampleTitle">💡 Exemple</h3>
+
+    <p id="ruleExampleText">
+        Code secret : <strong>527</strong><br>
+        Ton essai : <strong>572</strong><br><br>
+
+        🟢 <strong>5 → V</strong> : bon chiffre, bonne position.<br>
+        🟠 <strong>7 → X</strong> : bon chiffre, mauvaise position.<br>
+        🟠 <strong>2 → X</strong> : bon chiffre, mauvaise position.
+    </p>
+
+</div>
 
                     <div class="rule-card">
 
-                        <h3>🔢 Ton objectif</h3>
+                        <h3 id="ruleObjectiveTitle">🔢 Ton objectif</h3>
 
-                        <p>
+                        <p id="ruleObjectiveText">
                             Tu dois trouver le code secret
                             avant la fin du chronomètre.
                         </p>
@@ -1234,9 +1247,9 @@
 
                     <div class="rule-card">
 
-                        <h3>🟢 V — Bien placé</h3>
+                        <h3 id="ruleVTitle">🟢 V — Bien placé</h3>
 
-                        <p>
+                        <p id="ruleVText">
                             Un chiffre est correct et se trouve
                             exactement à la bonne position.
                         </p>
@@ -1246,9 +1259,9 @@
 
                     <div class="rule-card">
 
-                        <h3>🟠 X — Mal placé</h3>
+                        <h3 id="ruleXTitle">🟠 X — Mal placé</h3>
 
-                        <p>
+                        <p id="ruleXText">
                             Un chiffre appartient au code secret,
                             mais il n'est pas à la bonne position.
                         </p>
@@ -1258,9 +1271,9 @@
 
                     <div class="rule-card">
 
-                        <h3>⚠️ Attention</h3>
+                        <h3 id="ruleWarningTitle">⚠️ Attention</h3>
 
-                        <p>
+                        <p id="ruleWarningText">
                             Les 3 chiffres de ton code doivent
                             toujours être différents.
                         </p>
@@ -1270,9 +1283,9 @@
 
                     <div class="rule-card">
 
-                        <h3>🏆 Le score</h3>
+                        <h3 id="ruleScoreTitle">🏆 Le score</h3>
 
-                        <p>
+                        <p id="ruleScoreText">
                             Plus tu trouves rapidement le code
                             avec peu d'essais, plus ton score
                             est élevé.
@@ -1292,55 +1305,64 @@
 
         <section id="onlineScreen" class="screen">
 
-            <div class="screen-container">
+    <div class="screen-container">
 
-                <button
-                    class="back-btn"
-                    data-back="homeScreen"
-                    type="button"
-                >
-                    ← Retour
-                </button>
+        <button
+            class="back-btn"
+            data-back="homeScreen"
+            type="button"
+            data-i18n="back"
+        >
+            ← Retour
+        </button>
 
-                <h2>🌐 Mode en ligne</h2>
+        <h2 data-i18n="onlineModeTitle">
+            🌐 Mode en ligne
+        </h2>
 
-                <p class="two-instruction">
-                    Joue contre un autre joueur, même à distance.
-                </p>
+        <p
+            class="two-instruction"
+            data-i18n="onlineModeInstruction"
+        >
+            Joue contre un autre joueur, même à distance.
+        </p>
 
-                <div class="online-menu">
+        <div class="online-menu">
 
-                    <button
-                        id="createOnlineGameBtn"
-                        class="menu-btn primary-btn"
-                        type="button"
-                    >
-                        🎮 CRÉER UNE PARTIE
-                    </button>
+            <button
+                id="createOnlineGameBtn"
+                class="menu-btn primary-btn"
+                type="button"
+                data-i18n="createOnlineGame"
+            >
+                🎮 CRÉER UNE PARTIE
+            </button>
 
-                    <button
-                        id="joinOnlineGameBtn"
-                        class="menu-btn"
-                        type="button"
-                    >
-                        🔗 REJOINDRE UNE PARTIE
-                    </button>
+            <button
+                id="joinOnlineGameBtn"
+                class="menu-btn"
+                type="button"
+                data-i18n="joinOnlineGame"
+            >
+                🔗 REJOINDRE UNE PARTIE
+            </button>
 
-                </div>
+        </div>
 
-                <div
-                    id="onlineMessage"
-                    class="message"
-                >
-                </div>
+        <div
+            id="onlineMessage"
+            class="message"
+        >
+        </div>
 
-            </div>
+    </div>
 
         </section>
 <!-- =================================================
      MODE EN LIGNE
      CRÉER UNE PARTIE
      ================================================= -->
+
 
 <section id="createOnlineScreen" class="screen">
 
@@ -1350,19 +1372,28 @@
             class="back-btn"
             data-back="onlineScreen"
             type="button"
+            data-i18n="back"
         >
             ← Retour
         </button>
 
-        <h2>🎮 Créer une partie</h2>
+        <h2 data-i18n="createGameTitle">
+            🎮 Créer une partie
+        </h2>
 
-        <p class="two-instruction">
+        <p
+            class="two-instruction"
+            data-i18n="createGameInstruction"
+        >
             Crée une partie et invite ton adversaire.
         </p>
 
         <div class="online-room">
 
-            <div class="room-code-label">
+            <div
+                class="room-code-label"
+                data-i18n="roomCodeLabel"
+            >
                 CODE DE LA PARTIE
             </div>
 
@@ -1376,11 +1407,15 @@
             <button
                 id="shareOnlineGameBtn"
                 type="button"
+                data-i18n="transferLink"
             >
                 🔗 TRANSFÉRER LE LIEN
             </button>
 
-            <p class="room-info">
+            <p
+                class="room-info"
+                data-i18n="roomInfo"
+            >
                 Donne ce code à ton adversaire
                 pour qu'il puisse rejoindre la partie.
             </p>
@@ -1398,6 +1433,7 @@
             class="back-btn"
             type="button"
             data-back="onlineScreen"
+            data-i18n="cancel"
         >
             ← Annuler
         </button>
@@ -1917,7 +1953,112 @@
 <!-- =================================================
      ÉCRAN : PAIEMENT
      ================================================= -->
+<section
+    id="ageRangeScreen"
+    class="screen"
+>
+    <div class="screen-container">
 
+        <button
+            id="backFromAgeRangeBtn"
+            class="back-btn"
+            type="button"
+        >
+            ← Retour
+        </button>
+
+        <h2 id="ageRangeScreenTitle">
+    👤 CHOISISSEZ VOTRE TRANCHE D’ÂGE
+</h2>
+
+<p
+    id="ageRangeScreenDescription"
+    class="payment-description"
+>
+    Sélectionnez votre tranche d’âge pour continuer.
+</p>
+        <div class="payment-methods">
+
+            <button
+    id="age10to24Btn"
+    class="payment-method-btn"
+    type="button"
+>
+    10–24 ans
+</button>
+
+<button
+    id="age25to39Btn"
+    class="payment-method-btn"
+    type="button"
+>
+    25–39 ans
+</button>
+
+<button
+    id="age40PlusBtn"
+    class="payment-method-btn"
+    type="button"
+>
+    40 ans et +
+</button>
+
+        </div>
+
+    </div>
+</section>
+<!-- 💰 ÉCRAN DE CHOIX DE L'OFFRE -->
+
+<section
+    id="offerScreen"
+    class="screen"
+>
+
+    <div class="screen-container">
+
+        <button
+            id="backFromOfferBtn"
+            class="back-btn"
+            type="button"
+        >
+            ← Retour
+        </button>
+
+        <h2 id="offerScreenTitle">
+            💰 CHOISISSEZ VOTRE OFFRE
+        </h2>
+
+        <p
+            id="offerScreenDescription"
+            class="payment-description"
+        >
+            Choisissez votre formule pour continuer à jouer.
+        </p>
+
+        <div
+            id="offerMethods"
+            class="payment-methods"
+        >
+
+           <button 
+    id="monthlyOfferBtn" 
+    class="payment-method-btn" 
+    type="button" 
+> 
+    <span id="monthlyOfferPrice">200 FCFA / mois</span>
+</button>
+           <button 
+    id="yearlyOfferBtn" 
+    class="payment-method-btn" 
+    type="button" 
+> 
+    <span id="yearlyOfferPrice">1 000 FCFA / an</span>
+</button>
+        </div>
+
+    </div>
+
+</section>
 <section
     id="paymentScreen"
     class="screen"
@@ -1935,10 +2076,12 @@
        
         <h2>💰 CONTINUER À JOUER</h2>
 
-        <p class="payment-price">
-            1 000 FCFA
-        </p>
-
+        <p
+    id="paymentPrice"
+    class="payment-price"
+>
+    1 000 FCFA
+</p>
         <p class="payment-description">
             Choisissez votre moyen de paiement.
         </p>
@@ -1950,28 +2093,35 @@
 
         <div class="payment-methods">
 
-            <button
-                id="orangeMoneyBtn"
-                class="payment-method-btn"
-                type="button"
-            >
-                🟠 Orange Money
-            </button>
-
-            <button
-                id="waveBtn"
-                class="payment-method-btn"
-                type="button"
-            >
-                🟡 Wave
-            </button>
-
-            <button
+   <button
+    id="orangeMoneyBtn"
+    class="payment-method-btn"
+    type="button"
+>
+    <img
+        src="images/orange_logo.svg"
+        alt="Orange Money"
+        class="payment-logo"
+    >
+</button>
+<button
+    id="waveBtn"
+    class="payment-method-btn"
+    type="button"
+>
+    <img
+        src="images/wave.png"
+        alt="Wave"
+        class="payment-logo"
+    >
+    
+</button>            <button
                 id="cardPaymentBtn"
                 class="payment-method-btn"
                 type="button"
             >
-                💳 Carte bancaire
+               <span class="card-payment-icon">💳</span>
+<span class="card-payment-label">Carte bancaire</span>
             </button>
 
         </div>
@@ -2001,10 +2151,9 @@
 
         <h2>💳 PAIEMENT PAR CARTE</h2>
 
-        <p class="payment-price">
-            1 000 FCFA
-        </p>
-
+      <p class="payment-price">
+          1 000 FCFA
+      </p>
        <p class="payment-description">
     🔒 Paiement sécurisé
 </p>
@@ -2036,7 +2185,10 @@
 
 </script>
 
-<script src="./script.js?v=20260918" defer></script>
+<script src="./script.js?v=20260927" defer></script>
+<script>
+    console.log("🟣 INDEX HTML : SCRIPT TAG ATTEINT");
+</script>
 <script>
 </script>
 <!-- =================================================
@@ -2051,41 +2203,39 @@
 
     <div class="free-games-limit-box">
 
-        <div class="free-games-limit-icon">
-            🎁
-        </div>
-
-        <h2>
-            PARTIES GRATUITES ÉPUISÉES
-        </h2>
-
-        <p>
-            Vous avez utilisé vos
-            <strong>10 parties gratuites</strong>.
-        </p>
-
-        <p class="free-games-limit-offer">
-            Continuez à jouer pour seulement
-            <strong>1 000 FCFA</strong>.
-        </p>
-
-        <button
-            id="continuePaidGameBtn"
-            class="guess-btn"
-            type="button"
-        >
-            🔓 CONTINUER À JOUER — 1 000 FCFA
-        </button>
-
-        <button
-            id="closeFreeGamesLimitBtn"
-            class="back-btn"
-            type="button"
-        >
-            ← RETOUR
-        </button>
-
+    <div class="free-games-limit-icon">
+        🎁
     </div>
+
+    <h2 id="freeGamesLimitTitle">
+        PARTIES GRATUITES ÉPUISÉES
+    </h2>
+
+    <p id="freeGamesLimitText">
+        Vous avez utilisé vos
+        <strong>10 parties gratuites</strong>.
+    </p>
+
+   <p class="free-games-limit-offer" id="freeGamesLimitOffer">
+    Choisissez votre offre pour continuer à jouer.
+</p>
+    <button
+        id="continuePaidGameBtn"
+        class="guess-btn"
+        type="button"
+    >
+        🔓 CONTINUER À JOUER
+    </button>
+
+    <button
+        id="closeFreeGamesLimitBtn"
+        class="back-btn"
+        type="button"
+    >
+        ← RETOUR
+    </button>
+
+</div>
 
 </div>
 
