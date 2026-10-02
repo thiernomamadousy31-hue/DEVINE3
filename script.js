@@ -2195,6 +2195,7 @@ function updateFreeGamesLimitPopup() {
             : `Vous avez utilisé vos <strong>${limitNumber} parties gratuites</strong>.`;
 }
 function startSolo(level) {
+   currentLevel = level;
 
     // 🎁 COMPTEUR DES PARTIES GRATUITES
     let freeGames =
