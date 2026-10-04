@@ -411,25 +411,25 @@ testAnonymousLogin();
 const levels = {
     beginner: {
         name: "Débutant",
-        time: 300,
+        time: 240,
         multiplier: 1
     },
 
     intermediate: {
         name: "Intermédiaire",
-        time: 240,
+        time: 180,
         multiplier: 1.5
     },
 
     pro: {
         name: "Pro",
-        time: 180,
+        time: 120,
         multiplier: 2
     },
 
     expert: {
         name: "Expert",
-        time: 120,
+        time: 60,
         multiplier: 3
     }
 };
@@ -614,7 +614,13 @@ const defaultChallenges = {
 
 
 let challenges = loadChallenges();
+const levelProgress = loadLevelProgress();
 
+let levelStreak =
+    levelProgress.levelStreak;
+
+let unlockedLevels =
+    levelProgress.unlockedLevels;
 
 /* =========================================================
    AUDIO
@@ -1331,6 +1337,78 @@ function loadChallenges() {
         return { ...defaultChallenges };
     }
 }
+function loadLevelProgress() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                "devine3_level_progress"
+            );
+
+        if (!saved) {
+            return {
+                levelStreak: {
+                    beginner: 0,
+                    intermediate: 0,
+                    pro: 0
+                },
+                unlockedLevels: {
+                    beginner: true,
+                    intermediate: false,
+                    pro: false,
+                    expert: false
+                }
+            };
+        }
+
+        const data =
+            JSON.parse(saved);
+
+        return {
+            levelStreak: {
+                beginner:
+                    data.levelStreak?.beginner || 0,
+
+                intermediate:
+                    data.levelStreak?.intermediate || 0,
+
+                pro:
+                    data.levelStreak?.pro || 0
+            },
+
+            unlockedLevels: {
+                beginner: true,
+
+                intermediate:
+                    data.unlockedLevels?.intermediate || false,
+
+                pro:
+                    data.unlockedLevels?.pro || false,
+
+                expert:
+                    data.unlockedLevels?.expert || false
+            }
+        };
+
+    } catch (error) {
+
+        return {
+            levelStreak: {
+                beginner: 0,
+                intermediate: 0,
+                pro: 0
+            },
+
+            unlockedLevels: {
+                beginner: true,
+                intermediate: false,
+                pro: false,
+                expert: false
+            }
+        };
+    }
+}
 
 
 function saveChallenges() {
@@ -1338,6 +1416,16 @@ function saveChallenges() {
     localStorage.setItem(
         "devine3_challenges",
         JSON.stringify(challenges)
+    );
+}
+function saveLevelProgress() {
+
+    localStorage.setItem(
+        "devine3_level_progress",
+        JSON.stringify({
+            levelStreak,
+            unlockedLevels
+        })
     );
 }
 
@@ -2195,15 +2283,22 @@ function updateFreeGamesLimitPopup() {
             : `Vous avez utilisé vos <strong>${limitNumber} parties gratuites</strong>.`;
 }
 function startSolo(level) {
-   currentLevel = level;
-   console.log("🎯 NIVEAU CHOISI :", level, "| currentLevel :", currentLevel);
+    currentLevel = level;
+    console.log("🎯 NIVEAU CHOISI :", level, "| currentLevel :", currentLevel);
+    
 
     // 🎁 COMPTEUR DES PARTIES GRATUITES
     let freeGames =
         Number(localStorage.getItem("devine3_free_games")) || 0;
+        const onlineGames =
+    Number(
+        localStorage.getItem(
+            "devine3_online_games"
+        )
+    ) || 0;
 
     // 🔒 LIMITE DE 15 PARTIES GRATUITES
-   if (freeGames >= 15) {
+   if (freeGames >= 15 || onlineGames >= 10) {
 
     freeGamesLimitMode = "solo";
 
@@ -2524,7 +2619,19 @@ function submitSoloGuess() {
 
     attempts++;
 
+const maxAttempts = {
+    beginner: 12,
+    intermediate: 10,
+    pro: 8,
+    expert: 6
+};
 
+if (attempts > maxAttempts[currentLevel]) {
+
+    loseSoloGame("attempts");
+
+    return;
+}
     const result =
         calculateResult(
             secretNumber,
@@ -2738,7 +2845,47 @@ function winSoloGame() {
 
 
     saveStats();
+    // SÉRIE DE VICTOIRES POUR DÉBLOQUER LES NIVEAUX
+if (currentLevel === "beginner") {
 
+    if (timeLeft > 60) {
+        levelStreak.beginner++;
+    } else {
+        levelStreak.beginner = 0;
+    }
+}
+
+if (currentLevel === "intermediate") {
+
+    if (timeLeft > 60) {
+        levelStreak.intermediate++;
+    } else {
+        levelStreak.intermediate = 0;
+    }
+}
+
+if (currentLevel === "pro") {
+
+    if (timeLeft > 60) {
+        levelStreak.pro++;
+    } else {
+        levelStreak.pro = 0;
+    }
+}
+// DÉBLOCAGE DES NIVEAUX
+if (levelStreak.beginner >= 5) {
+    unlockedLevels.intermediate = true;
+}
+
+if (levelStreak.intermediate >= 5) {
+    unlockedLevels.pro = true;
+}
+
+if (levelStreak.pro >= 5) {
+    unlockedLevels.expert = true;
+}
+saveLevelProgress();
+updateLevelsUI();
 
     updateChallengesAfterWin();
 
@@ -2828,12 +2975,24 @@ console.log("🏆 winSoloGame() EXECUTÉE");
    DÉFAITE SOLO
    ========================================================= */
 
-function loseSoloGame() {
+function loseSoloGame(reason = "time") {
 
     if (gameOver) {
         return;
     }
+    // Une défaite casse la série de victoires
+if (currentLevel === "beginner") {
+    levelStreak.beginner = 0;
+}
 
+if (currentLevel === "intermediate") {
+    levelStreak.intermediate = 0;
+}
+
+if (currentLevel === "pro") {
+    levelStreak.pro = 0;
+}
+saveLevelProgress();
 
     clearInterval(timerInterval);
 
@@ -2856,20 +3015,34 @@ function loseSoloGame() {
     ).textContent = "😔";
 
 
+     document.getElementById(
+    "finalTitle"
+).textContent =
+    reason === "attempts"
+        ? (
+            isEnglish
+                ? "TOO MANY ATTEMPTS!"
+                : "TROP D'ESSAIS !"
+        )
+        : (
+            isEnglish
+                ? "TIME'S UP!"
+                : "Temps écoulé !"
+        );
        document.getElementById(
-        "finalTitle"
-    ).textContent =
-        isEnglish
-            ? "TIME'S UP!"
-            : "Temps écoulé !";
-
-        document.getElementById(
-        "finalMessage"
-    ).textContent =
-        isEnglish
-            ? "You didn't find the code in time."
-            : "Tu n'as pas trouvé le code à temps.";
-
+    "finalMessage"
+).textContent =
+    reason === "attempts"
+        ? (
+            isEnglish
+                ? "You used too many attempts."
+                : "Tu as utilisé trop d'essais."
+        )
+        : (
+            isEnglish
+                ? "You didn't find the code in time."
+                : "Tu n'as pas trouvé le code à temps."
+        );
     document.getElementById(
         "secret"
     ).textContent =
@@ -4046,8 +4219,14 @@ document
                 "devine3_online_games"
             )
         ) || 0;
+        const freeGames =
+    Number(
+        localStorage.getItem(
+            "devine3_free_games"
+        )
+    ) || 0;
 
-    if (onlineGames >= 10) {
+    if (onlineGames >= 10 || freeGames >= 15) {
         freeGamesLimitMode = "online";
 
         console.log(
@@ -4117,8 +4296,14 @@ document
             "devine3_online_games"
         )
     ) || 0;
+    const freeGames =
+    Number(
+        localStorage.getItem(
+            "devine3_free_games"
+        )
+    ) || 0;
 
-if (onlineGames >= 10) {
+if (onlineGames >= 10 || freeGames >= 15) {
 
     freeGamesLimitMode = "online";
 
@@ -4196,7 +4381,76 @@ document
     );
 
 
-/* Niveaux */
+/* NIVEAUX */
+
+function updateLevelsUI() {
+
+    document
+        .querySelectorAll(".level-card")
+        .forEach(button => {
+
+            const level =
+                button.dataset.level;
+
+            const locked =
+                !unlockedLevels[level];
+
+            button.classList.toggle(
+                "locked",
+                locked
+            );
+
+            button.disabled =
+                locked;
+
+            if (level === "intermediate") {
+
+                const progress =
+                    document.getElementById(
+                        "beginnerProgress"
+                    );
+
+                if (progress) {
+
+                    progress.textContent =
+                        unlockedLevels.intermediate
+                            ? "Niveau débloqué"
+                            : `${levelStreak.beginner}/5 victoires — moins de 3 min`;
+                }
+            }
+            if (level === "pro") {
+
+    const progress =
+        document.getElementById(
+            "intermediateProgress"
+        );
+
+    if (progress) {
+
+        progress.textContent =
+            unlockedLevels.pro
+                ? "Niveau débloqué"
+                : `${levelStreak.intermediate}/5 victoires — moins de 2 min`;
+    }
+}
+if (level === "expert") {
+
+    const progress =
+        document.getElementById(
+            "proProgress"
+        );
+
+    if (progress) {
+
+        progress.textContent =
+            unlockedLevels.expert
+                ? "Niveau débloqué"
+                : `${levelStreak.pro}/5 victoires — moins de 1 min`;
+    }
+}
+        });
+}
+
 
 document
     .querySelectorAll(".level-card")
@@ -4206,14 +4460,19 @@ document
             "click",
             () => {
 
-                startSolo(
-                    button.dataset.level
-                );
+                const level =
+                    button.dataset.level;
+
+                if (!unlockedLevels[level]) {
+                    return;
+                }
+
+                startSolo(level);
             }
         );
     });
 
-
+updateLevelsUI();
 /* Retour */
 
 document
@@ -5034,6 +5293,36 @@ if (cardPaymentBtn) {
             console.log(
                 "💳 PAIEMENT PAR CARTE CLIQUÉ"
             );
+            const paymentPrice =
+    document.getElementById("paymentPrice");
+
+const cardPaymentPrice =
+    document.getElementById("cardPaymentPrice");
+
+if (paymentPrice && cardPaymentPrice) {
+    cardPaymentPrice.textContent =
+        paymentPrice.textContent;
+}
+const cardPaymentInternational =
+    document.getElementById("cardPaymentInternational");
+
+if (cardPaymentInternational && paymentPrice) {
+   const isFrench =
+    frLanguageBtn &&
+    frLanguageBtn.classList.contains("active");
+
+if (cardPaymentInternational && paymentPrice) {
+
+    cardPaymentInternational.textContent =
+        isFrench
+            ? "Vous serez redirigé vers une plateforme de paiement sécurisée pour finaliser votre achat de " +
+              paymentPrice.textContent +
+              "."
+            : "You will be redirected to a secure payment platform to complete your purchase of " +
+              paymentPrice.textContent +
+              ".";
+}
+}
 
             document
                 .getElementById("paymentScreen")
@@ -5753,7 +6042,28 @@ document.getElementById(
 document.querySelector(
     "#cardPaymentBtn .card-payment-label"
 ).textContent =
-    "Carte bancaire";        }
+    "Carte bancaire";   
+document.getElementById(
+    "backFromCardPaymentBtn"
+).textContent =
+    "← Retour";
+
+document.querySelector(
+    "#cardPaymentScreen h2"
+).textContent =
+    "💳 PAIEMENT PAR CARTE";
+
+document.querySelector(
+    "#cardPaymentScreen .payment-description"
+).textContent =
+    "🔒 Paiement sécurisé";
+
+document.getElementById(
+    "cardPaymentInternational"
+).textContent =
+    "Vous serez redirigé vers une plateforme de paiement sécurisée pour finaliser votre achat de " +
+    document.getElementById("paymentPrice").textContent +
+    ".";     }
     );
 
 
@@ -5764,6 +6074,10 @@ document.querySelector(
 
 document.getElementById(
     "backFromAgeRangeBtn"
+).textContent =
+    "← Back";
+    document.getElementById(
+    "backFromOfferBtn"
 ).textContent =
     "← Back";
 
@@ -6507,7 +6821,28 @@ document.getElementById(
 document.querySelector(
     "#cardPaymentBtn .card-payment-label"
 ).textContent =
-    "Bank card";        }
+    "Bank card";  
+document.getElementById(
+    "backFromCardPaymentBtn"
+).textContent =
+    "← Back";
+
+document.querySelector(
+    "#cardPaymentScreen h2"
+).textContent =
+    "💳 CARD PAYMENT";
+
+document.querySelector(
+    "#cardPaymentScreen .payment-description"
+).textContent =
+    "🔒 Secure payment";
+
+document.getElementById(
+    "cardPaymentInternational"
+).textContent =
+    "You will be redirected to a secure payment platform to complete your purchase of " +
+    document.getElementById("paymentPrice").textContent +
+    ".";      }
     );
 
 } 
@@ -6990,6 +7325,10 @@ const yearlyDisplay =
 
         description.textContent =
             "Choisissez votre formule pour continuer à jouer.";
+            document.getElementById(
+    "backFromOfferBtn"
+).textContent =
+    "← Retour";
 
        monthlyBtn.innerHTML =
     monthlyDisplay
@@ -7050,15 +7389,6 @@ yearlyBtn.innerHTML =
     );
 }
 
-if (age10to24Btn) {
-
-    age10to24Btn.addEventListener(
-        "click",
-        () => {
-            selectAgeRange("10-24");
-        }
-    );
-}
 
 
 if (age25to39Btn) {
@@ -7115,7 +7445,8 @@ if (yearlyOfferBtn) {
 
             document
                 .getElementById("paymentPrice")
-                .textContent = "1 000 FCFA";
+                .textContent =
+    document.getElementById("yearlyOfferPrice").textContent;
 
             showScreen("paymentScreen");
 
