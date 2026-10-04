@@ -603,6 +603,23 @@ body::after {
     box-shadow:
         0 0 22px rgba(212,175,55,0.10);
 }
+.level-card.locked {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    filter: grayscale(0.35);
+}
+
+.level-card.locked:hover {
+    border-color: rgba(212,175,55,0.18);
+
+    box-shadow: none;
+}
+
+.level-card.locked:active {
+    transform: none;
+}
 
 .level-icon {
     font-size: 27px;
