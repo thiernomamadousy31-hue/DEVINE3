@@ -12,7 +12,7 @@
         name="theme-color"
         content="#090d18"
     >
-<link rel="manifest" href="manifest.json">
+
     <title>DEVINE 3</title>
 
     <!-- Feuille de style externe -->
@@ -202,7 +202,7 @@
 
                         <span class="level-info">
                             <strong>Débutant</strong>
-                            <small>5 minutes</small>
+                            <small>4 minutes</small>
                         </span>
 
                         <span class="level-multiplier">
@@ -224,7 +224,7 @@
 
                         <span class="level-info">
                             <strong>Intermédiaire</strong>
-                            <small>4 minutes</small>
+                            <small id="beginnerProgress">0/5 victoires — moins de 3 min</small>
                         </span>
 
                         <span class="level-multiplier">
@@ -246,7 +246,7 @@
 
                         <span class="level-info">
                             <strong>Pro</strong>
-                            <small>3 minutes</small>
+                            <small id="intermediateProgress">0/5 victoires — moins de 2 min</small>
                         </span>
 
                         <span class="level-multiplier">
@@ -268,7 +268,7 @@
 
                         <span class="level-info">
                             <strong>Expert</strong>
-                            <small>2 minutes</small>
+                            <small id="proProgress">0/5 victoires — moins de 1 min</small>
                         </span>
 
                         <span class="level-multiplier">
@@ -2151,18 +2151,19 @@
 
         <h2>💳 PAIEMENT PAR CARTE</h2>
 
-      <p class="payment-price">
-          1 000 FCFA
-      </p>
-       <p class="payment-description">
+      <p id="cardPaymentPrice" class="payment-price">
+    1 000 FCFA
+</p> <p class="payment-description">
     🔒 Paiement sécurisé
 </p>
 
-<p class="payment-international">
+<p
+    id="cardPaymentInternational"
+    class="payment-international"
+>
     Vous serez redirigé vers une plateforme de paiement sécurisée
-    pour finaliser votre achat de 1 000 FCFA.
+    pour finaliser votre achat.
 </p>
-
     </div>
 
 </section>
