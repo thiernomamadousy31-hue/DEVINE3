@@ -1815,7 +1815,8 @@ function listenToOnlineGame(gameId) {
 await loadOnlineHistory();
 
 if (
-    payload.new.status === "finished"
+    payload.new.status === "finished" &&
+    wasPlaying
 ) {
 
     console.log(
@@ -5408,6 +5409,7 @@ document.getElementById(
     "40 ans et +";
         
             currentLanguage = "fr";
+            document.getElementById("cardPaymentBtn").style.paddingLeft = "0.7cm";
             document.getElementById("popupConfirm").textContent =
     "Confirmer";
 
@@ -5617,7 +5619,7 @@ document.querySelector(
 
             document.querySelector(
                 '#levelsScreen [data-level="beginner"] small'
-            ).textContent = "5 minutes";
+            ).textContent = "4 minutes";
 
             document.querySelector(
                 '#levelsScreen [data-level="intermediate"] strong'
@@ -5625,7 +5627,7 @@ document.querySelector(
 
             document.querySelector(
                 '#levelsScreen [data-level="intermediate"] small'
-            ).textContent = "4 minutes";
+            ).textContent = "0/5 victoires — moins de 3 minutes";
 
             document.querySelector(
                 '#levelsScreen [data-level="pro"] strong'
@@ -5633,7 +5635,7 @@ document.querySelector(
 
             document.querySelector(
                 '#levelsScreen [data-level="pro"] small'
-            ).textContent = "3 minutes";
+            ).textContent = "0/5 victoires — moins de 2 minutes";
 
             document.querySelector(
                 '#levelsScreen [data-level="expert"] strong'
@@ -5641,7 +5643,7 @@ document.querySelector(
 
             document.querySelector(
                 '#levelsScreen [data-level="expert"] small'
-            ).textContent = "2 minutes";
+            ).textContent = "0/5 victoires — moins de 1 minute";
 
 
             // 🏠 ÉCRAN D'ACCUEIL — FRANÇAIS
@@ -6032,6 +6034,7 @@ document.querySelector(
     "#paymentScreen .payment-international"
 ).textContent =
     "🌍 Paiement disponible selon les moyens proposés dans votre pays.";
+
     // 💳 BOUTONS PAIEMENT — FRANÇAIS
 
 document.getElementById(
@@ -6063,8 +6066,35 @@ document.getElementById(
 ).textContent =
     "Vous serez redirigé vers une plateforme de paiement sécurisée pour finaliser votre achat de " +
     document.getElementById("paymentPrice").textContent +
-    ".";     }
+    ".";       // 🌐 ÉCRAN REJOINDRE UNE PARTIE — FRANÇAIS
+
+document.querySelector(
+    "#joinOnlineScreen .back-btn"
+).textContent =
+    "← Retour";
+
+document.querySelector(
+    "#joinOnlineScreen h2"
+).textContent =
+    "🔗 Rejoindre une partie";
+
+document.querySelector(
+    "#joinOnlineScreen .two-instruction"
+).textContent =
+    "Entre le code donné par ton adversaire.";
+
+document.querySelector(
+    "#joinOnlineScreen .room-code-label"
+).textContent =
+    "CODE DE LA PARTIE";
+
+document.getElementById(
+    "confirmJoinOnlineBtn"
+).textContent =
+    "🔗 REJOINDRE";
+   }
     );
+
 
 
     enLanguageBtn.addEventListener(
@@ -6106,6 +6136,7 @@ document.getElementById(
 ).textContent =
     "40 years and older";
             currentLanguage = "en";
+            document.getElementById("cardPaymentBtn").style.paddingLeft = "0cm";
 
             console.log("🇬🇧 LANGUE : ANGLAIS");
             document.getElementById("popupConfirm").textContent =
@@ -6179,6 +6210,7 @@ document.getElementById(
                 "cancelCreateOnlineBtn"
             ).textContent =
                 "← Cancel";
+           
                 // 🌐 ÉCRAN REJOINDRE UNE PARTIE — ANGLAIS
 
 document.querySelector(
