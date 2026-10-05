@@ -3983,8 +3983,9 @@ body::after {
 #cardPaymentBtn {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
+    padding-left: 0.7cm;
 }
 #orangeMoneyBtn {
     justify-content: flex-start;
@@ -4021,6 +4022,7 @@ body::after {
 .card-payment-icon {
     font-size: 80px;
     flex-shrink: 0;
+        
 }
 .card-payment-icon,
 .card-payment-label {
