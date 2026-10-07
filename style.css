@@ -699,7 +699,29 @@ body::after {
     box-shadow:
         0 0 14px rgba(212,175,55,0.07);
 }
+#soloGameContainer.level-beginner .level-display {
+    color: #6ee7a2;
+    border-color: rgba(46,204,113,0.35);
+    background: rgba(46,204,113,0.08);
+}
 
+#soloGameContainer.level-intermediate .level-display {
+    color: #f5d76e;
+    border-color: rgba(241,196,15,0.35);
+    background: rgba(241,196,15,0.08);
+}
+
+#soloGameContainer.level-pro .level-display {
+    color: #f0a35b;
+    border-color: rgba(230,126,34,0.38);
+    background: rgba(230,126,34,0.08);
+}
+
+#soloGameContainer.level-expert .level-display {
+    color: #e47777;
+    border-color: rgba(139,0,0,0.45);
+    background: rgba(139,0,0,0.10);
+}
 
 /* =========================================================
    CHRONOMÈTRE
@@ -728,6 +750,45 @@ body::after {
     box-shadow:
         0 0 30px rgba(212,175,55,0.07),
         inset 0 0 25px rgba(212,175,55,0.025);
+}
+#soloGameContainer.level-beginner .timer-box {
+    border-color: rgba(46,204,113,0.30);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(46,204,113,0.07),
+            rgba(255,255,255,0.018)
+        );
+}
+
+#soloGameContainer.level-intermediate .timer-box {
+    border-color: rgba(241,196,15,0.32);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(241,196,15,0.07),
+            rgba(255,255,255,0.018)
+        );
+}
+
+#soloGameContainer.level-pro .timer-box {
+    border-color: rgba(230,126,34,0.35);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(230,126,34,0.07),
+            rgba(255,255,255,0.018)
+        );
+}
+
+#soloGameContainer.level-expert .timer-box {
+    border-color: rgba(139,0,0,0.40);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(139,0,0,0.09),
+            rgba(255,255,255,0.018)
+        );
 }
 
 .timer-label {
@@ -761,6 +822,35 @@ body::after {
         0 0 10px rgba(245,215,110,0.65),
         0 0 25px rgba(212,175,55,0.30);
 }
+/* 🎨 COULEUR DU CHRONO SELON LE NIVEAU */
+
+#soloGameContainer.level-beginner .timer-box strong {
+    color: #6ee7a2;
+    text-shadow:
+        0 0 10px rgba(46,204,113,0.55),
+        0 0 25px rgba(46,204,113,0.25);
+}
+
+#soloGameContainer.level-intermediate .timer-box strong {
+    color: #f5d76e;
+    text-shadow:
+        0 0 10px rgba(245,215,110,0.65),
+        0 0 25px rgba(212,175,55,0.30);
+}
+
+#soloGameContainer.level-pro .timer-box strong {
+    color: #f0a35b;
+    text-shadow:
+        0 0 10px rgba(230,126,34,0.55),
+        0 0 25px rgba(230,126,34,0.25);
+}
+
+#soloGameContainer.level-expert .timer-box strong {
+    color: #e47777;
+    text-shadow:
+        0 0 10px rgba(139,0,0,0.55),
+        0 0 25px rgba(139,0,0,0.25);
+}
 
 .timer-warning strong {
     color: #ffd166;
@@ -793,6 +883,21 @@ body::after {
     font-weight: 900;
 
     color: #ffffff;
+}
+#soloGameContainer.level-beginner .game-title h2 {
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate .game-title h2 {
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro .game-title h2 {
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert .game-title h2 {
+    color: #e47777;
 }
 
 .game-title p {
@@ -838,6 +943,29 @@ body::after {
 
 .message.info {
     color: #f5d76e;
+}
+#soloGameContainer.level-beginner #message {
+    color: #6ee7a2 !important;
+    text-shadow:
+        0 0 8px rgba(46,204,113,0.22);
+}
+
+#soloGameContainer.level-intermediate #message {
+    color: #f5d76e !important;
+    text-shadow:
+        0 0 8px rgba(212,175,55,0.22);
+}
+
+#soloGameContainer.level-pro #message {
+    color: #f0a35b !important;
+    text-shadow:
+        0 0 8px rgba(230,126,34,0.24);
+}
+
+#soloGameContainer.level-expert #message {
+    color: #e47777 !important;
+    text-shadow:
+        0 0 8px rgba(139,0,0,0.25);
 }
 
 
@@ -907,6 +1035,83 @@ body::after {
 .guess-input::placeholder {
     color: rgba(245,215,110,0.18);
 }
+#soloGameContainer.level-beginner .guess-input {
+    border-color: rgba(46,204,113,0.38);
+}
+
+#soloGameContainer.level-intermediate .guess-input {
+    border-color: rgba(241,196,15,0.40);
+}
+
+#soloGameContainer.level-pro .guess-input {
+    border-color: rgba(230,126,34,0.42);
+}
+
+#soloGameContainer.level-expert .guess-input {
+    border-color: rgba(139,0,0,0.48);
+}
+#soloGameContainer.level-beginner .guess-input:focus {
+    border-color: #6ee7a2;
+    box-shadow:
+        0 0 22px rgba(46,204,113,0.18),
+        inset 0 0 18px rgba(46,204,113,0.04);
+}
+
+#soloGameContainer.level-intermediate .guess-input:focus {
+    border-color: #f5d76e;
+    box-shadow:
+        0 0 22px rgba(212,175,55,0.18),
+        inset 0 0 18px rgba(212,175,55,0.04);
+}
+
+#soloGameContainer.level-pro .guess-input:focus {
+    border-color: #f0a35b;
+    box-shadow:
+        0 0 22px rgba(230,126,34,0.20),
+        inset 0 0 18px rgba(230,126,34,0.04);
+}
+
+#soloGameContainer.level-expert .guess-input:focus {
+    border-color: #e47777;
+    box-shadow:
+        0 0 22px rgba(139,0,0,0.24),
+        inset 0 0 18px rgba(139,0,0,0.05);
+}
+#soloGameContainer.level-beginner .guess-input {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,45,28,0.82),
+            rgba(0,0,0,0.78)
+        );
+}
+
+#soloGameContainer.level-intermediate .guess-input {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(45,35,5,0.82),
+            rgba(0,0,0,0.78)
+        );
+}
+
+#soloGameContainer.level-pro .guess-input {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(55,27,5,0.82),
+            rgba(0,0,0,0.78)
+        );
+}
+
+#soloGameContainer.level-expert .guess-input {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(45,5,5,0.84),
+            rgba(0,0,0,0.80)
+        );
+}
 
 .guess-btn {
     width: 100%;
@@ -953,7 +1158,65 @@ body::after {
         0 0 28px rgba(212,175,55,0.30),
         inset 0 1px 0 rgba(255,255,255,0.40);
 }
+#soloGameContainer.level-beginner .guess-btn {
+    border-color: rgba(110,231,162,0.75);
 
+    background:
+        linear-gradient(
+            135deg,
+            #155c3b,
+            #2ecc71 50%,
+            #155c3b
+        );
+
+    box-shadow:
+        0 0 20px rgba(46,204,113,0.16),
+        inset 0 1px 0 rgba(255,255,255,0.30);
+}
+
+#soloGameContainer.level-intermediate .guess-btn {
+    border-color: rgba(245,215,110,0.80);
+
+    background:
+        linear-gradient(
+            135deg,
+            #76560c,
+            #d4af37 50%,
+            #76560c
+        );
+}
+
+#soloGameContainer.level-pro .guess-btn {
+    border-color: rgba(240,163,91,0.80);
+
+    background:
+        linear-gradient(
+            135deg,
+            #71370e,
+            #e67e22 50%,
+            #71370e
+        );
+
+    box-shadow:
+        0 0 20px rgba(230,126,34,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.30);
+}
+
+#soloGameContainer.level-expert .guess-btn {
+    border-color: rgba(228,119,119,0.80);
+
+    background:
+        linear-gradient(
+            135deg,
+            #4d0808,
+            #8b0000 50%,
+            #4d0808
+        );
+
+    box-shadow:
+        0 0 22px rgba(139,0,0,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.30);
+}
 
 /* =========================================================
    RÈGLES RAPIDES
@@ -1017,6 +1280,21 @@ body::after {
 
     text-transform: uppercase;
 }
+#soloGameContainer.level-beginner .section-title {
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate .section-title {
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro .section-title {
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert .section-title {
+    color: #e47777;
+}
 
 .history {
     width: 100%;
@@ -1054,6 +1332,25 @@ body::after {
     background:
         rgba(255,255,255,0.015);
 }
+#soloGameContainer.level-beginner .history:empty::before {
+    border-color: rgba(46,204,113,0.25);
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate .history:empty::before {
+    border-color: rgba(241,196,15,0.25);
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro .history:empty::before {
+    border-color: rgba(230,126,34,0.28);
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert .history:empty::before {
+    border-color: rgba(139,0,0,0.35);
+    color: #e47777;
+}
 
 
 /* =========================================================
@@ -1087,6 +1384,25 @@ body::after {
     box-shadow:
         inset 0 0 15px rgba(212,175,55,0.018);
 }
+#soloGameContainer.level-beginner .history-item {
+    border-color: rgba(46,204,113,0.30);
+    box-shadow: 0 0 10px rgba(46,204,113,0.08);
+}
+
+#soloGameContainer.level-intermediate .history-item {
+    border-color: rgba(241,196,15,0.32);
+    box-shadow: 0 0 10px rgba(241,196,15,0.08);
+}
+
+#soloGameContainer.level-pro .history-item {
+    border-color: rgba(230,126,34,0.35);
+    box-shadow: 0 0 10px rgba(230,126,34,0.09);
+}
+
+#soloGameContainer.level-expert .history-item {
+    border-color: rgba(139,0,0,0.45);
+    box-shadow: 0 0 11px rgba(139,0,0,0.12);
+}
 
 .history-number {
     color: #ffffff;
@@ -1111,9 +1427,39 @@ body::after {
 .history-v {
     color: #62e6a8;
 }
+#soloGameContainer.level-beginner .history-v {
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate .history-v {
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro .history-v {
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert .history-v {
+    color: #e47777;
+}
 
 .history-x {
     color: #f5c45e;
+}
+#soloGameContainer.level-beginner .history-x {
+    color: #4fcf8a;
+}
+
+#soloGameContainer.level-intermediate .history-x {
+    color: #d9b94a;
+}
+
+#soloGameContainer.level-pro .history-x {
+    color: #d88a45;
+}
+
+#soloGameContainer.level-expert .history-x {
+    color: #b85c5c;
 }
 
 
@@ -1724,6 +2070,41 @@ body::after {
 
     animation:
         popupIn 0.2s ease;
+}
+@keyframes popupVibrate {
+
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    15% {
+        transform: translateX(-6px);
+    }
+
+    30% {
+        transform: translateX(6px);
+    }
+
+    45% {
+        transform: translateX(-5px);
+    }
+
+    60% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-3px);
+    }
+
+    90% {
+        transform: translateX(3px);
+    }
+}
+
+.popup.level-unlocked {
+    animation:
+        popupVibrate 0.55s ease-in-out;
 }
 
 @keyframes popupIn {
@@ -4028,4 +4409,534 @@ body::after {
 .card-payment-label {
     display: inline-flex;
     align-items: center;
+}
+/* ⏳ PULSATION DU CHRONO EN FIN DE TEMPS */
+
+@keyframes timerPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.06);
+        opacity: 0.78;
+    }
+}
+#soloGameContainer .timer-warning strong,
+#soloGameContainer .timer-danger strong {
+    animation: timerPulse 0.8s ease-in-out infinite;
+}
+#soloGameContainer.level-beginner #freeGamesCounter {
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate #freeGamesCounter {
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro #freeGamesCounter {
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert #freeGamesCounter {
+    color: #e47777;
+}
+#soloGameContainer.level-beginner #quitGameBtn {
+    color: #6ee7a2;
+}
+
+#soloGameContainer.level-intermediate #quitGameBtn {
+    color: #f5d76e;
+}
+
+#soloGameContainer.level-pro #quitGameBtn {
+    color: #f0a35b;
+}
+
+#soloGameContainer.level-expert #quitGameBtn {
+    color: #e47777;
+}
+body.sky-beginner {
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            #123d2a 0%,
+            #0a2118 30%,
+            #030806 65%,
+            #000000 100%
+        );
+}
+
+body.sky-beginner::after {
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(46,204,113,0.10),
+            transparent 35%
+        );
+}
+body.sky-pro {
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            #4a230b 0%,
+            #241105 30%,
+            #080403 65%,
+            #000000 100%
+        );
+}
+
+body.sky-pro::after {
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(230,126,34,0.12),
+            transparent 35%
+        );
+}
+body.sky-expert {
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            #420b0b 0%,
+            #220505 30%,
+            #080202 65%,
+            #000000 100%
+        );
+}
+
+body.sky-expert::after {
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(139,0,0,0.14),
+            transparent 35%
+        );
+}
+.popup.popup-beginner {
+    border-color: rgba(46,204,113,0.55);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.75),
+        0 0 35px rgba(46,204,113,0.16),
+        inset 0 0 25px rgba(46,204,113,0.035);
+}
+
+.popup.popup-intermediate {
+    border-color: rgba(212,175,55,0.60);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.75),
+        0 0 35px rgba(212,175,55,0.18),
+        inset 0 0 25px rgba(212,175,55,0.035);
+}
+
+.popup.popup-pro {
+    border-color: rgba(230,126,34,0.60);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.75),
+        0 0 35px rgba(230,126,34,0.18),
+        inset 0 0 25px rgba(230,126,34,0.035);
+}
+
+.popup.popup-expert {
+    border-color: rgba(139,0,0,0.65);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.75),
+        0 0 35px rgba(139,0,0,0.20),
+        inset 0 0 25px rgba(139,0,0,0.04);
+}
+.popup.popup-beginner #popupTitle {
+    color: #6ee7a2;
+}
+
+.popup.popup-intermediate #popupTitle {
+    color: #f5d76e;
+}
+
+.popup.popup-pro #popupTitle {
+    color: #f0a35b;
+}
+
+.popup.popup-expert #popupTitle {
+    color: #e47777;
+}
+.popup.popup-beginner #popupConfirm {
+    border-color: rgba(110,231,162,0.75);
+    background:
+        linear-gradient(
+            135deg,
+            #155c3b,
+            #2ecc71 50%,
+            #155c3b
+        );
+}
+
+.popup.popup-intermediate #popupConfirm {
+    border-color: rgba(245,215,110,0.80);
+    background:
+        linear-gradient(
+            135deg,
+            #76560c,
+            #d4af37 50%,
+            #76560c
+        );
+}
+
+.popup.popup-pro #popupConfirm {
+    border-color: rgba(240,163,91,0.80);
+    background:
+        linear-gradient(
+            135deg,
+            #71370e,
+            #e67e22 50%,
+            #71370e
+        );
+}
+
+.popup.popup-expert #popupConfirm {
+    border-color: rgba(228,119,119,0.80);
+    background:
+        linear-gradient(
+            135deg,
+            #4d0808,
+            #8b0000 50%,
+            #4d0808
+        );
+}
+#ageRangeScreen .screen-container {
+    max-width: 500px;
+    padding: 32px 24px;
+
+    border-radius: 26px;
+
+    border: 1px solid rgba(212,175,55,0.30);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,20,7,0.92),
+            rgba(5,5,5,0.94)
+        );
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.65),
+        0 0 40px rgba(212,175,55,0.08),
+        inset 0 0 30px rgba(212,175,55,0.025);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#ageRangeScreen #ageRangeScreenTitle {
+    color: #f5d76e;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-align: center;
+    text-shadow:
+        0 0 10px rgba(245,215,110,0.45),
+        0 0 25px rgba(212,175,55,0.18);
+    margin-bottom: 14px;
+}
+#ageRangeScreen #ageRangeScreenDescription {
+    color: rgba(255,255,255,0.72);
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0 auto 26px;
+    max-width: 380px;
+}
+#offerScreen .screen-container {
+    max-width: 500px;
+    padding: 32px 24px;
+
+    border-radius: 26px;
+
+    border: 1px solid rgba(212,175,55,0.30);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,20,7,0.92),
+            rgba(5,5,5,0.94)
+        );
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.65),
+        0 0 40px rgba(212,175,55,0.08),
+        inset 0 0 30px rgba(212,175,55,0.025);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#offerScreen #offerScreenTitle {
+    color: #f5d76e;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-align: center;
+    text-shadow:
+        0 0 10px rgba(245,215,110,0.45),
+        0 0 25px rgba(212,175,55,0.18);
+    margin-bottom: 14px;
+}
+#offerScreen #offerScreenDescription {
+    color: rgba(255,255,255,0.72);
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0 auto 26px;
+    max-width: 380px;
+}
+#offerScreen #monthlyOfferBtn {
+    border-color: rgba(110,231,162,0.65);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(21,92,59,0.88),
+            rgba(10,35,22,0.94)
+        );
+
+    color: #6ee7a2;
+
+    box-shadow:
+        0 0 22px rgba(46,204,113,0.12),
+        inset 0 0 20px rgba(46,204,113,0.035);
+}
+
+#offerScreen #monthlyOfferBtn span {
+    color: #6ee7a2;
+    font-weight: 900;
+    text-shadow:
+        0 0 8px rgba(110,231,162,0.25);
+}
+#offerScreen #yearlyOfferBtn {
+    border-color: rgba(245,215,110,0.75);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(118,86,12,0.90),
+            rgba(35,27,5,0.95)
+        );
+
+    color: #f5d76e;
+
+    box-shadow:
+        0 0 24px rgba(212,175,55,0.14),
+        inset 0 0 20px rgba(212,175,55,0.04);
+}
+
+#offerScreen #yearlyOfferBtn span {
+    color: #f5d76e;
+    font-weight: 900;
+    text-shadow:
+        0 0 9px rgba(245,215,110,0.28);
+}
+#paymentScreen .screen-container {
+    max-width: 500px;
+    padding: 32px 24px;
+
+    border-radius: 26px;
+
+    border: 1px solid rgba(212,175,55,0.30);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,20,7,0.92),
+            rgba(5,5,5,0.94)
+        );
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.65),
+        0 0 40px rgba(212,175,55,0.08),
+        inset 0 0 30px rgba(212,175,55,0.025);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#paymentScreen h2 {
+    color: #f5d76e;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-align: center;
+    text-shadow:
+        0 0 10px rgba(245,215,110,0.45),
+        0 0 25px rgba(212,175,55,0.18);
+    margin-bottom: 14px;
+}
+#paymentScreen #paymentPrice {
+    color: #f5d76e;
+    font-size: clamp(30px, 8vw, 42px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-align: center;
+    margin: 4px 0 18px;
+
+    text-shadow:
+        0 0 12px rgba(245,215,110,0.55),
+        0 0 30px rgba(212,175,55,0.22);
+}
+#paymentScreen .payment-description {
+    color: rgba(255,255,255,0.72);
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0 auto 14px;
+    max-width: 380px;
+}
+#paymentScreen .payment-international {
+    color: rgba(245,215,110,0.62);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+    margin: 0 auto 24px;
+    max-width: 380px;
+
+    text-shadow:
+        0 0 6px rgba(212,175,55,0.12);
+}
+#paymentScreen #orangeMoneyBtn {
+    border-color: rgba(255,145,0,0.65);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(92,45,5,0.88),
+            rgba(25,12,2,0.95)
+        );
+
+    box-shadow:
+        0 0 24px rgba(255,145,0,0.14),
+        inset 0 0 20px rgba(255,145,0,0.035);
+}
+
+#paymentScreen #orangeMoneyBtn .payment-logo {
+    filter:
+        drop-shadow(
+            0 0 8px rgba(255,145,0,0.35)
+        );
+}
+#paymentScreen #waveBtn {
+    border-color: rgba(70,160,255,0.65);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,45,78,0.88),
+            rgba(3,15,28,0.95)
+        );
+
+    box-shadow:
+        0 0 24px rgba(70,160,255,0.14),
+        inset 0 0 20px rgba(70,160,255,0.035);
+}
+
+#paymentScreen #waveBtn .payment-logo {
+    filter:
+        drop-shadow(
+            0 0 8px rgba(70,160,255,0.35)
+        );
+}
+#paymentScreen #cardPaymentBtn {
+    border-color: rgba(245,215,110,0.70);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(75,58,12,0.88),
+            rgba(20,16,4,0.95)
+        );
+
+    box-shadow:
+        0 0 24px rgba(212,175,55,0.14),
+        inset 0 0 20px rgba(212,175,55,0.035);
+}
+
+#paymentScreen #cardPaymentBtn .card-payment-icon {
+    filter:
+        drop-shadow(
+            0 0 8px rgba(245,215,110,0.35)
+        );
+}
+
+#paymentScreen #cardPaymentBtn .card-payment-label {
+    color: #f5d76e;
+    font-weight: 900;
+    text-shadow:
+        0 0 8px rgba(245,215,110,0.22);
+}
+#cardPaymentScreen .screen-container {
+    max-width: 500px;
+    padding: 32px 24px;
+
+    border-radius: 26px;
+
+    border: 1px solid rgba(212,175,55,0.30);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,20,7,0.92),
+            rgba(5,5,5,0.94)
+        );
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.65),
+        0 0 40px rgba(212,175,55,0.08),
+        inset 0 0 30px rgba(212,175,55,0.025);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+#cardPaymentScreen h2 {
+    color: #f5d76e;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-align: center;
+    text-shadow:
+        0 0 10px rgba(245,215,110,0.45),
+        0 0 25px rgba(212,175,55,0.18);
+    margin-bottom: 14px;
+}
+#cardPaymentScreen #cardPaymentPrice {
+    color: #f5d76e;
+    font-size: clamp(30px, 8vw, 42px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-align: center;
+    margin: 4px 0 18px;
+
+    text-shadow:
+        0 0 12px rgba(245,215,110,0.55),
+        0 0 30px rgba(212,175,55,0.22);
+}
+#cardPaymentScreen .payment-description {
+    color: #6ee7a2;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.6;
+    text-align: center;
+    margin: 0 auto 14px;
+
+    text-shadow:
+        0 0 8px rgba(46,204,113,0.22);
+}
+#cardPaymentScreen #cardPaymentInternational {
+    color: rgba(245,215,110,0.62);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+    margin: 0 auto;
+    max-width: 380px;
+
+    text-shadow:
+        0 0 6px rgba(212,175,55,0.12);
 }
