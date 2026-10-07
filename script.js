@@ -5879,6 +5879,26 @@ document.querySelector(
             document.querySelector(
                 '#levelsScreen [data-level="expert"] strong'
             ).textContent = "Expert";
+            document.querySelector(
+    '#levelsScreen [data-level="intermediate"] small'
+).textContent =
+    unlockedLevels.intermediate
+        ? "Niveau débloqué"
+        : "0/5 victoires — 10 secondes par tentative";
+
+document.querySelector(
+    '#levelsScreen [data-level="pro"] small'
+).textContent =
+    unlockedLevels.pro
+        ? "Niveau débloqué"
+        : "0/5 victoires — 8 secondes par tentative";
+
+document.querySelector(
+    '#levelsScreen [data-level="expert"] small'
+).textContent =
+    unlockedLevels.expert
+        ? "Niveau débloqué"
+        : `${levelStreak.pro}/5 victoires — 6 secondes par tentative`;
 
             
 
@@ -6574,18 +6594,26 @@ document.querySelector(
             document.querySelector(
                 '#levelsScreen [data-level="expert"] strong'
             ).textContent = "Expert";
-            document.querySelectorAll(
-    '#levelsScreen [data-level] small'
-).forEach(small => {
+           document.querySelector(
+    '#levelsScreen [data-level="intermediate"] small'
+).textContent =
+    unlockedLevels.intermediate
+        ? "Level unlocked"
+        : "0/5 wins — 10 seconds per attempt";
 
-    if (
-        small.textContent === "Niveau débloqué"
-    ) {
-        small.textContent = "Level unlocked";
-    }
+document.querySelector(
+    '#levelsScreen [data-level="pro"] small'
+).textContent =
+    unlockedLevels.pro
+        ? "Level unlocked"
+        : "0/5 wins — 8 seconds per attempt";
 
-});
-
+document.querySelector(
+    '#levelsScreen [data-level="expert"] small'
+).textContent =
+    unlockedLevels.expert
+        ? "Level unlocked"
+        : `${levelStreak.pro}/5 wins — 6 seconds per attempt`;
            
 
 
