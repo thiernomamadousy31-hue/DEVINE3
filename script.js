@@ -411,7 +411,7 @@ testAnonymousLogin();
 const levels = {
     beginner: {
         name: "Débutant",
-        time: 240,
+        time: 120,
         multiplier: 1
     },
 
@@ -444,6 +444,8 @@ let timeLeft = 0;
 let timerInterval = null;
 
 let gameOver = false;
+let attemptTimerInterval = null;
+let attemptTimeLeft = 0;
 
 let attempts = 0;
 
@@ -2244,6 +2246,12 @@ function closePopup() {
 
 
     overlay.classList.remove("active");
+    const popup =
+    document.querySelector(".popup");
+
+if (popup) {
+    popup.classList.remove("level-unlocked");
+}
 
     overlay.setAttribute(
         "aria-hidden",
@@ -2285,6 +2293,16 @@ function updateFreeGamesLimitPopup() {
 }
 function startSolo(level) {
     currentLevel = level;
+    document.body.classList.remove(
+    "sky-beginner",
+    "sky-intermediate",
+    "sky-pro",
+    "sky-expert"
+);
+
+document.body.classList.add(
+    "sky-" + currentLevel
+);
     console.log("🎯 NIVEAU CHOISI :", level, "| currentLevel :", currentLevel);
     
 
@@ -2349,6 +2367,24 @@ if (freeGamesCounter) {
     history = [];
 
     gameOver = false;
+    const soloGameContainer =
+    document.getElementById(
+        "soloGameContainer"
+    );
+
+if (soloGameContainer) {
+
+    soloGameContainer.classList.remove(
+        "level-beginner",
+        "level-intermediate",
+        "level-pro",
+        "level-expert"
+    );
+
+    soloGameContainer.classList.add(
+        "level-" + currentLevel
+    );
+}
 
 
     const isEnglish =
@@ -2446,7 +2482,14 @@ document.getElementById(
     showScreen("gameScreen");
 
 
+    if (currentLevel === "beginner") {
+
     startSoloTimer();
+
+} else {
+
+    startAttemptTimer();
+}
 
 
     setTimeout(() => {
@@ -2496,6 +2539,110 @@ function startSoloTimer() {
                 loseSoloGame();
             }
 
+        }, 1000);
+}
+function startAttemptTimer() {
+
+    clearInterval(attemptTimerInterval);
+    console.log(
+    "⏱️ NOUVEAU CHRONO —",
+    currentLevel,
+    attemptTimeLeft
+);
+
+    if (currentLevel === "intermediate") {
+        attemptTimeLeft = 10;
+    } else if (currentLevel === "pro") {
+        attemptTimeLeft = 8;
+    } else if (currentLevel === "expert") {
+        attemptTimeLeft = 6;
+    } else {
+        return;
+    }
+
+    document.getElementById("timer").textContent =
+    formatTime(attemptTimeLeft);
+
+    attemptTimerInterval =
+        setInterval(() => {
+
+            if (gameOver) {
+                clearInterval(attemptTimerInterval);
+                return;
+            }
+
+            
+  attemptTimeLeft--;
+
+if (
+    (currentLevel === "intermediate" && attemptTimeLeft <= 5) ||
+    (currentLevel === "pro" && attemptTimeLeft <= 4) ||
+    (currentLevel === "expert" && attemptTimeLeft <= 3)
+) {
+    playCountdownSound();
+}
+
+document.getElementById("timer").textContent =
+    formatTime(attemptTimeLeft);
+        
+
+      if (attemptTimeLeft <= 0) {
+
+    clearInterval(
+        attemptTimerInterval
+    );
+
+    const message = document.getElementById("message");
+
+   if (message) {
+    message.textContent = "⏱️ TEMPS ÉCOULÉ";
+    message.className = "message error";
+
+    setTimeout(() => {
+        if (!gameOver) {
+            message.textContent = "";
+            message.className = "message";
+        }
+    }, 700);
+}
+    attempts++;
+const maxAttempts = {
+    beginner: 12,
+    intermediate: 10,
+    pro: 8,
+    expert: 6
+};
+
+if (attempts > maxAttempts[currentLevel]) {
+
+    loseSoloGame("attempts");
+
+    return;
+}
+
+if (
+    currentLevel === "pro" ||
+    currentLevel === "expert"
+) {
+    document.getElementById(
+        "history"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "history"
+    ).style.visibility = "visible";
+}
+addHistoryItem(
+    "history",
+    "—",
+    {
+        v: 0,
+        x: 0
+    }
+);
+
+startAttemptTimer();
+}
         }, 1000);
 }
 
@@ -2688,6 +2835,13 @@ console.log("🎯 RESULTAT FINAL :", result);
 
     return;
 }
+if (
+    currentLevel === "intermediate" ||
+    currentLevel === "pro" ||
+    currentLevel === "expert"
+) {
+    startAttemptTimer();
+}
 
     message.textContent =
         `${result.v}V — ${result.x}X`;
@@ -2873,6 +3027,14 @@ if (currentLevel === "pro") {
         levelStreak.pro = 0;
     }
 }
+const wasIntermediateUnlocked =
+    unlockedLevels.intermediate;
+
+const wasProUnlocked =
+    unlockedLevels.pro;
+
+const wasExpertUnlocked =
+    unlockedLevels.expert;
 // DÉBLOCAGE DES NIVEAUX
 if (levelStreak.beginner >= 5) {
     unlockedLevels.intermediate = true;
@@ -2887,6 +3049,62 @@ if (levelStreak.pro >= 5) {
 }
 saveLevelProgress();
 updateLevelsUI();
+let newlyUnlockedLevel = null;
+
+if (
+    !wasIntermediateUnlocked &&
+    unlockedLevels.intermediate
+) {
+    newlyUnlockedLevel = "intermediate";
+} else if (
+    !wasProUnlocked &&
+    unlockedLevels.pro
+) {
+    newlyUnlockedLevel = "pro";
+} else if (
+    !wasExpertUnlocked &&
+    unlockedLevels.expert
+) {
+    newlyUnlockedLevel = "expert";
+}
+if (newlyUnlockedLevel) {
+
+    const levelNames = {
+        intermediate: isEnglish
+            ? "INTERMEDIATE"
+            : "INTERMÉDIAIRE",
+
+        pro: "PRO",
+
+        expert: "EXPERT"
+    };
+
+    showPopup(
+        isEnglish
+            ? "🏆 LEVEL UP!"
+            : "🏆 PASSE AU NIVEAU SUPÉRIEUR !",
+
+        isEnglish
+            ? `${levelNames[newlyUnlockedLevel]} level unlocked!`
+            : `Niveau ${levelNames[newlyUnlockedLevel]} débloqué !`
+    );
+
+    const popup =
+        document.querySelector(".popup");
+
+    if (popup) {
+
+        popup.classList.remove(
+            "level-unlocked"
+        );
+
+        void popup.offsetWidth;
+
+        popup.classList.add(
+            "level-unlocked"
+        );
+    }
+}
 
     updateChallengesAfterWin();
 
@@ -3327,6 +3545,12 @@ function updateHome() {
 function quitSolo() {
 
     if (gameOver) {
+        document.body.classList.remove(
+    "sky-beginner",
+    "sky-intermediate",
+    "sky-pro",
+    "sky-expert"
+);
 
         showScreen("homeScreen");
 
@@ -3338,7 +3562,22 @@ function quitSolo() {
         enLanguageBtn &&
         enLanguageBtn.classList.contains("active");
 
+const popup =
+    document.querySelector(".popup");
 
+if (popup) {
+
+    popup.classList.remove(
+        "popup-beginner",
+        "popup-intermediate",
+        "popup-pro",
+        "popup-expert"
+    );
+
+    popup.classList.add(
+        "popup-" + currentLevel
+    );
+}
     showPopup(
         isEnglish
             ? "Quit the game?"
@@ -3353,6 +3592,12 @@ function quitSolo() {
             clearInterval(timerInterval);
 
             gameOver = true;
+            document.body.classList.remove(
+    "sky-beginner",
+    "sky-intermediate",
+    "sky-pro",
+    "sky-expert"
+);
 
             showScreen("homeScreen");
 
@@ -4416,7 +4661,7 @@ function updateLevelsUI() {
                     progress.textContent =
                         unlockedLevels.intermediate
                             ? "Niveau débloqué"
-                            : `${levelStreak.beginner}/5 victoires — moins de 3 min`;
+                            : `${levelStreak.beginner}/5 victoires — 10 secondes par tentative`;
                 }
             }
             if (level === "pro") {
@@ -4431,7 +4676,7 @@ function updateLevelsUI() {
         progress.textContent =
             unlockedLevels.pro
                 ? "Niveau débloqué"
-                : `${levelStreak.intermediate}/5 victoires — moins de 2 min`;
+                : `${levelStreak.intermediate}/5 victoires — 8 secondes par tentative`;
     }
 }
 if (level === "expert") {
@@ -4446,7 +4691,7 @@ if (level === "expert") {
         progress.textContent =
             unlockedLevels.expert
                 ? "Niveau débloqué"
-                : `${levelStreak.pro}/5 victoires — moins de 1 min`;
+                : `${levelStreak.pro}/5 victoires — 6 secondes par tentative`;
     }
 }
         });
@@ -5618,33 +5863,24 @@ document.querySelector(
             ).textContent = "Débutant";
 
             document.querySelector(
-                '#levelsScreen [data-level="beginner"] small'
-            ).textContent = "4 minutes";
-
+             '#levelsScreen [data-level="beginner"] small'
+            ).textContent = "2 minutes";
             document.querySelector(
                 '#levelsScreen [data-level="intermediate"] strong'
             ).textContent = "Intermédiaire";
 
-            document.querySelector(
-                '#levelsScreen [data-level="intermediate"] small'
-            ).textContent = "0/5 victoires — moins de 3 minutes";
+           
 
             document.querySelector(
                 '#levelsScreen [data-level="pro"] strong'
             ).textContent = "Pro";
 
-            document.querySelector(
-                '#levelsScreen [data-level="pro"] small'
-            ).textContent = "0/5 victoires — moins de 2 minutes";
-
+            
             document.querySelector(
                 '#levelsScreen [data-level="expert"] strong'
             ).textContent = "Expert";
 
-            document.querySelector(
-                '#levelsScreen [data-level="expert"] small'
-            ).textContent = "0/5 victoires — moins de 1 minute";
-
+            
 
             // 🏠 ÉCRAN D'ACCUEIL — FRANÇAIS
 
@@ -6321,33 +6557,36 @@ document.querySelector(
                 '#levelsScreen [data-level="beginner"] strong'
             ).textContent = "Beginner";
 
-            document.querySelector(
-                '#levelsScreen [data-level="beginner"] small'
-            ).textContent = "5 minutes";
-
+           document.querySelector(
+    '#levelsScreen [data-level="beginner"] small'
+).textContent = "2 minutes";
             document.querySelector(
                 '#levelsScreen [data-level="intermediate"] strong'
             ).textContent = "Intermediate";
 
-            document.querySelector(
-                '#levelsScreen [data-level="intermediate"] small'
-            ).textContent = "4 minutes";
-
+            
             document.querySelector(
                 '#levelsScreen [data-level="pro"] strong'
             ).textContent = "Pro";
 
-            document.querySelector(
-                '#levelsScreen [data-level="pro"] small'
-            ).textContent = "3 minutes";
+            
 
             document.querySelector(
                 '#levelsScreen [data-level="expert"] strong'
             ).textContent = "Expert";
+            document.querySelectorAll(
+    '#levelsScreen [data-level] small'
+).forEach(small => {
 
-            document.querySelector(
-                '#levelsScreen [data-level="expert"] small'
-            ).textContent = "2 minutes";
+    if (
+        small.textContent === "Niveau débloqué"
+    ) {
+        small.textContent = "Level unlocked";
+    }
+
+});
+
+           
 
 
             // 🏠 HOME SCREEN — ENGLISH
@@ -7423,26 +7662,6 @@ yearlyBtn.innerHTML =
 
 
 
-if (age25to39Btn) {
-
-    age25to39Btn.addEventListener(
-        "click",
-        () => {
-            selectAgeRange("25-39");
-        }
-    );
-}
-
-
-if (age40PlusBtn) {
-
-    age40PlusBtn.addEventListener(
-        "click",
-        () => {
-            selectAgeRange("40-plus");
-        }
-    );
-}
 // 💰 CLIC SUR L'OFFRE MENSUELLE
 
 if (monthlyOfferBtn) {
