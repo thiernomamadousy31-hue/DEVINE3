@@ -488,6 +488,12 @@ async function cleanupOldOnlineRealtimeChannels() {
 function resetOnlineGameState() {
 
     console.log("🧹 NETTOYAGE DE L'ANCIENNE PARTIE EN LIGNE");
+    const onlineChat =
+    document.getElementById("onlineChat");
+
+if (onlineChat) {
+    onlineChat.innerHTML = "";
+}
         // 🧹 Nettoyer l'affichage de l'ancienne partie
     const onlineGameMessage =
         document.getElementById("onlineGameMessage");
@@ -1599,7 +1605,7 @@ function countCompletedOnlineGame() {
         onlineGames
     );
 }
-function showOnlineVerdict(winnerNumber) {
+function showOnlineVerdict(winnerNumber, endReason) {
 
     const playerNumber =
         currentOnlineGame.player1_id === currentUser.id
@@ -1696,10 +1702,21 @@ document.getElementById("onlineVerdictOpponentCode").textContent =
     enLanguageBtn.classList.contains("active");
    // 🏆 TITRE
 document.getElementById("onlineVerdictTitle").textContent =
-    isEnglish
-        ? (isWinner ? "🏆 VICTORY!" : "💥 DEFEAT!")
-        : (isWinner ? "🏆 VICTOIRE !" : "💥 DÉFAITE !");
-
+    endReason === "quit"
+        ? (
+            isEnglish
+                ? (isWinner
+                    ? "🏆 VICTORY BY FORFEIT!"
+                    : "🚪 OPPONENT LEFT!")
+                : (isWinner
+                    ? "🏆 VICTOIRE PAR ABANDON !"
+                    : "🚪 ADVERSAIRE PARTI !")
+        )
+        : (
+            isEnglish
+                ? (isWinner ? "🏆 VICTORY!" : "💥 DEFEAT!")
+                : (isWinner ? "🏆 VICTOIRE !" : "💥 DÉFAITE !")
+        );
 if (isWinner) {
     playWinSound();
 } else {
@@ -1708,14 +1725,25 @@ if (isWinner) {
 
 // 📝 SOUS-TITRE
 document.getElementById("onlineVerdictSubtitle").textContent =
-    isEnglish
-        ? (isWinner
-            ? "YOU FOUND THE CODE!"
-            : "YOUR OPPONENT FOUND THE CODE!")
-        : (isWinner
-            ? "TU AS TROUVÉ LE CODE !"
-            : "TON ADVERSAIRE A TROUVÉ LE CODE !");
-
+    endReason === "quit"
+        ? (
+            isEnglish
+                ? (isWinner
+                    ? "YOUR OPPONENT LEFT THE GAME!"
+                    : "YOU LEFT THE GAME!")
+                : (isWinner
+                    ? "TON ADVERSAIRE A QUITTÉ LA PARTIE !"
+                    : "TU AS QUITTÉ LA PARTIE !")
+        )
+        : (
+            isEnglish
+                ? (isWinner
+                    ? "YOU FOUND THE CODE!"
+                    : "YOUR OPPONENT FOUND THE CODE!")
+                : (isWinner
+                    ? "TU AS TROUVÉ LE CODE !"
+                    : "TON ADVERSAIRE A TROUVÉ LE CODE !")
+        );
 // 💬 MESSAGE
 document.getElementById("onlineVerdictMessage").textContent =
     isEnglish
@@ -1858,7 +1886,10 @@ if (
         ? "💥 DEFEAT!"
         : "💥 DÉFAITE !";
     }
-    showOnlineVerdict(payload.new.winner);
+    showOnlineVerdict(
+    payload.new.winner,
+    payload.new.end_reason
+);
 
     clearInterval(onlineTurnTimer);
   // 🧹 NETTOYAGE DE L'AFFICHAGE DU TOUR
@@ -4380,6 +4411,8 @@ function formatPlayerResult(result) {
    ========================================================= */
 
 function quitTwoPlayers() {
+        document.querySelector(".popup").className = "popup";
+
 
     showPopup(
     currentLanguage === "en"
@@ -4397,6 +4430,12 @@ function quitTwoPlayers() {
 
 
             twoGameOver = true;
+            document.body.classList.remove(
+    "sky-beginner",
+    "sky-intermediate",
+    "sky-pro",
+    "sky-expert"
+);
 
 
             showScreen(
@@ -4752,6 +4791,34 @@ document
     );
 
 
+/* Clavier numérique du jeu solo */
+
+document
+    .querySelectorAll("#soloNumericKeyboard button")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const input = document.getElementById("guessInput");
+            const key = button.dataset.key;
+
+            if (!input) return;
+
+            if (key === "backspace") {
+                input.value = input.value.slice(0, -1);
+                return;
+            }
+
+            if (key === "enter") {
+                document.getElementById("guessForm").requestSubmit();
+                return;
+            }
+
+            if (/^[0-9]$/.test(key) && input.value.length < 3) {
+                input.value += key;
+            }
+        });
+    });
 document
     .getElementById("quitGameBtn")
     .addEventListener(
