@@ -3,7 +3,7 @@
   "short_name": "DEVINE 3",
   "description": "Jeu de logique et de réflexion à 3 chiffres",
   "start_url": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#020617",
   "theme_color": "#020617",
   "orientation": "portrait",
