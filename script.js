@@ -46,6 +46,7 @@ function generateRoomCode() {
     return code;
 }
 console.log("🟢 SCRIPT ACTUEL CHARGÉ");
+
 window.TEST_SCRIPT_DEVINE3 = "NOUVEAU SCRIPT";
 async function createOnlineGame() {
 
@@ -1892,6 +1893,37 @@ if (
 );
 
     clearInterval(onlineTurnTimer);
+    
+    // 🔒 Fermer le clavier du code secret à la fin du duel
+    const secretKeyboard =
+        document.getElementById("onlineSecretKeyboard");
+
+    if (secretKeyboard) {
+        secretKeyboard.hidden = true;
+    }
+
+    const secretInput =
+        document.getElementById("onlineSecretInput");
+
+    if (secretInput) {
+        secretInput.blur();
+    }
+
+    // 🔒 Fermer aussi le clavier des propositions
+    const numericKeyboard =
+        document.getElementById("onlineNumericKeyboard");
+
+    if (numericKeyboard) {
+        numericKeyboard.hidden = true;
+    }
+
+    const guessInput =
+        document.getElementById("onlineGuessInput");
+
+    if (guessInput) {
+        guessInput.blur();
+    }
+
   // 🧹 NETTOYAGE DE L'AFFICHAGE DU TOUR
 const currentPlayerElement =
     document.getElementById("onlineCurrentPlayer");
@@ -1900,8 +1932,9 @@ if (currentPlayerElement) {
     currentPlayerElement.textContent = "";
 }
 
+
 const timerElement =
-    document.getElementById("onlineTurnTimer");
+    document.getElementById("onlineTimer");
 
 if (timerElement) {
     timerElement.textContent = "";
@@ -1927,12 +1960,14 @@ if (onlineInstruction) {
 if (
     payload.new.status === "playing"
 ) {
-        const timerElement =
-    document.getElementById("onlineTurnTimer");
+        
+const timerElement =
+    document.getElementById("onlineTimer");
 
 if (timerElement) {
     timerElement.textContent = "15";
 }
+
 
         const playerNumber =
             currentOnlineGame.player1_id === currentUser.id
@@ -2201,7 +2236,12 @@ document
         }
 
         input.value = "";
-        input.focus();
+
+document.getElementById(
+    "onlineChatKeyboard"
+).hidden = true;
+
+input.blur();
     });
 function showScreen(id) {
 
@@ -2419,9 +2459,8 @@ if (soloGameContainer) {
 
 
     const isEnglish =
-    enLanguageBtn &&
-    enLanguageBtn.classList.contains("active");
-
+    document.getElementById("enLanguageBtn")
+        ?.classList.contains("active");
 document.getElementById(
     "currentLevelName"
 ).textContent =
@@ -2509,7 +2548,9 @@ document.getElementById(
         ? "History"
         : "Historique";
 
-
+if (soloNumericKeyboard) {
+    soloNumericKeyboard.hidden = true;
+}
     showScreen("gameScreen");
 
 
@@ -2572,27 +2613,31 @@ function startSoloTimer() {
 
         }, 1000);
 }
-function startAttemptTimer() {
+
+function startAttemptTimer(resume = false) {
 
     clearInterval(attemptTimerInterval);
-    console.log(
-    "⏱️ NOUVEAU CHRONO —",
-    currentLevel,
-    attemptTimeLeft
-);
 
-    if (currentLevel === "intermediate") {
-        attemptTimeLeft = 10;
-    } else if (currentLevel === "pro") {
-        attemptTimeLeft = 8;
-    } else if (currentLevel === "expert") {
-        attemptTimeLeft = 6;
-    } else {
-        return;
+    console.log(
+        "⏱️ NOUVEAU CHRONO —",
+        currentLevel,
+        attemptTimeLeft
+    );
+
+    if (!resume) {
+        if (currentLevel === "intermediate") {
+            attemptTimeLeft = 12;
+        } else if (currentLevel === "pro") {
+            attemptTimeLeft = 10;
+        } else if (currentLevel === "expert") {
+            attemptTimeLeft = 8;
+        } else {
+            return;
+        }
     }
 
     document.getElementById("timer").textContent =
-    formatTime(attemptTimeLeft);
+        formatTime(attemptTimeLeft);
 
     attemptTimerInterval =
         setInterval(() => {
@@ -2995,27 +3040,62 @@ function winSoloGame() {
         levels[currentLevel];
 
 
-    let score =
-        500 +
-        timeLeft * 2 +
-        Math.max(
-            0,
-            300 - attempts * 25
-        );
+    
+const baseScores = {
+    beginner: 500,
+    intermediate: 1000,
+    pro: 2000,
+    expert: 4000
+};
 
+const maxTimes = {
+    beginner: 120,
+    intermediate: 12,
+    pro: 10,
+    expert: 8
+};
 
-    score =
-        Math.round(
-            score *
-            config.multiplier
-        );
+const maxAttemptsByLevel = {
+    beginner: 12,
+    intermediate: 10,
+    pro: 8,
+    expert: 6
+};
 
+const baseScore = baseScores[currentLevel];
 
-    score =
-        Math.max(
-            50,
-            score
-        );
+const maxTime = maxTimes[currentLevel];
+
+const remainingTime =
+    currentLevel === "beginner"
+        ? timeLeft
+        : attemptTimeLeft;
+
+const timeRatio = Math.min(
+    1,
+    Math.max(0, remainingTime / maxTime)
+);
+
+const attemptRatio = Math.min(
+    1,
+    Math.max(
+        0,
+        1 - attempts / maxAttemptsByLevel[currentLevel]
+    )
+);
+
+const speedBonus = Math.round(
+    baseScore * 0.20 * timeRatio
+);
+
+const precisionBonus = Math.round(
+    baseScore * 0.10 * attemptRatio
+);
+
+let score =
+    baseScore +
+    speedBonus +
+    precisionBonus;
 
 
     stats.games++;
@@ -3031,32 +3111,19 @@ function winSoloGame() {
 
 
     saveStats();
-    // SÉRIE DE VICTOIRES POUR DÉBLOQUER LES NIVEAUX
-if (currentLevel === "beginner") {
+   
+/* SÉRIE DE VICTOIRES POUR DÉBLOQUER LES NIVEAUX */
 
-    if (timeLeft > 60) {
-        levelStreak.beginner++;
-    } else {
-        levelStreak.beginner = 0;
-    }
+if (currentLevel === "beginner") {
+    levelStreak.beginner++;
 }
 
 if (currentLevel === "intermediate") {
-
-    if (timeLeft > 60) {
-        levelStreak.intermediate++;
-    } else {
-        levelStreak.intermediate = 0;
-    }
+    levelStreak.intermediate++;
 }
 
 if (currentLevel === "pro") {
-
-    if (timeLeft > 60) {
-        levelStreak.pro++;
-    } else {
-        levelStreak.pro = 0;
-    }
+    levelStreak.pro++;
 }
 const wasIntermediateUnlocked =
     unlockedLevels.intermediate;
@@ -3609,6 +3676,12 @@ if (popup) {
         "popup-" + currentLevel
     );
 }
+
+// Mettre les chronomètres en pause pendant la confirmation
+if (!gameOver) {
+    clearInterval(timerInterval);
+    clearInterval(attemptTimerInterval);
+}
     showPopup(
         isEnglish
             ? "Quit the game?"
@@ -3620,10 +3693,26 @@ if (popup) {
 
         () => {
 
-            clearInterval(timerInterval);
+            if (!gameOver) {
 
-            gameOver = true;
-            document.body.classList.remove(
+    // Arrêter les deux chronomètres
+    clearInterval(timerInterval);
+    clearInterval(attemptTimerInterval);
+
+    // Un abandon casse la série du niveau joué
+    if (currentLevel === "beginner") {
+        levelStreak.beginner = 0;
+    } else if (currentLevel === "intermediate") {
+        levelStreak.intermediate = 0;
+    } else if (currentLevel === "pro") {
+    levelStreak.pro = 0;
+} else if (currentLevel === "expert") {
+    levelStreak.pro = 0;
+}
+    saveLevelProgress();
+}
+
+gameOver = true;            document.body.classList.remove(
     "sky-beginner",
     "sky-intermediate",
     "sky-pro",
@@ -4036,10 +4125,9 @@ function submitTwoGuess() {
 
     if (!isValidCode(guess)) {
 
-        const isEnglish =
-    enLanguageBtn &&
-    enLanguageBtn.classList.contains("active");
-
+       const isEnglish =
+    document.getElementById("enLanguageBtn")
+        ?.classList.contains("active");
         message.className =
             "message error";
 
@@ -4612,6 +4700,206 @@ if (game) {
 
         }
     );
+   
+/* CLAVIER POPUP DU CODE DE PARTIE */
+
+const roomKeyboard =
+    document.getElementById("joinRoomKeyboard");
+
+const roomInput =
+    document.getElementById("joinRoomCode");
+
+const closeRoomKeyboardBtn =
+    document.getElementById("closeRoomKeyboardBtn");
+
+if (roomKeyboard && roomInput && closeRoomKeyboardBtn) {
+
+    // Désactiver le clavier natif du téléphone
+    roomInput.setAttribute("inputmode", "none");
+
+    // Ouvrir le popup en touchant le champ du code
+    roomInput.addEventListener("focus", () => {
+        roomKeyboard.hidden = false;
+    });
+
+    // Fermer le popup
+    closeRoomKeyboardBtn.addEventListener("click", () => {
+        roomKeyboard.hidden = true;
+        roomInput.blur();
+    });
+
+    // Gérer les touches du clavier
+    roomKeyboard
+        .querySelectorAll("button[data-key]")
+        .forEach(button => {
+
+            button.addEventListener("mousedown", event => {
+                event.preventDefault();
+            });
+
+            button.addEventListener("click", () => {
+
+                const key = button.dataset.key;
+
+                if (key === "backspace") {
+                    roomInput.value =
+                        roomInput.value.slice(0, -1);
+                    return;
+                }
+
+                if (key === "clear") {
+                    roomInput.value = "";
+                    return;
+                }
+
+                if (
+                    /^[A-Z0-9]$/.test(key) &&
+                    roomInput.value.length < 4
+                ) {
+                    roomInput.value += key;
+                }
+            });
+        });
+}
+
+/* CLAVIER POPUP DU CODE SECRET */
+
+const onlineSecretKeyboard =
+    document.getElementById("onlineSecretKeyboard");
+
+const onlineSecretInput =
+    document.getElementById("onlineSecretInput");
+
+const closeOnlineSecretKeyboardBtn =
+    document.getElementById("closeOnlineSecretKeyboardBtn");
+
+if (
+    onlineSecretKeyboard &&
+    onlineSecretInput &&
+    closeOnlineSecretKeyboardBtn
+) {
+    // Empêcher l'ouverture du clavier natif sur téléphone
+    onlineSecretInput.setAttribute("inputmode", "none");
+
+    // Afficher le popup quand le champ est sélectionné
+    onlineSecretInput.addEventListener("focus", () => {
+        onlineSecretKeyboard.hidden = false;
+    });
+
+    // Fermer le popup
+    closeOnlineSecretKeyboardBtn.addEventListener("click", () => {
+        onlineSecretKeyboard.hidden = true;
+        onlineSecretInput.blur();
+    });
+
+    // Gérer les touches du clavier
+    onlineSecretKeyboard
+        .querySelectorAll("button[data-secret-key]")
+        .forEach(button => {
+            button.addEventListener("mousedown", event => {
+                event.preventDefault();
+            });
+
+            button.addEventListener("click", () => {
+                const key = button.dataset.secretKey;
+
+                if (key === "backspace") {
+                    onlineSecretInput.value =
+                        onlineSecretInput.value.slice(0, -1);
+                    return;
+                }
+
+                if (key === "clear") {
+                    onlineSecretInput.value = "";
+                    return;
+                }
+
+                if (
+                    /^[0-9]$/.test(key) &&
+                    onlineSecretInput.value.length < 3
+                ) {
+                    onlineSecretInput.value += key;
+                }
+            });
+        });
+}
+
+
+
+/* QUITTER LA PRÉPARATION DU DUEL EN LIGNE */
+
+const quitOnlineSecretBtn =
+    document.getElementById("quitOnlineSecretBtn");
+
+if (quitOnlineSecretBtn) {
+    quitOnlineSecretBtn.addEventListener("click", async () => {
+
+        const game = currentOnlineGame;
+
+        // Fermer le clavier et effacer le code non validé
+        const keyboard =
+            document.getElementById("onlineSecretKeyboard");
+
+        if (keyboard) {
+            keyboard.hidden = true;
+        }
+
+        const secretInput =
+            document.getElementById("onlineSecretInput");
+
+        if (secretInput) {
+            secretInput.value = "";
+            secretInput.blur();
+        }
+
+        const status =
+            document.getElementById("onlineSecretStatus");
+
+        if (status) {
+            status.textContent = "";
+        }
+
+        // Fermer la préparation côté serveur
+        if (game && currentUser) {
+            const { data, error } =
+                await supabaseClient.rpc(
+                    "cancel_online_preparation",
+                    {
+                        p_game_id: game.id
+                    }
+                );
+
+            if (error) {
+                console.error(
+                    "❌ ERREUR ANNULATION PRÉPARATION :",
+                    error
+                );
+
+                if (status) {
+                    status.textContent =
+                        currentLanguage === "en"
+                            ? "Unable to leave the room. Please try again."
+                            : "Impossible de quitter la salle. Réessaie.";
+                }
+
+                return;
+            }
+
+            console.log(
+                "✅ PRÉPARATION ANNULÉE :",
+                data
+            );
+        }
+
+        // Réinitialiser l'état local
+        resetOnlineGameState();
+
+        showScreen("homeScreen");
+        playSound("click");
+    });
+}
+
+
 document
     .getElementById("statisticsBtn")
     .addEventListener(
@@ -4685,9 +4973,7 @@ function updateLevelsUI() {
                 locked
             );
 
-            button.disabled =
-                locked;
-
+           button.disabled = false;
             if (level === "intermediate") {
 
                 const progress =
@@ -4700,7 +4986,7 @@ function updateLevelsUI() {
                     progress.textContent =
                         unlockedLevels.intermediate
                             ? "Niveau débloqué"
-                            : `${levelStreak.beginner}/5 victoires — 10 secondes par tentative`;
+                            : `${levelStreak.beginner}/5 victoires — 12 secondes par tentative`;
                 }
             }
             if (level === "pro") {
@@ -4715,7 +5001,7 @@ function updateLevelsUI() {
         progress.textContent =
             unlockedLevels.pro
                 ? "Niveau débloqué"
-                : `${levelStreak.intermediate}/5 victoires — 8 secondes par tentative`;
+                : `${levelStreak.intermediate}/5 victoires — 10 secondes par tentative`;
     }
 }
 if (level === "expert") {
@@ -4730,7 +5016,7 @@ if (level === "expert") {
         progress.textContent =
             unlockedLevels.expert
                 ? "Niveau débloqué"
-                : `${levelStreak.pro}/5 victoires — 6 secondes par tentative`;
+                : `${levelStreak.pro}/5 victoires — 8 secondes par tentative`;
     }
 }
         });
@@ -4748,11 +5034,101 @@ document
                 const level =
                     button.dataset.level;
 
-                if (!unlockedLevels[level]) {
-                    return;
-                }
+         
+if (!unlockedLevels[level]) {
 
-                startSolo(level);
+    const overlay = document.getElementById(
+        "paidLevelUnlockOverlay"
+    );
+
+    const title = document.getElementById(
+        "paidLevelTitle"
+    );
+
+    const description = document.getElementById(
+        "paidLevelDescription"
+    );
+
+    const price = document.getElementById(
+        "paidLevelPrice"
+    );
+
+    const payButton = document.getElementById(
+        "payToUnlockLevelBtn"
+    );
+
+    const closeButton = document.getElementById(
+        "closePaidLevelModalBtn"
+    );
+
+    const isEnglish =
+        document.getElementById("enLanguageBtn")
+            ?.classList.contains("active");
+
+    const levelNames = {
+        intermediate: isEnglish ? "Intermediate" : "Intermédiaire",
+        pro: "Pro",
+        expert: "Expert"
+    };
+
+    title.textContent = isEnglish
+        ? "🔒 UNLOCK THIS LEVEL"
+        : "🔒 DÉBLOQUER CE NIVEAU";
+
+    description.textContent = isEnglish
+        ? `Unlock ${levelNames[level]} to play immediately.`
+        : `Débloquez le niveau ${levelNames[level]} pour jouer immédiatement.`;
+
+    const localPrice = convertFCFAToPlayerCurrency(500);
+
+    price.textContent = localPrice.code === "XOF"
+        ? "500 FCFA"
+        : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`;
+
+    payButton.textContent = isEnglish
+        ? "🔓 UNLOCK"
+        : "🔓 DÉBLOQUER";
+
+    closeButton.textContent = isEnglish
+        ? "← BACK"
+        : "← RETOUR";
+
+    overlay.style.display = "flex";
+
+    closeButton.onclick = () => {
+        overlay.style.display = "none";
+    };
+
+    payButton.onclick = () => {
+
+    const localPrice =
+        convertFCFAToPlayerCurrency(500);
+
+    localStorage.setItem(
+        "devine3_pending_level_unlock",
+        JSON.stringify({
+            level: level,
+            amountFCFA: 500,
+            currency: localPrice.code,
+            displayedAmount:
+                localPrice.code === "XOF"
+                    ? "500 FCFA"
+                    : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`
+        })
+    );
+
+    alert(
+        isEnglish
+            ? "Payment will be available after PayDunya integration."
+            : "Le paiement sera disponible après l'intégration de PayDunya."
+    );
+};
+
+    return;
+}
+
+startSolo(level);
+
             }
         );
     });
@@ -4791,34 +5167,109 @@ document
     );
 
 
-/* Clavier numérique du jeu solo */
 
-document
-    .querySelectorAll("#soloNumericKeyboard button")
-    .forEach(button => {
 
-        button.addEventListener("click", () => {
+/* CLAVIER POPUP DU JEU SOLO */
 
-            const input = document.getElementById("guessInput");
-            const key = button.dataset.key;
+const soloNumericKeyboard =
+    document.getElementById("soloNumericKeyboard");
 
-            if (!input) return;
+const soloGuessInput =
+    document.getElementById("guessInput");
 
-            if (key === "backspace") {
-                input.value = input.value.slice(0, -1);
-                return;
-            }
+const closeSoloKeyboardBtn =
+    document.getElementById("closeSoloKeyboardBtn");
 
-            if (key === "enter") {
-                document.getElementById("guessForm").requestSubmit();
-                return;
-            }
+if (
+    soloNumericKeyboard &&
+    soloGuessInput &&
+    closeSoloKeyboardBtn
+) {
+    soloGuessInput.setAttribute("inputmode", "none");
+        const updateSoloKeyboardLanguage = () => {
 
-            if (/^[0-9]$/.test(key) && input.value.length < 3) {
-                input.value += key;
-            }
-        });
+    const isEnglish =
+    document.getElementById("enLanguageBtn")
+        ?.classList.contains("active");
+        const backspaceButton =
+            soloNumericKeyboard.querySelector(
+                'button[data-key="backspace"]'
+            );
+
+        const enterButton =
+            soloNumericKeyboard.querySelector(
+                'button[data-key="enter"]'
+            );
+
+        if (backspaceButton) {
+            backspaceButton.textContent =
+                isEnglish ? "⌫ Delete" : "⌫ Effacer";
+        }
+
+        if (enterButton) {
+            enterButton.textContent =
+                isEnglish ? "✓ Submit" : "✓ Valider";
+        }
+
+        closeSoloKeyboardBtn.setAttribute(
+            "aria-label",
+            isEnglish ? "Close keyboard" : "Fermer le clavier"
+        );
+    };
+
+    // Le clavier s'ouvre uniquement au clic sur le champ.
+    soloGuessInput.addEventListener("click", () => {
+        updateSoloKeyboardLanguage();
+        soloNumericKeyboard.hidden = false;
     });
+
+    // Fermer le clavier.
+    closeSoloKeyboardBtn.addEventListener("click", () => {
+        soloNumericKeyboard.hidden = true;
+        soloGuessInput.blur();
+    });
+
+    // Gestion des touches.
+    soloNumericKeyboard
+        .querySelectorAll(".solo-keyboard-layout button")
+        .forEach(button => {
+
+            button.addEventListener("mousedown", event => {
+                event.preventDefault();
+            });
+
+            button.addEventListener("click", () => {
+
+                const key = button.dataset.key;
+
+                if (key === "backspace") {
+                    soloGuessInput.value =
+                        soloGuessInput.value.slice(0, -1);
+                    return;
+                }
+
+                if (key === "enter") {
+                    soloNumericKeyboard.hidden = true;
+
+                    document
+                        .getElementById("guessForm")
+                        .requestSubmit();
+
+                    return;
+                }
+
+                if (
+                    /^[0-9]$/.test(key) &&
+                    soloGuessInput.value.length < 3
+                ) {
+                    soloGuessInput.value += key;
+                }
+            });
+        });
+
+    updateSoloKeyboardLanguage();
+}
+
 document
     .getElementById("quitGameBtn")
     .addEventListener(
@@ -4889,6 +5340,65 @@ document
             saveP2Secret();
         }
     );
+    
+/* Claviers numériques des codes secrets du duel local */
+
+[
+    {
+        keyboardId: "p1SecretKeyboard",
+        inputId: "p1SecretInput",
+        formId: "p1SecretForm"
+    },
+    {
+        keyboardId: "p2SecretKeyboard",
+        inputId: "p2SecretInput",
+        formId: "p2SecretForm"
+    }
+].forEach(config => {
+
+    document
+        .querySelectorAll(
+            `#${config.keyboardId} button`
+        )
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const input = document.getElementById(
+                    config.inputId
+                );
+
+                const key = button.dataset.key;
+
+                if (!input) return;
+                if (key === "close") {
+    onlineNumericKeyboard.hidden = true;
+    return;
+}
+
+                if (key === "backspace") {
+                    input.value = input.value.slice(0, -1);
+                    return;
+                }
+
+                if (key === "enter") {
+                    document
+                        .getElementById(config.formId)
+                        .requestSubmit();
+                    return;
+                }
+
+               if (
+    /^[0-9]$/.test(key) &&
+    input.value.length < 3
+) {
+    input.value += key;
+}
+
+input.blur();            });
+        });
+});
+
 
 
 document
@@ -4902,6 +5412,43 @@ document
             submitTwoGuess();
         }
     );
+    
+/* Clavier numérique du duel local */
+
+document
+    .querySelectorAll(".twoNumericKeyboard button")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const input =
+                document.getElementById("twoGuessInput");
+
+            const key = button.dataset.key;
+
+            if (!input) return;
+
+            if (key === "backspace") {
+                input.value = input.value.slice(0, -1);
+                return;
+            }
+
+            if (key === "enter") {
+                document
+                    .getElementById("twoGuessForm")
+                    .requestSubmit();
+                return;
+            }
+
+            if (
+                /^[0-9]$/.test(key) &&
+                input.value.length < 3
+            ) {
+                input.value += key;
+            }
+        });
+    });
+
  /* Mode en ligne */
 async function loadOnlineHistory() {
 
@@ -5118,6 +5665,65 @@ document
             await loadOnlineHistory();
         }
     );
+    
+/* Clavier numérique du duel en ligne */
+
+document
+    .querySelectorAll("#onlineNumericKeyboard button")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const input =
+                document.getElementById("onlineGuessInput");
+
+            const key = button.dataset.key;
+
+if (!input) return;
+
+if (key === "close") {
+    onlineNumericKeyboard.hidden = true;
+    return;
+}
+
+if (key === "backspace") {                
+    input.value = input.value.slice(0, -1);
+                return;
+            }
+
+            if (key === "enter") {
+                document
+                    .getElementById("onlineGuessForm")
+                    .requestSubmit();
+                return;
+            }
+
+            if (
+                /^[0-9]$/.test(key) &&
+                input.value.length < 3
+            ) {
+                input.value += key;
+            }
+        });
+    });
+    /* OUVERTURE DU POPUP — DUEL EN LIGNE */
+
+const onlineGuessInput =
+    document.getElementById("onlineGuessInput");
+
+const onlineNumericKeyboard =
+    document.getElementById("onlineNumericKeyboard");
+
+if (onlineGuessInput && onlineNumericKeyboard) {
+
+    onlineGuessInput.addEventListener("click", () => {
+        if (!onlineGuessInput.disabled) {
+            onlineNumericKeyboard.hidden = false;
+        }
+    });
+
+}
+
 
 document.getElementById("continueTwoBtn")
     .addEventListener("click", event => {
@@ -5189,13 +5795,34 @@ document
 
 /* Popup */
 
+
+
 document
     .getElementById("popupCancel")
     .addEventListener(
         "click",
-        closePopup
-    );
+        () => {
+            closePopup();
 
+            // En duel local, ne pas relancer le chronomètre solo.
+           if (
+    document.getElementById("twoP1SecretScreen").classList.contains("active") ||
+    document.getElementById("twoP2SecretScreen").classList.contains("active") ||
+    document.getElementById("twoPassScreen").classList.contains("active") ||
+    document.getElementById("twoGameScreen").classList.contains("active") ||
+    document.getElementById("onlineGameScreen").classList.contains("active")
+) {
+    return;
+}
+            if (!gameOver) {
+                if (currentLevel === "beginner") {
+                    startSoloTimer();
+                } else {
+                    startAttemptTimer(true);
+                }
+            }
+        }
+    );
 
 document
     .getElementById("popupConfirm")
@@ -5372,6 +5999,7 @@ document.getElementById("onlineVerdictReplayBtn")
         console.log("🔄 REJOUER : retour au lobby en ligne");
 
         resetOnlineGameState();
+        document.getElementById("onlineChatInput").value = "";
 
         document.getElementById("onlineVerdictOverlay").style.display = "none";
 
@@ -5721,6 +6349,15 @@ document.getElementById(
     "40 ans et +";
         
             currentLanguage = "fr";
+            
+document.querySelectorAll(
+    ".history:empty"
+).forEach((history) => {
+    history.style.removeProperty(
+        "--history-empty-message"
+    );
+});
+
             document.getElementById("cardPaymentBtn").style.paddingLeft = "0.7cm";
             document.getElementById("popupConfirm").textContent =
     "Confirmer";
@@ -5951,21 +6588,21 @@ document.querySelector(
 ).textContent =
     unlockedLevels.intermediate
         ? "Niveau débloqué"
-        : "0/5 victoires — 10 secondes par tentative";
+        : "0/5 victoires — 12 secondes par tentative";
 
 document.querySelector(
     '#levelsScreen [data-level="pro"] small'
 ).textContent =
     unlockedLevels.pro
         ? "Niveau débloqué"
-        : "0/5 victoires — 8 secondes par tentative";
+        : "0/5 victoires — 10 secondes par tentative";
 
 document.querySelector(
     '#levelsScreen [data-level="expert"] small'
 ).textContent =
     unlockedLevels.expert
         ? "Niveau débloqué"
-        : `${levelStreak.pro}/5 victoires — 6 secondes par tentative`;
+        : `${levelStreak.pro}/5 victoires — 8 secondes par tentative`;
 
             
 
@@ -6666,21 +7303,21 @@ document.querySelector(
 ).textContent =
     unlockedLevels.intermediate
         ? "Level unlocked"
-        : "0/5 wins — 10 seconds per attempt";
+        : "0/5 wins — 12 seconds per attempt";
 
 document.querySelector(
     '#levelsScreen [data-level="pro"] small'
 ).textContent =
     unlockedLevels.pro
         ? "Level unlocked"
-        : "0/5 wins — 8 seconds per attempt";
+        : "0/5 wins — 10 seconds per attempt";
 
 document.querySelector(
     '#levelsScreen [data-level="expert"] small'
 ).textContent =
     unlockedLevels.expert
         ? "Level unlocked"
-        : `${levelStreak.pro}/5 wins — 6 seconds per attempt`;
+        : `${levelStreak.pro}/5 wins — 8 seconds per attempt`;
            
 
 
@@ -6821,6 +7458,24 @@ document.getElementById(
     "historyLabel"
 ).textContent =
     "History";
+    
+document.querySelectorAll(
+    ".history:empty"
+).forEach((history) => {
+    history.style.setProperty(
+        "--history-empty-message",
+        '"No guesses yet"'
+    );
+});
+document.querySelectorAll(
+    "#twoGameScreen .history:empty"
+).forEach((history) => {
+    history.style.setProperty(
+        "--history-empty-message",
+        '"No guesses yet"'
+    );
+});
+
     const freeGamesCounter =
     document.getElementById(
         "freeGamesCounter"
@@ -7901,3 +8556,153 @@ updateSoundButton();
 /* =========================================================
    FIN
    ========================================================= */
+
+   
+/* =========================================
+   CLAVIER POPUP — MESSAGERIE DEVINE 3
+   ========================================= */
+
+(() => {
+    const keyboard = document.getElementById("onlineChatKeyboard");
+    const input = document.getElementById("onlineChatInput");
+    const sendButton = document.getElementById("onlineChatSendBtn");
+    const closeButton = document.getElementById("closeChatKeyboardBtn");
+    const lettersPanel = document.getElementById("chatKeyboardLetters");
+    const numbersPanel = document.getElementById("chatKeyboardNumbers");
+    const emojisPanel = document.getElementById("chatKeyboardEmojis");
+
+    if (
+        !keyboard || !input || !sendButton ||
+        !closeButton || !lettersPanel ||
+        !numbersPanel || !emojisPanel
+    ) {
+        console.error("Clavier de messagerie : élément HTML introuvable.");
+        return;
+    }
+
+    let shiftActive = false;
+
+    function openKeyboard() {
+        keyboard.hidden = false;
+    }
+
+    function closeKeyboard() {
+        keyboard.hidden = true;
+        input.blur();
+    }
+
+    function showPanel(panel) {
+        lettersPanel.hidden = panel !== "letters";
+        numbersPanel.hidden = panel !== "numbers";
+        emojisPanel.hidden = panel !== "emojis";
+    }
+
+    function insertText(text) {
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? input.value.length;
+        const value = input.value;
+
+        if (value.length - (end - start) + text.length > 100) {
+            return;
+        }
+
+        input.value =
+            value.slice(0, start) +
+            text +
+            value.slice(end);
+
+        const cursor = start + text.length;
+        input.setSelectionRange(cursor, cursor);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function deleteCharacter() {
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? input.value.length;
+
+        if (start !== end) {
+            input.value =
+                input.value.slice(0, start) +
+                input.value.slice(end);
+            input.setSelectionRange(start, start);
+        } else if (start > 0) {
+            input.value =
+                input.value.slice(0, start - 1) +
+                input.value.slice(end);
+            input.setSelectionRange(start - 1, start - 1);
+        }
+
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    input.addEventListener("focus", openKeyboard);
+
+    closeButton.addEventListener("click", closeKeyboard);
+
+    keyboard.addEventListener("click", async event => {
+        const button = event.target.closest("button");
+        if (!button) return;
+
+        const key = button.dataset.chatKey;
+        const action = button.dataset.chatAction;
+
+        if (action === "shift") {
+            shiftActive = !shiftActive;
+            keyboard.querySelectorAll("[data-chat-key]").forEach(keyButton => {
+                if (/^[a-z]$/.test(keyButton.dataset.chatKey)) {
+                    const letter = keyButton.dataset.chatKey;
+                    keyButton.textContent =
+                        shiftActive ? letter.toUpperCase() : letter.toLowerCase();
+                }
+            });
+            return;
+        }
+
+        if (action === "numbers") {
+            showPanel("numbers");
+            return;
+        }
+
+        if (action === "letters") {
+            showPanel("letters");
+            return;
+        }
+
+        if (action === "emoji") {
+            showPanel("emojis");
+            return;
+        }
+
+        if (action === "backspace") {
+            deleteCharacter();
+            return;
+        }
+
+        if (action === "send") {
+            sendButton.click();
+            return;
+        }
+
+        if (key !== undefined) {
+            insertText(
+                shiftActive && /^[a-z]$/.test(key)
+                    ? key.toUpperCase()
+                    : key
+            );
+
+            if (shiftActive && /^[a-z]$/.test(key)) {
+                shiftActive = false;
+                keyboard.querySelectorAll("[data-chat-key]").forEach(keyButton => {
+                    if (/^[a-z]$/.test(keyButton.dataset.chatKey)) {
+                        keyButton.textContent = keyButton.dataset.chatKey;
+                    }
+                });
+            }
+        }
+    });
+
+    // Ne pas afficher le clavier natif du téléphone.
+    input.setAttribute("inputmode", "none");
+
+    showPanel("letters");
+})();
