@@ -1312,10 +1312,29 @@ body::after {
 
     padding-right: 3px;
 }
-.history:empty::before {
-    content: "Aucune proposition pour le moment";
 
-    display: block;
+
+.history:empty::before {
+    content: var(
+    --history-empty-message,
+    "Aucune proposition pour le moment"
+);
+
+    grid-column: 1 / -1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    box-sizing: border-box;
+
+    width: 100%;
+
+    min-height: 60px;
 
     padding: 19px;
 
@@ -1325,13 +1344,12 @@ body::after {
 
     color: #6f674f;
 
-    text-align: center;
-
     font-size: 12px;
 
-    background:
-        rgba(255,255,255,0.015);
+    background: rgba(255,255,255,0.015);
 }
+
+
 #soloGameContainer.level-beginner .history:empty::before {
     border-color: rgba(46,204,113,0.25);
     color: #6ee7a2;
@@ -3377,9 +3395,10 @@ body::after {
     flex-direction: column;
     gap: 10px;
 
-    max-height: 220px;
+        height: 55px;
+    max-height: 55px;
     overflow-y: auto;
-
+    flex-shrink: 0;
     padding: 12px;
 
     margin-top: 10px;
@@ -4985,4 +5004,385 @@ body.sky-expert::after {
 
 .numeric-keyboard button[data-key="backspace"] {
     color: #f5d76e;
+}
+
+
+
+/* Clavier popup du code de partie */
+#joinRoomKeyboard.room-keyboard {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: 10px 6px;
+}
+
+#joinRoomKeyboard.room-keyboard .chat-keyboard-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+#joinRoomKeyboard.room-keyboard .chat-keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+#joinRoomKeyboard.room-keyboard .chat-keyboard-row button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 42px;
+    height: 42px;
+    width: auto;
+    margin: 0;
+    padding: 2px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    touch-action: manipulation;
+}
+
+#joinRoomKeyboard.room-keyboard button[data-key="backspace"],
+#joinRoomKeyboard.room-keyboard button[data-key="clear"] {
+    background: #505050;
+    border-color: #777777;
+    color: #ffffff;
+}
+
+/* =========================================
+   CLAVIER POPUP — MESSAGERIE DEVINE 3
+   ========================================= */
+
+.chat-keyboard-popup {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: 10px 6px;
+    background: #171717;
+    border: 1px solid #b99a4a;
+    border-radius: 12px;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.chat-keyboard-popup[hidden],
+.chat-keyboard-layout[hidden] {
+    display: none !important;
+}
+
+.chat-keyboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 0 4px;
+    color: #e6c36a;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.chat-keyboard-header button {
+    width: 40px;
+    height: 34px;
+    border: 0;
+    border-radius: 6px;
+    background: #343434;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.chat-keyboard-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.chat-keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.chat-keyboard-row button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 42px;
+    padding: 2px;
+    border: 1px solid #505050;
+    border-radius: 6px;
+    background: #343434;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.chat-keyboard-row button:active {
+    background: #b99a4a;
+    color: #171717;
+}
+
+.chat-keyboard-bottom button[data-chat-action="numbers"],
+.chat-keyboard-bottom button[data-chat-action="emoji"],
+.chat-keyboard-bottom button[data-chat-action="send"] {
+    background: #6f5a27;
+    border-color: #b99a4a;
+}
+
+.chat-keyboard-bottom button[data-chat-key=" "] {
+    flex: 2.5 1 0;
+    font-size: 12px;
+}
+
+.chat-keyboard-row button[data-chat-action="shift"],
+.chat-keyboard-row button[data-chat-action="backspace"] {
+    background: #505050;
+}
+
+.chat-emoji-row button {
+    font-size: 21px;
+}
+
+
+
+/* CLAVIER SOLO COMPACT ET LARGE */
+
+.solo-keyboard-popup {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    margin: 6px auto;
+    padding: 5px;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 10px;
+    background: #080808;
+}
+
+.solo-keyboard-popup[hidden] {
+    display: none !important;
+}
+
+
+/* FORCER LE CLAVIER SOLO À OCCUPER TOUTE LA LARGEUR */
+
+#soloNumericKeyboard {
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    width: 100%;
+    gap: 4px;
+    justify-items: stretch;
+    align-items: stretch;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    padding: 2px 0;
+    box-sizing: border-box;
+    min-height: 36px;
+    justify-self: stretch;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button[data-key="backspace"] {
+    grid-column: span 4;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button[data-key="enter"] {
+    grid-column: span 4;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button#closeSoloKeyboardBtn {
+    grid-column: span 2;
+}
+/* CORRECTION CIBLEE DU CLAVIER SOLO */
+
+#soloNumericKeyboard.solo-keyboard-popup {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: 6px;
+}
+
+#soloNumericKeyboard.solo-keyboard-popup[hidden] {
+    display: none !important;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 38px;
+    margin: 0;
+    padding: 2px;
+    box-sizing: border-box;
+    justify-self: stretch;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 6px;
+    background: #171717;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button[data-key="backspace"] {
+    grid-column: span 4;
+    color: #f5d76e;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button[data-key="enter"] {
+    grid-column: span 4;
+    color: #6ee7a2;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button#closeSoloKeyboardBtn {
+    grid-column: span 2;
+    color: #f5d76e;
+    font-size: 20px;
+}
+
+#soloNumericKeyboard .solo-keyboard-layout button:active {
+    transform: scale(0.97);
+}
+/* POPUP DU CLAVIER NUMÉRIQUE — DUEL EN LIGNE */
+#onlineNumericKeyboard.solo-keyboard-popup {
+    position: fixed;
+    left: 50%;
+    top: 58%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    display: block;
+    width: calc(100% - 24px);
+    max-width: 440px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid rgba(212, 175, 55, 0.7);
+    border-radius: 12px;
+    background: #101010;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+}
+
+#onlineNumericKeyboard.solo-keyboard-popup[hidden] {
+    display: none !important;
+}
+
+#onlineNumericKeyboard .solo-keyboard-layout {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#onlineNumericKeyboard .solo-keyboard-layout button {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    margin: 0;
+    padding: 2px;
+    box-sizing: border-box;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 6px;
+    background: #171717;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#onlineNumericKeyboard .solo-keyboard-layout button[data-key="backspace"] {
+    grid-column: span 4;
+    color: #f5d76e;
+}
+
+#onlineNumericKeyboard .solo-keyboard-layout button[data-key="enter"] {
+    grid-column: span 4;
+    color: #6ee7a2;
+}
+
+#onlineNumericKeyboard .solo-keyboard-layout button[data-key="close"] {
+    grid-column: span 2;
+    color: #f5d76e;
+    font-size: 20px;
+}
+
+/* 🔒 FENÊTRE DE DÉBLOCAGE PAYANT */
+
+.paid-level-unlock-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(6px);
+}
+
+.paid-level-unlock-box {
+    width: 100%;
+    max-width: 380px;
+    padding: 28px 22px;
+    text-align: center;
+    color: #f5d782;
+    background: linear-gradient(145deg, #171717, #29200c);
+    border: 1px solid #d4af37;
+    border-radius: 18px;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+}
+
+.paid-level-unlock-icon {
+    margin-bottom: 12px;
+    font-size: 42px;
+}
+
+.paid-level-unlock-box h2 {
+    margin: 0 0 14px;
+    font-size: 22px;
+}
+
+.paid-level-unlock-box p {
+    line-height: 1.5;
+}
+
+.paid-level-unlock-price {
+    margin: 22px 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.paid-level-unlock-box button {
+    width: 100%;
+    margin-top: 10px;
 }
