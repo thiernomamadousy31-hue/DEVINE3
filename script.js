@@ -33,6 +33,8 @@ const supabaseClient = window.supabase.createClient(
     }
 );
 let currentUser = null;
+let currentPlayerProfile = null;
+let currentPlayerPseudo = "";
 function generateRoomCode() {
     const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
@@ -48,13 +50,46 @@ function generateRoomCode() {
 console.log("🟢 SCRIPT ACTUEL CHARGÉ");
 
 window.TEST_SCRIPT_DEVINE3 = "NOUVEAU SCRIPT";
+
 async function createOnlineGame() {
 
-    await cleanupOldOnlineRealtimeChannels();
-
-    if (!currentUser) {        console.error("❌ Aucun joueur connecté.");
+    if (!currentUser) {
+        console.error("❌ Aucun joueur connecté.");
         return;
     }
+
+    // 👤 PSEUDO OBLIGATOIRE POUR CRÉER UN DUEL
+    if (
+        !currentPlayerProfile ||
+        !currentPlayerPseudo ||
+        !currentPlayerPseudo.trim()
+    ) {
+        const pseudoModal =
+            document.getElementById("pseudoModal");
+
+        const pseudoMessage =
+            document.getElementById("pseudoMessage");
+
+        if (pseudoMessage) {
+            pseudoMessage.style.color = "#ff7777";
+            pseudoMessage.textContent =
+                currentLanguage === "en"
+                    ? "Create a username before playing online."
+                    : "Crée ton pseudo avant de jouer en ligne.";
+        }
+
+        if (pseudoModal) {
+            pseudoModal.style.display = "flex";
+        }
+
+        console.log(
+            "🔒 CRÉATION REFUSÉE : PSEUDO OBLIGATOIRE"
+        );
+
+        return;
+    }
+
+    await cleanupOldOnlineRealtimeChannels();
 
     const roomCode = generateRoomCode();
 
@@ -175,10 +210,42 @@ async function testSetOnlineSecret() {
         data
     );
 }
+
 async function joinOnlineGame(roomCode) {
 
     if (!currentUser) {
         console.error("❌ Aucun joueur connecté.");
+        return;
+    }
+
+    // 👤 PSEUDO OBLIGATOIRE POUR LE DUEL EN LIGNE
+    if (
+        !currentPlayerProfile ||
+        !currentPlayerPseudo ||
+        !currentPlayerPseudo.trim()
+    ) {
+        const pseudoModal =
+            document.getElementById("pseudoModal");
+
+        const pseudoMessage =
+            document.getElementById("pseudoMessage");
+
+        if (pseudoMessage) {
+            pseudoMessage.style.color = "#ff7777";
+            pseudoMessage.textContent =
+                currentLanguage === "en"
+                    ? "Create a username before playing online."
+                    : "Crée ton pseudo avant de jouer en ligne.";
+        }
+
+        if (pseudoModal) {
+            pseudoModal.style.display = "flex";
+        }
+
+        console.log(
+            "🔒 DUEL REFUSÉ : PSEUDO OBLIGATOIRE"
+        );
+
         return;
     }
 
@@ -315,6 +382,7 @@ document
             .disabled = true;
     });
  
+
 async function testAnonymousLogin() {
 
     let {
@@ -323,27 +391,21 @@ async function testAnonymousLogin() {
     } = await supabaseClient.auth.getSession();
 
     if (sessionError) {
-        console.error(
-            "❌ ERREUR SESSION :",
-            sessionError
-        );
+        console.error("❌ ERREUR SESSION :", sessionError);
         return;
     }
 
     if (session) {
-
         const {
             data: refreshedSession,
             error: refreshError
         } = await supabaseClient.auth.refreshSession();
 
         if (refreshError) {
-
             console.error(
                 "❌ ERREUR RAFRAÎCHISSEMENT SESSION :",
                 refreshError
             );
-
             return;
         }
 
@@ -353,61 +415,251 @@ async function testAnonymousLogin() {
     let user;
 
     if (session && session.user) {
-
         user = session.user;
-        currentUser = user;
-
-        console.log(
-            "✅ SESSION EXISTANTE :",
-            user.id
-        );
-
+        console.log("✅ SESSION EXISTANTE :", user.id);
     } else {
-
         const { data, error } =
             await supabaseClient.auth.signInAnonymously();
 
         if (error) {
-            console.error(
-                "❌ ERREUR AUTH ANONYME :",
-                error
-            );
+            console.error("❌ ERREUR AUTH ANONYME :", error);
             return;
         }
 
         user = data.user;
-        currentUser = user;
+        console.log("✅ NOUVEAU JOUEUR ANONYME :", user.id);
+    }
 
-        console.log(
-            "✅ NOUVEAU JOUEUR ANONYME :",
-            user.id
+    currentUser = user;
+
+    const {
+        data: profile,
+        error: profileError
+    } = await supabaseClient
+        .from("players")
+       .select("id, username, best_score, country_code")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if (profileError) {
+        console.error(
+            "❌ ERREUR LECTURE PROFIL :",
+            profileError
         );
+        return;
+    }
 
-        const { error: playerError } =
-            await supabaseClient
-                .from("players")
-                .insert({
-                    id: user.id
-                });
+    if (!profile) {
+        const {
+            data: newProfile,
+            error: insertError
+        } = await supabaseClient
+           
+.from("players")
+.insert({
+    id: user.id,
+    country_code: localStorage.getItem("devine3_country_code")
+})
 
-        if (playerError) {
+           .select("id, username, best_score, country_code")
+            .single();
 
+        if (insertError) {
             console.error(
-                "❌ ERREUR CRÉATION PLAYER :",
-                playerError
+                "❌ ERREUR CRÉATION PROFIL :",
+                insertError
             );
-
             return;
         }
 
-        console.log(
-            "✅ JOUEUR ENREGISTRÉ :",
-            user.id
-        );
+        currentPlayerProfile = newProfile;
+    
+} else {
+    currentPlayerProfile = profile;
+
+    const detectedCountryCode =
+        localStorage.getItem("devine3_country_code");
+
+    if (
+        !currentPlayerProfile.country_code &&
+        detectedCountryCode
+    ) {
+        const {
+            data: updatedProfile,
+            error: countryUpdateError
+        } = await supabaseClient
+            .from("players")
+            .update({
+                country_code: detectedCountryCode
+            })
+            .eq("id", user.id)
+            .select("id, username, best_score, country_code")
+            .single();
+
+        if (countryUpdateError) {
+            console.error(
+                "❌ ERREUR ENREGISTREMENT DU PAYS :",
+                countryUpdateError
+            );
+        } else {
+            currentPlayerProfile = updatedProfile;
+
+            console.log(
+                "🌍 PAYS ENREGISTRÉ :",
+                updatedProfile.country_code
+            );
+        }
     }
 }
 
+    currentPlayerPseudo =
+        (currentPlayerProfile.username || "").trim();
+
+    console.log("✅ PROFIL CHARGÉ :", currentPlayerProfile);
+    console.log(
+        "👤 PSEUDO ACTUEL :",
+        currentPlayerPseudo || "(aucun pseudo enregistré)"
+    );
+        // 👤 AFFICHER LA FENÊTRE SI LE JOUEUR N'A PAS DE PSEUDO
+
+    if (!currentPlayerPseudo) {
+        const pseudoModal =
+            document.getElementById("pseudoModal");
+
+        if (pseudoModal) {
+            pseudoModal.style.display = "flex";
+        } else {
+            console.error(
+                "❌ FENÊTRE pseudoModal INTROUVABLE"
+            );
+        }
+    }
+}
+
+
 testAnonymousLogin();
+
+// =========================================================
+// 👤 ENREGISTREMENT DU PSEUDO DU JOUEUR
+// =========================================================
+
+document.getElementById("pseudoForm").addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+        const pseudoInput =
+            document.getElementById("pseudoInput");
+
+        const pseudoMessage =
+            document.getElementById("pseudoMessage");
+
+        const savePseudoBtn =
+            document.getElementById("savePseudoBtn");
+
+        const pseudo =
+            pseudoInput.value.trim();
+
+        pseudoMessage.textContent = "";
+        pseudoMessage.style.color = "#ff7777";
+
+        // Vérifier la longueur du pseudo, emojis simples compris
+const segmenter = new Intl.Segmenter(
+    undefined,
+    { granularity: "grapheme" }
+);
+
+const pseudoLength = [...segmenter.segment(pseudo)].length;
+console.log(
+    "🧪 LONGUEUR VISIBLE DU PSEUDO :",
+    pseudo,
+    "→",
+    pseudoLength
+);
+
+if (pseudoLength < 3 || pseudoLength > 20) {
+    pseudoMessage.textContent =
+        "Le pseudo doit contenir entre 3 et 20 caractères.";
+    return;
+}
+        // Vérifier que le profil est chargé
+        if (!currentUser || !currentPlayerProfile) {
+            pseudoMessage.textContent =
+                "Chargement du profil en cours. Réessaie dans un instant.";
+            return;
+        }
+
+        savePseudoBtn.disabled = true;
+        savePseudoBtn.textContent = "ENREGISTREMENT...";
+
+        try {
+            const { data, error } = await supabaseClient
+    .rpc("set_player_username", {
+        p_username: pseudo
+    });
+            if (error) {
+                if (error.code === "23505") {
+                    pseudoMessage.textContent =
+                        "Ce pseudo est déjà utilisé. Choisis-en un autre.";
+                } else {
+                    console.error(
+                        "❌ ERREUR ENREGISTREMENT PSEUDO :",
+                        error
+                    );
+
+                    pseudoMessage.textContent =
+                        "Impossible d'enregistrer le pseudo. Réessaie.";
+                }
+
+                return;
+            }
+
+            currentPlayerProfile.username = data;
+            currentPlayerPseudo = data.trim();
+            pseudoMessage.style.color = "#7CFC98";
+            pseudoMessage.textContent =
+                "Pseudo enregistré avec succès !";
+
+            document.getElementById(
+                "pseudoModal"
+            ).style.display = "none";
+
+            console.log(
+                "✅ PSEUDO ENREGISTRÉ :",
+                currentPlayerPseudo
+            );
+
+        } catch (error) {
+            console.error(
+                "❌ ERREUR INATTENDUE :",
+                error
+            );
+
+            pseudoMessage.textContent =
+                "Une erreur est survenue. Réessaie.";
+
+        } finally {
+            savePseudoBtn.disabled = false;
+            savePseudoBtn.textContent =
+                "✓ VALIDER MON PSEUDO";
+        }
+    }
+);
+
+/* 👤 BOUTON PLUS TARD — FERMER LA FENÊTRE DU PSEUDO */
+document.getElementById("laterPseudoBtn").addEventListener(
+    "click",
+    function () {
+        document.getElementById("pseudoModal").style.display = "none";
+
+        console.log(
+            "ℹ️ CRÉATION DU PSEUDO REPORTÉE — JEU SOLO AUTORISÉ"
+        );
+    }
+);
+
+
 
 const levels = {
     beginner: {
@@ -601,9 +853,10 @@ const defaultStats = {
     wins: 0,
     losses: 0,
     attempts: 0,
+    winningAttempts: 0,
+    winningGamesCount: 0,
     bestScore: 0
 };
-
 
 let stats = loadStats();
 
@@ -874,11 +1127,10 @@ function playSound(type) {
 
     switch (type) {
 
-        case "click":
-            frequency = 420;
-            duration = 0.05;
-            break;
-
+       case "click":
+    frequency = 700;
+    duration = 0.09;
+    break;
 
         case "success":
             frequency = 700;
@@ -920,7 +1172,7 @@ function playSound(type) {
 
 
     gain.gain.exponentialRampToValueAtTime(
-        1,
+        1.5,
         audioContext.currentTime + 0.01
     );
 
@@ -2265,6 +2517,171 @@ function showScreen(id) {
     }
 }
 
+async function loadGlobalLeaderboard() {
+
+    const message =
+        document.getElementById(
+            "globalLeaderboardMessage"
+        );
+
+    const list =
+        document.getElementById(
+            "globalLeaderboardList"
+        );
+
+    message.textContent =
+        "Chargement du classement...";
+
+    list.innerHTML = "";
+
+    const { data, error } =
+        await supabaseClient.rpc(
+            "get_global_top50"
+        );
+
+    if (error) {
+
+        console.error(
+            "Erreur classement mondial :",
+            error
+        );
+
+        message.textContent =
+            "Impossible de charger le classement.";
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        message.textContent =
+            "Aucun joueur classé pour le moment.";
+
+        return;
+    }
+
+    
+    message.textContent =
+        "🏆 TOP 50 MONDIAL — À TOI DE CONQUÉRIR LE PODIUM !";
+
+    data.forEach((player, index) => {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "leaderboard-row";
+
+        if (index === 0) {
+            row.classList.add("rank-gold");
+        } else if (index === 1) {
+            row.classList.add("rank-silver");
+        } else if (index === 2) {
+            row.classList.add("rank-bronze");
+        }
+
+        const rank =
+            document.createElement("div");
+
+        rank.className = "leaderboard-rank";
+
+        if (index === 0) {
+            rank.textContent = "🥇 1";
+        } else if (index === 1) {
+            rank.textContent = "🥈 2";
+        } else if (index === 2) {
+            rank.textContent = "🥉 3";
+        } else {
+            rank.textContent = `#${index + 1}`;
+        }
+
+      
+const username =
+    document.createElement("div");
+
+username.className = "leaderboard-username";
+
+const flag =
+    document.createElement("span");
+
+flag.className = "leaderboard-country-flag";
+flag.innerHTML = getCountryFlagSVG(player.country_code);
+flag.title = player.country_code
+    ? `Pays : ${player.country_code}`
+    : "Pays non renseigné";
+
+flag.style.display = "inline-block";
+flag.style.marginRight = "8px";
+flag.style.fontSize = "22px";
+flag.style.lineHeight = "1";
+username.appendChild(flag);
+username.appendChild(
+    document.createTextNode(" " + player.username)
+);
+
+        const score =
+            document.createElement("div");
+
+        score.className = "leaderboard-score";
+        score.textContent =
+            `${Number(player.best_score).toLocaleString("fr-FR")} pts`;
+
+        row.appendChild(rank);
+        row.appendChild(username);
+        row.appendChild(score);
+
+        list.appendChild(row);
+
+    });
+    } // Fin de loadGlobalLeaderboard()
+
+function countryCodeToFlag(countryCode) {
+    const code = String(countryCode || "")
+        .trim()
+        .toUpperCase();
+
+    if (!/^[A-Z]{2}$/.test(code)) {
+        return "🌍";
+    }
+
+    return String.fromCodePoint(
+        ...[...code].map(char =>
+            127397 + char.charCodeAt(0)
+        )
+    );
+}
+
+function getCountryFlagSVG(countryCode) {
+    const code = String(countryCode || "")
+        .trim()
+        .toUpperCase();
+
+    if (code === "SN") {
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="30" height="20" viewBox="0 0 30 20"
+                 role="img" aria-label="Drapeau du Sénégal"
+                 style="vertical-align:middle;border-radius:2px;
+                        box-shadow:0 0 3px #888;">
+                <rect width="10" height="20" x="0" fill="#00853F"/>
+                <rect width="10" height="20" x="10" fill="#FDEF42"/>
+                <rect width="10" height="20" x="20" fill="#E31B23"/>
+                <polygon points="15,5.2 16.3,9.1 20.4,9.1 17.1,11.5
+                                18.4,15.4 15,13 11.6,15.4
+                                12.9,11.5 9.6,9.1 13.7,9.1"
+                         fill="#00853F"/>
+            </svg>`;
+    }
+
+    return `
+        <span title="Pays : ${code || "non renseigné"}"
+              style="font-size:22px;vertical-align:middle;">
+            ${code ? countryCodeToFlag(code) : "🌍"}
+        </span>`;
+}
+
+
+
 
 /* =========================================================
    POPUP
@@ -2876,10 +3293,9 @@ if (attempts > maxAttempts[currentLevel]) {
     });
 
 
-    stats.attempts++;
+    stats.attempts = attempts;
 
-    saveStats();
-
+saveStats();
 
     input.value = "";
 
@@ -3098,19 +3514,46 @@ let score =
     precisionBonus;
 
 
-    stats.games++;
+   stats.games++;
 
-    stats.wins++;
+   stats.wins++;
 
+stats.winningAttempts += attempts;
+stats.winningGamesCount++;
 
-    if (score > stats.bestScore) {
+   if (score > stats.bestScore) {
 
-        stats.bestScore =
-            score;
-    }
+    stats.bestScore =
+        score;
+}
 
+// 🌍 SYNCHRONISATION DU MEILLEUR SCORE
+if (currentUser && currentPlayerProfile) {
 
-    saveStats();
+    supabaseClient
+        .rpc("update_my_best_score", {
+            p_score: stats.bestScore
+        })
+        .then(({ data, error }) => {
+
+            if (error) {
+                console.error(
+                    "❌ ERREUR SYNCHRONISATION SCORE :",
+                    error
+                );
+                return;
+            }
+
+            currentPlayerProfile.best_score = data;
+
+            console.log(
+                "🏆 MEILLEUR SCORE SYNCHRONISÉ :",
+                data
+            );
+        });
+}
+
+saveStats();
    
 /* SÉRIE DE VICTOIRES POUR DÉBLOQUER LES NIVEAUX */
 
@@ -3559,11 +4002,23 @@ function updateStatisticsUI() {
     }
 
 
-    if (attemptsElement) {
-        attemptsElement.textContent =
-            stats.attempts;
-    }
-
+   if (attemptsElement) {
+    attemptsElement.textContent =
+        stats.winningGamesCount > 0
+            ? (
+                stats.winningAttempts /
+                stats.winningGamesCount
+            ).toLocaleString(
+                currentLanguage === "en"
+                    ? "en-US"
+                    : "fr-FR",
+                {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                }
+            )
+            : "—";
+}
 
     if (best) {
         best.textContent =
@@ -4915,6 +5370,7 @@ document
     );
 
 
+
 document
     .getElementById("challengesBtn")
     .addEventListener(
@@ -4928,6 +5384,36 @@ document
             );
         }
     );
+
+
+document
+    .getElementById("globalLeaderboardBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            showScreen(
+                "globalLeaderboardScreen"
+            );
+
+            loadGlobalLeaderboard();
+
+        }
+    );
+
+document
+    .getElementById("backFromLeaderboardBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            
+showScreen(
+    "homeScreen");
+
+        }
+    );
+
 
 
 document
@@ -5144,13 +5630,14 @@ document
             "click",
             () => {
 
+                playSound("click");
+
                 showScreen(
                     button.dataset.back
                 );
             }
         );
     });
-
 
 /* Jeu solo */
 
@@ -5802,6 +6289,7 @@ document
     .addEventListener(
         "click",
         () => {
+            playSound("click");
             closePopup();
 
             // En duel local, ne pas relancer le chronomètre solo.
@@ -6634,8 +7122,7 @@ document.getElementById("statLossesLabel").textContent =
     "Défaites";
 
 document.getElementById("statAttemptsLabel").textContent =
-    "Essais";
-
+    "Moyenne d'essais par victoire";
 document.getElementById("statBestScoreLabel").textContent =
     "Meilleur score";
 
@@ -7349,8 +7836,7 @@ document.getElementById("statLossesLabel").textContent =
     "Losses";
 
 document.getElementById("statAttemptsLabel").textContent =
-    "Attempts";
-
+    "Average Attempts per Win";
 document.getElementById("statBestScoreLabel").textContent =
     "Best score";
 
@@ -8513,7 +8999,9 @@ document.addEventListener(
 
         const button =
             event.target.closest(
-                "#soloBtn, #twoPlayersBtn, #onlineBtn, #statisticsBtn, #challengesBtn, #levelsBtn, #rulesBtn, #soundBtn"
+              
+"#soloBtn, #twoPlayersBtn, #onlineBtn, #statisticsBtn, #challengesBtn, #globalLeaderboardBtn, #levelsBtn, #rulesBtn, #soundBtn"
+
             );
 
         if (!button) {
