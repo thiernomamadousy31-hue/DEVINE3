@@ -5386,3 +5386,445 @@ body.sky-expert::after {
     width: 100%;
     margin-top: 10px;
 }
+
+/* =========================================
+   🌍 CLASSEMENT MONDIAL — CASINO ROYAL
+   ========================================= */
+
+#globalLeaderboardScreen {
+    padding: 20px 14px;
+}
+
+#globalLeaderboardScreen .screen-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#globalLeaderboardTitle {
+    color: #f5c451;
+    text-align: center;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 900;
+    text-shadow: 0 0 12px rgba(245, 196, 81, 0.35);
+    margin: 24px 0 10px;
+}
+
+#globalLeaderboardDescription {
+    color: #d6d0c2;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+#globalLeaderboardMessage {
+    color: #f5c451;
+    text-align: center;
+    margin: 16px 0;
+}
+
+#globalLeaderboardList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#globalLeaderboardList .leaderboard-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 18px;
+    background: linear-gradient(
+        135deg,
+        #191919,
+        #292315
+    );
+    border: 1px solid rgba(245, 196, 81, 0.65);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    overflow-wrap: anywhere;
+}
+
+#globalLeaderboardList .leaderboard-row:first-child {
+    border-color: #f5c451;
+    background: linear-gradient(
+        135deg,
+        #35290d,
+        #17130a
+    );
+    box-shadow: 0 0 14px rgba(245, 196, 81, 0.18);
+}
+
+#backFromLeaderboardBtn {
+    margin-bottom: 12px;
+}
+
+/* =========================================
+   🏆 CLASSEMENT COMPÉTITIF — DEVINE 3
+   ========================================= */
+
+#globalLeaderboardMessage {
+    font-weight: 800;
+    line-height: 1.6;
+    padding: 12px;
+    border: 1px solid rgba(245, 196, 81, 0.35);
+    border-radius: 12px;
+    background: rgba(245, 196, 81, 0.06);
+}
+
+#globalLeaderboardList .leaderboard-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 66px;
+    padding: 12px;
+    border-radius: 14px;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#globalLeaderboardList .leaderboard-row:hover {
+    transform: translateY(-2px);
+    border-color: #f5c451;
+    box-shadow: 0 5px 18px rgba(245, 196, 81, 0.16);
+}
+
+.leaderboard-rank {
+    color: #f5c451;
+    font-size: 17px;
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.leaderboard-username {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.leaderboard-score {
+    color: #f5c451;
+    font-size: 15px;
+    font-weight: 900;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 🥇 Champion */
+
+#globalLeaderboardList .leaderboard-row.rank-gold {
+    background: linear-gradient(110deg, #44330d, #211a0b 75%);
+    border: 1px solid #f5c451;
+    box-shadow: 0 0 16px rgba(245, 196, 81, 0.2);
+}
+
+.rank-gold .leaderboard-rank {
+    color: #ffe28a;
+}
+
+.rank-gold .leaderboard-username {
+    color: #ffe8a8;
+}
+
+/* 🥈 Deuxième place */
+
+#globalLeaderboardList .leaderboard-row.rank-silver {
+    background: linear-gradient(110deg, #30343b, #1b1d21 75%);
+    border: 1px solid #aeb8c7;
+}
+
+.rank-silver .leaderboard-rank,
+.rank-silver .leaderboard-score {
+    color: #dce3ed;
+}
+
+/* 🥉 Troisième place */
+
+#globalLeaderboardList .leaderboard-row.rank-bronze {
+    background: linear-gradient(110deg, #422a1c, #211812 75%);
+    border: 1px solid #bd8156;
+}
+
+.rank-bronze .leaderboard-rank,
+.rank-bronze .leaderboard-score {
+    color: #e7a77a;
+}
+
+/* 📱 Petits écrans */
+
+@media (max-width: 380px) {
+
+    #globalLeaderboardList .leaderboard-row {
+        grid-template-columns: 48px minmax(0, 1fr) auto;
+        gap: 7px;
+        padding: 10px 8px;
+    }
+
+    .leaderboard-username,
+    .leaderboard-score {
+        font-size: 13px;
+    }
+
+    .leaderboard-rank {
+        font-size: 14px;
+    }
+}
+
+/* =========================================
+   🌐 MENU DUEL EN LIGNE — CASINO ROYAL
+   ========================================= */
+
+#onlineScreen .screen-container {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+#onlineScreen h2 {
+    color: #f5c451;
+    text-align: center;
+    font-size: clamp(25px, 5vw, 32px);
+    font-weight: 900;
+    margin: 28px 0 12px;
+    text-shadow: 0 0 12px rgba(245, 196, 81, 0.22);
+}
+
+#onlineScreen .two-instruction {
+    max-width: 420px;
+    margin: 0 auto 30px;
+    color: #d0c8b9;
+    text-align: center;
+    line-height: 1.7;
+}
+
+#onlineScreen .online-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    margin: 0 auto 24px;
+}
+
+#onlineScreen .online-menu .menu-btn {
+    width: 100%;
+    min-height: 76px;
+    padding: 18px 20px;
+    border: 1px solid rgba(245, 196, 81, 0.55);
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        #242019,
+        #141414
+    );
+    color: #f7f2e7;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+#onlineScreen .online-menu #createOnlineGameBtn {
+    background: linear-gradient(
+        135deg,
+        #604814,
+        #2b210d
+    );
+    border: 1px solid #f5c451;
+    color: #ffe8a6;
+}
+
+#onlineScreen .online-menu .menu-btn:hover {
+    transform: translateY(-2px);
+    border-color: #f5c451;
+    box-shadow: 0 8px 20px rgba(245, 196, 81, 0.16);
+}
+
+#onlineScreen .online-menu .menu-btn:active {
+    transform: scale(0.98);
+}
+
+#onlineScreen #onlineMessage {
+    margin-top: 18px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+@media (max-width: 380px) {
+
+    #onlineScreen .online-menu {
+        gap: 14px;
+    }
+
+    #onlineScreen .online-menu .menu-btn {
+        min-height: 68px;
+        padding: 15px 10px;
+        font-size: 14px;
+    }
+}
+
+/* =========================================
+   🎮 ÉCRAN CRÉER UNE PARTIE — PREMIUM
+   ========================================= */
+
+#createOnlineScreen .screen-container,
+#joinOnlineScreen .screen-container {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+#createOnlineScreen h2,
+#joinOnlineScreen h2 {
+    color: #f5c451;
+    text-align: center;
+    font-size: clamp(25px, 5vw, 32px);
+    font-weight: 900;
+    margin: 28px 0 12px;
+    text-shadow: 0 0 12px rgba(245, 196, 81, 0.22);
+}
+
+#createOnlineScreen .two-instruction,
+#joinOnlineScreen .two-instruction {
+    max-width: 420px;
+    margin: 0 auto 28px;
+    color: #d0c8b9;
+    text-align: center;
+    line-height: 1.7;
+}
+
+/* Carte de la salle */
+
+#createOnlineScreen .online-room,
+#joinOnlineScreen .online-room {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px 18px;
+    margin: 0 auto 22px;
+    border: 1px solid rgba(245, 196, 81, 0.65);
+    border-radius: 20px;
+    background: linear-gradient(
+        145deg,
+        #242019,
+        #121212 75%
+    );
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        inset 0 0 20px rgba(245, 196, 81, 0.035);
+}
+
+/* Libellé du code */
+
+#createOnlineScreen .room-code-label,
+#joinOnlineScreen .room-code-label {
+    color: #d8bd78;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+}
+
+/* Code créé */
+
+#createOnlineScreen .room-code {
+    color: #ffe18a;
+    text-align: center;
+    font-size: clamp(36px, 9vw, 48px);
+    font-weight: 900;
+    letter-spacing: 8px;
+    padding: 18px 8px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(245, 196, 81, 0.35);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.38);
+    text-shadow: 0 0 16px rgba(245, 196, 81, 0.25);
+    overflow-wrap: anywhere;
+}
+
+/* Bouton de partage */
+
+#createOnlineScreen #shareOnlineGameBtn {
+    display: block;
+    width: 100%;
+    min-height: 54px;
+    padding: 14px 16px;
+    border: 1px solid #f5c451;
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        #604814,
+        #35270d
+    );
+    color: #ffe8a6;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#createOnlineScreen #shareOnlineGameBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(245, 196, 81, 0.18);
+}
+
+/* Explication sous le partage */
+
+#createOnlineScreen .room-info {
+    color: #c9c2b4;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 18px 0 0;
+}
+
+/* Messages */
+
+#createOnlineScreen #createOnlineMessage,
+#joinOnlineScreen #joinOnlineMessage {
+    margin: 16px 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Boutons de retour et d'annulation */
+
+#createOnlineScreen #cancelCreateOnlineBtn {
+    display: block;
+    margin: 20px auto 0;
+}
+
+/* Adaptation aux petits écrans */
+
+@media (max-width: 380px) {
+    #createOnlineScreen .online-room,
+    #joinOnlineScreen .online-room {
+        padding: 20px 12px;
+    }
+
+    #createOnlineScreen .room-code {
+        letter-spacing: 5px;
+    }
+}
+
+#createOnlineScreen .room-info {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
