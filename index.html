@@ -117,6 +117,15 @@
                     >
                         🏆 DÉFIS
                     </button>
+                    
+<button
+    id="globalLeaderboardBtn"
+    class="menu-btn"
+    type="button"
+>
+    🌍 CLASSEMENT MONDIAL
+</button>
+
 
 
                     <button
@@ -1256,7 +1265,7 @@
 
 
                     <div class="stat-card">
-                        <span id="statAttemptsLabel">Essais</span>
+                       <span id="statAttemptsLabel">Moyenne d'essais par victoire</span>
                         <strong id="statAttempts">0</strong>
                     </div>
 
@@ -2553,6 +2562,49 @@
     </div>
 
 </section>
+
+<!-- =================================================
+     CLASSEMENT MONDIAL TOP 50
+     ================================================= -->
+
+<section id="globalLeaderboardScreen" class="screen">
+
+    <div class="screen-container">
+
+        <button
+            id="backFromLeaderboardBtn"
+            class="back-btn"
+            type="button"
+        >
+            ← Retour
+        </button>
+
+        <h2 id="globalLeaderboardTitle">
+            🌍 CLASSEMENT MONDIAL
+        </h2>
+
+        <p id="globalLeaderboardDescription">
+            Les 50 meilleurs joueurs de DEVINE 3
+        </p>
+
+        <div
+            id="globalLeaderboardMessage"
+            class="message"
+        >
+            Chargement du classement...
+        </div>
+
+        <div
+            id="globalLeaderboardList"
+            class="challenges-list"
+        ></div>
+
+    </div>
+
+</section>
+
+<!-- FIN DU CLASSEMENT MONDIAL -->
+
 <!-- =================================================
      ÉCRAN : PAIEMENT
      ================================================= -->
@@ -2625,6 +2677,159 @@
 </div>
 
 </div>
+ 
+
+<!-- =================================================
+     FENÊTRE DE CHOIX DU PSEUDO — STYLE NOIR ET OR
+     ================================================= -->
+
+<div
+    id="pseudoModal"
+    style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.92);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    "
+>
+    <div
+        style="
+            width: 100%;
+            max-width: 420px;
+            box-sizing: border-box;
+            padding: 30px 22px;
+            background: linear-gradient(145deg, #171717, #050505);
+            border: 2px solid #d4af37;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
+            text-align: center;
+            color: #ffffff;
+        "
+    >
+        <div style="font-size: 48px; margin-bottom: 12px;">
+            👤
+        </div>
+
+        <h2
+            id="pseudoModalTitle"
+            style="
+                margin: 0 0 16px;
+                color: #f2cf65;
+                font-size: 24px;
+                font-weight: 800;
+                letter-spacing: 1px;
+            "
+        >
+            CHOISIS TON PSEUDO
+        </h2>
+
+        <p
+            id="pseudoModalDescription"
+            style="
+                margin: 0 0 24px;
+                color: #dddddd;
+                font-size: 15px;
+                line-height: 1.6;
+            "
+        >
+            Ce pseudo sera utilisé dans tes parties et le classement Top 50.
+        </p>
+
+        <form id="pseudoForm" autocomplete="off">
+            <input
+                id="pseudoInput"
+                type="text"
+                minlength="3"
+                maxlength="20"
+                placeholder="Ton pseudo"
+                autocomplete="off"
+                required
+                style="
+                    display: block;
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 15px;
+                    margin-bottom: 14px;
+                    border: 1px solid #d4af37;
+                    border-radius: 10px;
+                    outline: none;
+                    background: #101010;
+                    color: #ffffff;
+                    font-size: 17px;
+                    text-align: center;
+                "
+            >
+
+            <p
+                id="pseudoMessage"
+                style="
+                    min-height: 20px;
+                    margin: 8px 0 16px;
+                    color: #ff7777;
+                    font-size: 13px;
+                "
+            ></p>
+
+            <button
+                id="savePseudoBtn"
+                type="submit"
+                style="
+                    display: block;
+                    width: 100%;
+                    padding: 15px 12px;
+                    border: 1px solid #f2cf65;
+                    border-radius: 10px;
+                    background: linear-gradient(135deg, #f2cf65, #b8860b);
+                    color: #111111;
+                    font-size: 15px;
+                    font-weight: 800;
+                    cursor: pointer;
+                    letter-spacing: 0.5px;
+                "
+            >
+                ✓ VALIDER MON PSEUDO
+            </button>
+        </form>
+        
+        <button
+            id="laterPseudoBtn"
+            type="button"
+            style="
+                display: block;
+                width: 100%;
+                margin-top: 12px;
+                padding: 13px 12px;
+                border: 1px solid #777777;
+                border-radius: 10px;
+                background: #202020;
+                color: #eeeeee;
+                font-size: 14px;
+                font-weight: 700;
+                cursor: pointer;
+            "
+        >
+            PLUS TARD
+        </button>
+
+        <p
+            style="
+                margin: 18px 0 0;
+                color: #a9a9a9;
+                font-size: 12px;
+            "
+        >
+            DEVINE 3 — Trouve le code. Bat le chrono.
+        </p>
+    </div>
+</div>
+
+<!-- FIN DE LA FENÊTRE DE CHOIX DU PSEUDO -->
 
 </body>
 </html>
