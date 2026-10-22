@@ -8404,16 +8404,51 @@ async function selectAgeRange(ageRange) {
         );
     }
 
-    const country =
-        await detectPlayerCountry();
+    
+const country =
+    await detectPlayerCountry();
 
-    if (!country) {
-        return;
+if (!country) {
+    return;
+}
+
+// 🌍 Enregistrer le pays du joueur dans Supabase
+if (!currentUser || !currentPlayerProfile) {
+    console.error(
+        "❌ Profil joueur indisponible pour enregistrer le pays."
+    );
+} else {
+    const {
+        data: updatedProfile,
+        error: countryUpdateError
+    } = await supabaseClient
+        .from("players")
+        .update({
+            country_code: country.code
+        })
+        .eq("id", currentUser.id)
+        .select("id, username, best_score, country_code")
+        .single();
+
+    if (countryUpdateError) {
+        console.error(
+            "❌ ERREUR ENREGISTREMENT DU PAYS :",
+            countryUpdateError
+        );
+    } else {
+        currentPlayerProfile = updatedProfile;
+
+        console.log(
+            "✅ PAYS ENREGISTRÉ DANS SUPABASE :",
+            updatedProfile.country_code
+        );
     }
+}
 
-    determinePlayerOffer();
+determinePlayerOffer();
 
-    showPlayerOffer();
+showPlayerOffer();
+
 }
 // 👤 CLIC SUR LES TRANCHES D'ÂGE
 
