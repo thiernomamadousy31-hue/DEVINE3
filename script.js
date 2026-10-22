@@ -2651,34 +2651,29 @@ function countryCodeToFlag(countryCode) {
     );
 }
 
+
 function getCountryFlagSVG(countryCode) {
     const code = String(countryCode || "")
         .trim()
         .toUpperCase();
 
-    if (code === "SN") {
+    if (!/^[A-Z]{2}$/.test(code)) {
         return `
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="30" height="20" viewBox="0 0 30 20"
-                 role="img" aria-label="Drapeau du Sénégal"
-                 style="vertical-align:middle;border-radius:2px;
-                        box-shadow:0 0 3px #888;">
-                <rect width="10" height="20" x="0" fill="#00853F"/>
-                <rect width="10" height="20" x="10" fill="#FDEF42"/>
-                <rect width="10" height="20" x="20" fill="#E31B23"/>
-                <polygon points="15,5.2 16.3,9.1 20.4,9.1 17.1,11.5
-                                18.4,15.4 15,13 11.6,15.4
-                                12.9,11.5 9.6,9.1 13.7,9.1"
-                         fill="#00853F"/>
-            </svg>`;
+            <span title="Pays non renseigné"
+                  style="font-size:22px;vertical-align:middle;">
+                🌍
+            </span>`;
     }
 
+    const flag = countryCodeToFlag(code);
+
     return `
-        <span title="Pays : ${code || "non renseigné"}"
+        <span title="Pays : ${code}"
               style="font-size:22px;vertical-align:middle;">
-            ${code ? countryCodeToFlag(code) : "🌍"}
+            ${flag}
         </span>`;
 }
+
 
 
 
