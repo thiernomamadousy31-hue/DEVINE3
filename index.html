@@ -234,10 +234,16 @@
                         </span>
 
                         <span class="level-info">
-                            <strong>Intermédiaire</strong>
-                            <small id="beginnerProgress">0/5 victoires — 10 secondes par tentative</small>
-                        </span>
+    <strong>Intermédiaire</strong>
+    <small id="beginnerProgress">0/5 victoires</small>
 
+    <span class="level-progress-track">
+        <span
+            id="beginnerProgressBar"
+            class="level-progress-fill"
+        ></span>
+    </span>
+</span>
                         <span class="level-multiplier">
                             ×1.5
                         </span>
@@ -255,10 +261,20 @@
                             🟠
                         </span>
 
-                        <span class="level-info">
-                            <strong>Pro</strong>
-                            <small id="intermediateProgress">0/5 victoires — moins de 2 min</small>
-                        </span>
+                       
+<span class="level-info">
+    <strong>Pro</strong>
+    <small id="intermediateProgress">
+        0/5 victoires
+    </small>
+
+    <span class="level-progress-track">
+        <span
+            id="intermediateProgressBar"
+            class="level-progress-fill"
+        ></span>
+    </span>
+</span>
 
                         <span class="level-multiplier">
                             ×2
@@ -277,11 +293,17 @@
                             🔴
                         </span>
 
-                        <span class="level-info">
-                            <strong>Expert</strong>
-                            <small id="proProgress">0/5 victoires — moins de 1 min</small>
-                        </span>
+                       <span class="level-info">
+    <strong>Expert</strong>
+    <small id="proProgress">0/5 victoires</small>
 
+    <span class="level-progress-track">
+        <span
+            id="proProgressBar"
+            class="level-progress-fill"
+        ></span>
+    </span>
+</span>
                         <span class="level-multiplier">
                             ×3
                         </span>
@@ -642,6 +664,26 @@
             </span>
     
         </div>
+        
+
+<div id="onlinePlayersIdentity" class="online-players-identity">
+
+    <div class="online-player-identity">
+        <span id="onlineMyFlag">🌍</span>
+        <strong id="onlineMyPseudo">Moi</strong>
+    </div>
+
+    <div class="online-duel-icon" aria-label="Duel">
+        ⚔️
+    </div>
+
+    <div class="online-player-identity">
+        <span id="onlineOpponentFlag">🌍</span>
+        <strong id="onlineOpponentPseudo">Adversaire</strong>
+    </div>
+
+</div>
+
 
 
         <div class="timer-box">
@@ -1063,60 +1105,65 @@
     </div>
 
 </div>
-        <div class="online-verdict-summary">
+       
+<div class="online-verdict-summary">
 
-            <div class="verdict-summary-title">
-                RÉSUMÉ DE LA PARTIE
-            </div>
+    <div class="verdict-summary-title">
+        RÉSUMÉ DE LA PARTIE
+    </div>
 
+    <div class="verdict-players">
 
-            <div class="verdict-players">
+        <div class="verdict-player">
 
-                <div class="verdict-player">
+            <span
+                class="verdict-player-icon"
+                id="onlineVerdictMyFlag"
+            >👤</span>
 
-                    <span class="verdict-player-icon">
-                        👤
-                    </span>
+            <div class="verdict-player-info">
 
-                    <div>
-                        <strong>TOI</strong>
+                <strong id="onlineVerdictMyPseudo">
+                    TOI
+                </strong>
 
-                        <span
-                            id="onlineVerdictMyResult"
-                        >
-                            GAGNANT
-                        </span>
-                    </div>
-
-                </div>
-
-
-                <div class="verdict-vs">
-                    VS
-                </div>
-
-
-                <div class="verdict-player">
-
-                    <span class="verdict-player-icon">
-                        👤
-                    </span>
-
-                    <div>
-                        <strong>ADVERSAIRE</strong>
-
-                        <span
-                            id="onlineVerdictOpponentResult"
-                        >
-                            PERDANT
-                        </span>
-                    </div>
-
-                </div>
+                <span id="onlineVerdictMyResult">
+                    GAGNANT
+                </span>
 
             </div>
 
         </div>
+
+        <div class="verdict-vs">
+            VS
+        </div>
+
+        <div class="verdict-player">
+
+            <span
+                class="verdict-player-icon"
+                id="onlineVerdictOpponentFlag"
+            >👤</span>
+
+            <div class="verdict-player-info">
+
+                <strong id="onlineVerdictOpponentPseudo">
+                    ADVERSAIRE
+                </strong>
+
+                <span id="onlineVerdictOpponentResult">
+                    PERDANT
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 
         <div class="online-verdict-actions">
@@ -1285,10 +1332,107 @@
                 >
                    🗑️ <span id="resetStatsLabel">Réinitialiser les statistiques</span>
                 </button>
+                
+<button
+    id="profileBtn"
+    class="menu-btn"
+    type="button"
+>
+    👤 MON PROFIL
+</button>
+
 
             </div>
 
         </section>
+        
+
+<section id="profileScreen" class="screen">
+
+    <div class="screen-container profile-container">
+
+        <button
+            class="back-btn"
+            data-back="statisticsScreen"
+            type="button"
+        >
+            ← Retour
+        </button>
+
+        <h2 class="profile-title">👤 Mon profil</h2>
+
+        <div class="profile-identity">
+            <div class="profile-avatar" aria-hidden="true">
+                👤
+            </div>
+
+            <div class="profile-identity-info">
+                <span class="profile-label">Joueur</span>
+                <strong id="profileUsername">Chargement...</strong>
+                <span id="profileCountry" class="profile-country">
+                    🌍 Non renseigné
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-stats-grid">
+
+            <div class="stat-card profile-stat-card">
+                <span>Meilleur score</span>
+                <strong id="profileBestScore">0</strong>
+            </div>
+
+            <div class="stat-card profile-stat-card">
+                <span>Niveau de progression</span>
+                <strong id="profileProgressLevel">Débutant</strong>
+            </div>
+
+        </div>
+
+        <div class="stat-card profile-progress-card">
+
+            <div class="profile-progress-heading">
+                <span id="profileProgressLabel">
+                    Progression vers Intermédiaire
+                </span>
+
+                <strong id="profileProgressCount">
+                    0/5 victoires
+                </strong>
+            </div>
+
+            <div
+                class="profile-progress-track"
+                role="progressbar"
+                aria-label="Progression vers le niveau suivant"
+                aria-valuemin="0"
+                aria-valuemax="5"
+                aria-valuenow="0"
+            >
+                <div class="profile-progress-fill"></div>
+            </div>
+
+        </div>
+
+        <div class="stat-card profile-warning-card">
+
+            <div class="profile-warning-heading">
+                <span aria-hidden="true">⚠️</span>
+                <strong>Règle importante</strong>
+            </div>
+
+            <p id="profileAbandonWarning">
+                Attention : abandonner une partie solo entraîne
+                la perte des victoires comptabilisées pour la progression.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
 
 
 
