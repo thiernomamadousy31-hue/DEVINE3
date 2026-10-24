@@ -271,6 +271,7 @@ async function joinOnlineGame(roomCode) {
     );
 
     currentOnlineGame = data;
+    await loadOnlinePlayersIdentity(data);
 
     listenToOnlineGame(data.id);
     listenToOnlineChat(data.id);
@@ -511,7 +512,34 @@ async function testAnonymousLogin() {
         }
     }
 }
+// 🌍 Détecter et enregistrer le pays dès le démarrage
+const detectedCountry = await detectPlayerCountry();
 
+if (detectedCountry && currentUser && currentPlayerProfile) {
+    const { data: updatedProfile, error: countryError } =
+        await supabaseClient
+            .from("players")
+            .update({
+                country_code: detectedCountry.code
+            })
+            .eq("id", currentUser.id)
+            .select("id, username, best_score, country_code")
+            .single();
+
+    if (countryError) {
+        console.error(
+            "❌ ERREUR ENREGISTREMENT DU PAYS :",
+            countryError
+        );
+    } else {
+        currentPlayerProfile = updatedProfile;
+
+        console.log(
+            "🌍 PAYS ENREGISTRÉ AU DÉMARRAGE :",
+            updatedProfile.country_code
+        );
+    }
+}
     currentPlayerPseudo =
         (currentPlayerProfile.username || "").trim();
 
@@ -814,7 +842,22 @@ if (joinRoomInput) {
     if (secretButton) {
         secretButton.disabled = false;
     }
+// 🧹 Réinitialiser le champ de proposition du duel
+const guessInput =
+    document.getElementById("onlineGuessInput");
 
+const guessButton =
+    document.getElementById("onlineGuessBtn");
+
+if (guessInput) {
+    guessInput.value = "";
+    guessInput.disabled = true;
+    guessInput.classList.remove("online-input-active");
+}
+
+if (guessButton) {
+    guessButton.disabled = true;
+}
     console.log("✅ ÉTAT EN LIGNE RÉINITIALISÉ");
 }
 
@@ -1921,6 +1964,40 @@ document.getElementById("onlineVerdictMyCode").textContent =
 
 document.getElementById("onlineVerdictOpponentCode").textContent =
     opponentSecret || "---";
+    
+    // 👤 PROFILS DES JOUEURS DANS LE VERDICT FINAL
+
+    const myFlag = document.getElementById("onlineMyFlag");
+    const myPseudo = document.getElementById("onlineMyPseudo");
+
+    const opponentFlag = document.getElementById("onlineOpponentFlag");
+    const opponentPseudo = document.getElementById("onlineOpponentPseudo");
+
+    const verdictMyFlag = document.getElementById("onlineVerdictMyFlag");
+    const verdictMyPseudo = document.getElementById("onlineVerdictMyPseudo");
+
+    const verdictOpponentFlag =
+        document.getElementById("onlineVerdictOpponentFlag");
+
+    const verdictOpponentPseudo =
+        document.getElementById("onlineVerdictOpponentPseudo");
+
+    if (myFlag && verdictMyFlag) {
+        verdictMyFlag.textContent = myFlag.textContent;
+    }
+
+    if (myPseudo && verdictMyPseudo) {
+        verdictMyPseudo.textContent = myPseudo.textContent;
+    }
+
+    if (opponentFlag && verdictOpponentFlag) {
+        verdictOpponentFlag.textContent = opponentFlag.textContent;
+    }
+
+    if (opponentPseudo && verdictOpponentPseudo) {
+        verdictOpponentPseudo.textContent = opponentPseudo.textContent;
+    }
+
     /* =====================================================
        HISTORIQUE DANS LE VERDICT FINAL
        ===================================================== */
@@ -1976,36 +2053,87 @@ if (isWinner) {
     playLossSound();
 }
 
-// 📝 SOUS-TITRE
+// 📝 SOUS-TITRE AVEC LES IDENTITÉS DES JOUEURS
+
+const myPlayerName =
+    document.getElementById("onlineMyPseudo")?.textContent.trim()
+    || (isEnglish ? "You" : "Tu");
+
+const opponentPlayerName =
+    document.getElementById("onlineOpponentPseudo")?.textContent.trim()
+    || (isEnglish ? "Your opponent" : "Ton adversaire");
+
 document.getElementById("onlineVerdictSubtitle").textContent =
     endReason === "quit"
         ? (
             isEnglish
-                ? (isWinner
-                    ? "YOUR OPPONENT LEFT THE GAME!"
-                    : "YOU LEFT THE GAME!")
-                : (isWinner
-                    ? "TON ADVERSAIRE A QUITTÉ LA PARTIE !"
-                    : "TU AS QUITTÉ LA PARTIE !")
-        )
+                ? (
+                    isWinner
+                        ? `${opponentPlayerName} LEFT THE GAME!`
+                        : `${myPlayerName} LEFT THE GAME!`
+                  )
+                : (
+                    isWinner
+                        ? `${opponentPlayerName} A QUITTÉ LA PARTIE !`
+                        : `${myPlayerName} A QUITTÉ LA PARTIE !`
+                  )
+          )
         : (
             isEnglish
-                ? (isWinner
-                    ? "YOU FOUND THE CODE!"
-                    : "YOUR OPPONENT FOUND THE CODE!")
-                : (isWinner
-                    ? "TU AS TROUVÉ LE CODE !"
-                    : "TON ADVERSAIRE A TROUVÉ LE CODE !")
-        );
-// 💬 MESSAGE
+                ? (
+                    isWinner
+                        ? `${myPlayerName} FOUND THE CODE!`
+                        : `${opponentPlayerName} FOUND THE CODE!`
+                  )
+                : (
+                    isWinner
+                        ? `${myPlayerName} A TROUVÉ LE CODE !`
+                        : `${opponentPlayerName} A TROUVÉ LE CODE !`
+                  )
+          );
+          // 🔐 INTITULÉS DES CODES AVEC LES IDENTITÉS DES JOUEURS
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.winner-code .verdict-code-label"
+).textContent =
+    isEnglish
+        ? `${myPlayerName}'S CODE`
+        : `CODE DE ${myPlayerName}`;
+
+document.querySelector(
+    "#onlineVerdictPopup .verdict-code-box.opponent-code .verdict-code-label"
+).textContent =
+    isEnglish
+        ? `${opponentPlayerName}'S CODE`
+        : `CODE DE ${opponentPlayerName}`;
+        // 📜 TITRES DE L'HISTORIQUE AVEC LES IDENTITÉS DES JOUEURS
+
+const verdictHistoryTitles = document.querySelectorAll(
+    "#onlineVerdictPopup .verdict-history-title"
+);
+
+if (verdictHistoryTitles.length >= 2) {
+
+    verdictHistoryTitles[0].textContent =
+        isEnglish
+            ? `${myPlayerName}'S GUESSES`
+            : `ESSAIS DE ${myPlayerName}`;
+
+    verdictHistoryTitles[1].textContent =
+        isEnglish
+            ? `${opponentPlayerName}'S GUESSES`
+            : `ESSAIS DE ${opponentPlayerName}`;
+}
+        
+ // 💬 MESSAGE PERSONNALISÉ AVEC LE PSEUDO DU JOUEUR
 document.getElementById("onlineVerdictMessage").textContent =
     isEnglish
         ? (isWinner
-            ? "Congratulations!"
-            : "Better luck next game!")
+            ? `Congratulations, ${myPlayerName}!`
+            : `Better luck next game, ${myPlayerName}!`)
         : (isWinner
-            ? "Félicitations !"
-            : "La prochaine partie sera la bonne !");
+            ? `Bravo ${myPlayerName} !`
+            : `La prochaine partie sera la bonne, ${myPlayerName} !`);
 
 // 👑 / 💥 ICÔNE
 document.getElementById("onlineVerdictIcon").textContent =
@@ -2067,6 +2195,121 @@ if (verdictHistory) {
     document.getElementById("onlineVerdictOverlay").style.display =
         "flex";
 }
+
+async function loadOnlinePlayersIdentity(game) {
+
+    if (!game || !currentUser) {
+        return;
+    }
+
+    const myFlag =
+        document.getElementById("onlineMyFlag");
+
+    const myPseudo =
+        document.getElementById("onlineMyPseudo");
+
+    const opponentFlag =
+        document.getElementById("onlineOpponentFlag");
+
+    const opponentPseudo =
+        document.getElementById("onlineOpponentPseudo");
+
+    if (
+        !myFlag ||
+        !myPseudo ||
+        !opponentFlag ||
+        !opponentPseudo
+    ) {
+        console.warn(
+            "⚠️ Éléments HTML des profils introuvables."
+        );
+        return;
+    }
+
+    const playerIds = [
+        game.player1_id,
+        game.player2_id
+    ].filter(Boolean);
+
+    const { data: players, error } =
+        await supabaseClient
+            .from("players")
+            .select("id, username, country_code")
+            .in("id", playerIds);
+
+    if (error) {
+        console.error(
+            "❌ ERREUR CHARGEMENT DES PROFILS :",
+            error
+        );
+        return;
+    }
+console.log("🔎 ID JOUEUR CONNECTÉ :", currentUser.id);
+console.log("🔎 ID DES JOUEURS DE LA SALLE :", playerIds);
+console.log("🔎 PROFILS RÉCUPÉRÉS :", players);
+    const me = players.find(
+        player => player.id === currentUser.id
+    );
+
+    const opponent = players.find(
+        player => player.id !== currentUser.id
+    );
+
+    if (me) {
+        myFlag.textContent =
+            countryCodeToFlag(me.country_code);
+
+        myPseudo.textContent =
+            me.username || currentPlayerPseudo;
+    }
+
+    if (opponent) {
+        opponentFlag.textContent =
+            countryCodeToFlag(opponent.country_code);
+
+        opponentPseudo.textContent =
+            opponent.username ||
+            (currentLanguage === "en"
+                ? "Opponent"
+                : "Adversaire");
+    }
+}
+
+function updateOnlineActivePlayer(game) {
+    if (!game || !currentUser) {
+        return;
+    }
+
+    const myIdentity = document.querySelector(
+        "#onlinePlayersIdentity .online-player-identity:first-child"
+    );
+
+    const opponentIdentity = document.querySelector(
+        "#onlinePlayersIdentity .online-player-identity:last-child"
+    );
+
+    if (!myIdentity || !opponentIdentity) {
+        return;
+    }
+
+    myIdentity.classList.remove("online-player-active");
+    opponentIdentity.classList.remove("online-player-active");
+
+    if (game.status !== "playing") {
+        return;
+    }
+
+    const myPlayerNumber =
+        game.player1_id === currentUser.id ? 1 : 2;
+
+    if (game.current_turn === myPlayerNumber) {
+        myIdentity.classList.add("online-player-active");
+    } else {
+        opponentIdentity.classList.add("online-player-active");
+    }
+}
+
+
 function listenToOnlineGame(gameId) {
 
     console.log(
@@ -2094,7 +2337,11 @@ function listenToOnlineGame(gameId) {
         currentOnlineGame &&
         currentOnlineGame.status === "playing";
 
-   currentOnlineGame = payload.new;
+  currentOnlineGame = payload.new;
+
+await loadOnlinePlayersIdentity(currentOnlineGame);
+updateOnlineActivePlayer(currentOnlineGame);
+
 await loadOnlineHistory();
 
 if (
@@ -2226,26 +2473,32 @@ if (timerElement) {
                 ? 1
                 : 2;
 
-        document.getElementById("onlineCurrentPlayer").textContent =
+               document.getElementById("onlineCurrentPlayer").textContent =
             currentOnlineGame.current_turn === playerNumber
-                currentLanguage === "en"
-    ? "IT'S YOUR TURN"
-    : "C'EST VOTRE TOUR"
-                currentLanguage === "en"
-    ? "IT'S YOUR OPPONENT'S TURN"
-    : "C'EST LE TOUR DE L'ADVERSAIRE"
+                ? (
+                    currentLanguage === "en"
+                        ? "🎮 IT'S YOUR TURN"
+                        : "🎮 C'EST VOTRE TOUR"
+                  )
+                : (
+                    currentLanguage === "en"
+                        ? "⏳ WAITING FOR YOUR OPPONENT'S TURN…"
+                        : "⏳ EN ATTENTE DU TOUR DE L'ADVERSAIRE…"
+                  );
    if (
     currentOnlineGame.current_turn === playerNumber &&
     onlinePlayer1Secret &&
     onlinePlayer2Secret
 ) {
 
-    // 🎮 C'EST MON TOUR
-    const onlineGuessInput =
-        document.getElementById("onlineGuessInput");
+   
+// 🎮 C'EST MON TOUR
+const onlineGuessInput =
+    document.getElementById("onlineGuessInput");
 
-    onlineGuessInput.value = "";
-    onlineGuessInput.disabled = false;
+onlineGuessInput.value = "";
+onlineGuessInput.disabled = false;
+onlineGuessInput.classList.add("online-input-active");
 
     document.getElementById("onlineGuessBtn").disabled = false;
 
@@ -2261,6 +2514,7 @@ if (timerElement) {
 
     document.getElementById("onlineGuessInput").disabled = true;
     document.getElementById("onlineGuessBtn").disabled = true;
+    document.getElementById("onlineGuessInput").classList.remove("online-input-active");
 
     document.getElementById("onlineCurrentPlayer").textContent =
     currentLanguage === "en"
@@ -2332,11 +2586,14 @@ function listenToOnlineSecrets(gameId) {
     }
 
     showScreen("onlineGameScreen");
-    const playerNumber =
-        currentOnlineGame.player1_id === currentUser.id
-            ? 1
-            : 2;
 
+// ✨ Actualiser le profil du joueur dont c'est le tour
+updateOnlineActivePlayer(currentOnlineGame);
+
+const playerNumber =
+    currentOnlineGame.player1_id === currentUser.id
+        ? 1
+        : 2;
     if (
     currentOnlineGame.status === "playing" &&
     currentOnlineGame.current_turn === playerNumber
@@ -2344,6 +2601,8 @@ function listenToOnlineSecrets(gameId) {
 
     document.getElementById("onlineGuessInput").disabled = false;
     document.getElementById("onlineGuessBtn").disabled = false;
+        document.getElementById("onlineGuessInput")
+        .classList.add("online-input-active");
 
     document.getElementById("onlineCurrentPlayer").textContent =
     currentLanguage === "en"
@@ -2356,6 +2615,8 @@ function listenToOnlineSecrets(gameId) {
 
     document.getElementById("onlineGuessInput").disabled = true;
     document.getElementById("onlineGuessBtn").disabled = true;
+    document.getElementById("onlineGuessInput")
+        .classList.remove("online-input-active");
 
     document.getElementById("onlineCurrentPlayer").textContent =
     currentLanguage === "en"
@@ -2518,6 +2779,10 @@ function showScreen(id) {
 }
 
 async function loadGlobalLeaderboard() {
+    console.log("🔎 TEST : loadGlobalLeaderboard() exécutée");
+        const isEnglish =
+        document.getElementById("enLanguageBtn")
+            ?.classList.contains("active");
 
     const message =
         document.getElementById(
@@ -2529,9 +2794,9 @@ async function loadGlobalLeaderboard() {
             "globalLeaderboardList"
         );
 
-    message.textContent =
-        "Chargement du classement...";
-
+    message.textContent = isEnglish
+    ? "Loading leaderboard..."
+    : "Chargement du classement...";
     list.innerHTML = "";
 
     const { data, error } =
@@ -2546,24 +2811,31 @@ async function loadGlobalLeaderboard() {
             error
         );
 
-        message.textContent =
-            "Impossible de charger le classement.";
-
+       message.textContent = isEnglish
+    ? "Unable to load the leaderboard."
+    : "Impossible de charger le classement.";
         return;
     }
+    console.log(
+    "🌍 PAYS REÇUS PAR LE CLASSEMENT :",
+    data?.map(player => ({
+        username: player.username,
+        country_code: player.country_code
+    }))
+);
 
     if (!data || data.length === 0) {
 
-        message.textContent =
-            "Aucun joueur classé pour le moment.";
-
+       message.textContent = isEnglish
+    ? "No players ranked yet."
+    : "Aucun joueur classé pour le moment.";
         return;
     }
 
     
-    message.textContent =
-        "🏆 TOP 50 MONDIAL — À TOI DE CONQUÉRIR LE PODIUM !";
-
+   message.textContent = isEnglish
+    ? "🏆 WORLD TOP 50 — CONQUER THE PODIUM!"
+    : "🏆 TOP 50 MONDIAL — À TOI DE CONQUÉRIR LE PODIUM !";
     data.forEach((player, index) => {
 
         const row =
@@ -2634,6 +2906,120 @@ username.appendChild(
 
     });
     } // Fin de loadGlobalLeaderboard()
+
+function updateProfileScreen() {
+
+    const usernameElement =
+        document.getElementById("profileUsername");
+
+    const countryElement =
+        document.getElementById("profileCountry");
+
+    const scoreElement =
+        document.getElementById("profileBestScore");
+
+    if (!currentPlayerProfile) {
+        usernameElement.textContent = "Profil indisponible";
+        countryElement.textContent = "🌍 Non renseigné";
+        scoreElement.textContent = "0";
+        return;
+    }
+
+    usernameElement.textContent =
+        currentPlayerProfile.username || "Pseudo non défini";
+
+    const countryCode =
+        currentPlayerProfile.country_code || "";
+
+    countryElement.textContent =
+        countryCode
+            ? countryCodeToFlag(countryCode) + " " + countryCode
+            : "🌍 Non renseigné";
+
+    scoreElement.textContent =
+        Number(currentPlayerProfile.best_score || 0)
+            .toLocaleString("fr-FR");
+}
+
+function updateProfileProgress() {
+
+    const levelElement =
+        document.getElementById("profileProgressLevel");
+
+    const labelElement =
+        document.getElementById("profileProgressLabel");
+
+    const countElement =
+        document.getElementById("profileProgressCount");
+        const progressBar =
+    document.querySelector(
+        "#profileScreen .profile-progress-fill"
+    );
+
+    if (
+        !levelElement ||
+        !labelElement ||
+        !countElement
+    ) {
+        return;
+    }
+
+    let levelName = "Débutant";
+    let nextLevelName = "Intermédiaire";
+    let wins = Number(levelStreak.beginner || 0);
+
+    if (unlockedLevels.expert) {
+        levelName = "Expert";
+        nextLevelName = "";
+        wins = 5;
+    } else if (unlockedLevels.pro) {
+        levelName = "Pro";
+        nextLevelName = "Expert";
+        wins = Number(levelStreak.pro || 0);
+    } else if (unlockedLevels.intermediate) {
+        levelName = "Intermédiaire";
+        nextLevelName = "Pro";
+        wins = Number(levelStreak.intermediate || 0);
+    }
+
+    levelElement.textContent = levelName;
+   console.log(
+    "TEST BARRE PROFIL",
+    {
+        progressBarTrouvee: Boolean(progressBar),
+        niveau: levelName,
+        victoires: wins,
+        largeurCalculee: nextLevelName
+            ? (Math.min(5, Math.max(0, wins)) / 5) * 100
+            : 100
+    }
+);
+
+if (progressBar) {
+    const progressPercent = nextLevelName
+        ? (Math.min(5, Math.max(0, wins)) / 5) * 100
+        : 100;
+
+    progressBar.style.width =
+        progressPercent + "%";
+        
+
+    progressBar.style.background =
+        "linear-gradient(90deg, #a77b22, #f4d77f)";
+}
+
+    if (!nextLevelName) {
+        labelElement.textContent = "Progression";
+        countElement.textContent = "Niveau maximal atteint";
+    } else {
+        labelElement.textContent =
+            "Progression vers " + nextLevelName;
+
+        countElement.textContent =
+            Math.min(5, wins) + "/5 victoires";
+    }
+}
+
 
 function countryCodeToFlag(countryCode) {
     const code = String(countryCode || "")
@@ -2850,6 +3236,9 @@ if (freeGamesCounter) {
     history = [];
 
     gameOver = false;
+    const isEnglish =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active");
     const soloGameContainer =
     document.getElementById(
         "soloGameContainer"
@@ -2870,9 +3259,7 @@ if (soloGameContainer) {
 }
 
 
-    const isEnglish =
-    document.getElementById("enLanguageBtn")
-        ?.classList.contains("active");
+   
 document.getElementById(
     "currentLevelName"
 ).textContent =
@@ -3036,18 +3423,17 @@ function startAttemptTimer(resume = false) {
         attemptTimeLeft
     );
 
-    if (!resume) {
-        if (currentLevel === "intermediate") {
-            attemptTimeLeft = 12;
-        } else if (currentLevel === "pro") {
-            attemptTimeLeft = 10;
-        } else if (currentLevel === "expert") {
-            attemptTimeLeft = 8;
-        } else {
-            return;
-        }
+   if (!resume) {
+    if (currentLevel === "intermediate") {
+        attemptTimeLeft = 15;
+    } else if (currentLevel === "pro") {
+        attemptTimeLeft = 12;
+    } else if (currentLevel === "expert") {
+        attemptTimeLeft = 10;
+    } else {
+        return;
     }
-
+}
     document.getElementById("timer").textContent =
         formatTime(attemptTimeLeft);
 
@@ -3095,12 +3481,11 @@ document.getElementById("timer").textContent =
 }
     attempts++;
 const maxAttempts = {
-    beginner: 12,
-    intermediate: 10,
-    pro: 8,
-    expert: 6
+    beginner: 14,
+    intermediate: 12,
+    pro: 10,
+    expert: 8
 };
-
 if (attempts > maxAttempts[currentLevel]) {
 
     loseSoloGame("attempts");
@@ -3256,12 +3641,11 @@ function submitSoloGuess() {
     attempts++;
 
 const maxAttempts = {
-    beginner: 12,
-    intermediate: 10,
-    pro: 8,
-    expert: 6
+    beginner: 14,
+    intermediate: 12,
+    pro: 10,
+    expert: 8
 };
-
 if (attempts > maxAttempts[currentLevel]) {
 
     loseSoloGame("attempts");
@@ -3467,12 +3851,11 @@ const maxTimes = {
 };
 
 const maxAttemptsByLevel = {
-    beginner: 12,
-    intermediate: 10,
-    pro: 8,
-    expert: 6
+    beginner: 14,
+    intermediate: 12,
+    pro: 10,
+    expert: 8
 };
-
 const baseScore = baseScores[currentLevel];
 
 const maxTime = maxTimes[currentLevel];
@@ -3735,22 +4118,19 @@ function loseSoloGame(reason = "time") {
     if (gameOver) {
         return;
     }
-    // Une défaite casse la série de victoires
+   // Une défaite casse uniquement la série du niveau joué
 if (currentLevel === "beginner") {
     levelStreak.beginner = 0;
-}
-
-if (currentLevel === "intermediate") {
+} else if (currentLevel === "intermediate") {
     levelStreak.intermediate = 0;
-}
-
-if (currentLevel === "pro") {
+} else if (currentLevel === "pro") {
     levelStreak.pro = 0;
 }
+
+// En Expert, les séries précédentes restent intactes
 saveLevelProgress();
-
+updateLevelsUI();
     clearInterval(timerInterval);
-
     gameOver = true;
         const isEnglish =
         enLanguageBtn &&
@@ -4156,12 +4536,10 @@ if (!gameOver) {
         levelStreak.intermediate = 0;
     } else if (currentLevel === "pro") {
     levelStreak.pro = 0;
-} else if (currentLevel === "expert") {
-    levelStreak.pro = 0;
 }
     saveLevelProgress();
+    updateLevelsUI();
 }
-
 gameOver = true;            document.body.classList.remove(
     "sky-beginner",
     "sky-intermediate",
@@ -5395,6 +5773,15 @@ document
 
         }
     );
+    
+
+
+document.getElementById("profileBtn").addEventListener("click", () => {
+    updateProfileScreen();
+    updateProfileProgress();
+    showScreen("profileScreen");
+});
+
 
 document
     .getElementById("backFromLeaderboardBtn")
@@ -5455,52 +5842,62 @@ function updateLevelsUI() {
             );
 
            button.disabled = false;
-            if (level === "intermediate") {
-
-                const progress =
-                    document.getElementById(
-                        "beginnerProgress"
-                    );
-
-                if (progress) {
-
-                    progress.textContent =
-                        unlockedLevels.intermediate
-                            ? "Niveau débloqué"
-                            : `${levelStreak.beginner}/5 victoires — 12 secondes par tentative`;
-                }
-            }
-            if (level === "pro") {
-
-    const progress =
-        document.getElementById(
-            "intermediateProgress"
-        );
+          if (level === "intermediate") {
+    const progress = document.getElementById("beginnerProgress");
+    const progressBar = document.getElementById("beginnerProgressBar");
 
     if (progress) {
+        progress.textContent = unlockedLevels.intermediate
+            ? "Niveau débloqué"
+            :`${levelStreak.beginner}/5 victoires — 15 secondes par tentative`;
+    }
 
-        progress.textContent =
-            unlockedLevels.pro
-                ? "Niveau débloqué"
-                : `${levelStreak.intermediate}/5 victoires — 10 secondes par tentative`;
+    if (progressBar) {
+        const victories = Math.min(5, Math.max(0, levelStreak.beginner));
+        const progressPercent = unlockedLevels.intermediate
+            ? 100
+            : (victories / 5) * 100;
+
+        progressBar.style.width = progressPercent + "%";
+    }
+}        if (level === "pro") {
+    const progress = document.getElementById("intermediateProgress");
+    const progressBar = document.getElementById("intermediateProgressBar");
+
+    if (progress) {
+        progress.textContent = unlockedLevels.pro
+            ? "Niveau débloqué"
+            : `${levelStreak.intermediate}/5 victoires — 12 secondes par tentative`;
+    }
+
+    if (progressBar) {
+        const victories = Math.min(5, Math.max(0, levelStreak.intermediate));
+        const progressPercent = unlockedLevels.pro
+            ? 100
+            : (victories / 5) * 100;
+
+        progressBar.style.width = progressPercent + "%";
     }
 }
 if (level === "expert") {
-
-    const progress =
-        document.getElementById(
-            "proProgress"
-        );
+    const progress = document.getElementById("proProgress");
+    const progressBar = document.getElementById("proProgressBar");
 
     if (progress) {
-
-        progress.textContent =
-            unlockedLevels.expert
-                ? "Niveau débloqué"
-                : `${levelStreak.pro}/5 victoires — 8 secondes par tentative`;
+        progress.textContent = unlockedLevels.expert
+            ? "Niveau débloqué"
+            : `${levelStreak.pro}/5 victoires — 10 secondes par tentative`;
     }
-}
-        });
+
+    if (progressBar) {
+        const victories = Math.min(5, Math.max(0, levelStreak.pro));
+        const progressPercent = unlockedLevels.expert
+            ? 100
+            : (victories / 5) * 100;
+
+        progressBar.style.width = progressPercent + "%";
+    }
+}        });
 }
 
 
@@ -5517,6 +5914,16 @@ document
 
          
 if (!unlockedLevels[level]) {
+    // 🔒 INTERDIRE DE SAUTER UN NIVEAU PAR PAIEMENT
+const requiredLevel = {
+    pro: "intermediate",
+    expert: "pro"
+};
+
+const prerequisite = requiredLevel[level];
+const canPayForLevel =
+    !prerequisite || unlockedLevels[prerequisite];
+
 
     const overlay = document.getElementById(
         "paidLevelUnlockOverlay"
@@ -5556,19 +5963,84 @@ if (!unlockedLevels[level]) {
         ? "🔒 UNLOCK THIS LEVEL"
         : "🔒 DÉBLOQUER CE NIVEAU";
 
-    description.textContent = isEnglish
-        ? `Unlock ${levelNames[level]} to play immediately.`
-        : `Débloquez le niveau ${levelNames[level]} pour jouer immédiatement.`;
+   
 
-    const localPrice = convertFCFAToPlayerCurrency(500);
+description.textContent = isEnglish
+    ? (
+        level === "intermediate"
+            ? "Win 5 consecutive games at Beginner level to unlock Intermediate for free, or pay the price below."
+            : level === "pro"
+                ? (
+                    canPayForLevel
+                        ? "Win 5 consecutive games at Intermediate level to unlock Pro for free, or pay the price below."
+                        : "You must unlock Intermediate first. Win 5 consecutive games at Beginner level to unlock it for free. Payment for Pro is unavailable until Intermediate is unlocked."
+                  )
+                : (
+                    canPayForLevel
+                        ? "Win 5 consecutive games at Pro level to unlock Expert for free, or pay the price below."
+                        : "You must unlock Pro first. Win 5 consecutive games at Intermediate level to unlock it for free. Payment for Expert is unavailable until Pro is unlocked."
+                  )
+      )
+    : (
+        level === "intermediate"
+            ? "Remportez 5 victoires consécutives au niveau Débutant pour débloquer Intermédiaire gratuitement, ou payez le prix indiqué ci-dessous."
+            : level === "pro"
+                ? (
+                    canPayForLevel
+                        ? "Remportez 5 victoires consécutives au niveau Intermédiaire pour débloquer Pro gratuitement, ou payez le prix indiqué ci-dessous."
+                        : "Vous devez d'abord débloquer Intermédiaire. Remportez 5 victoires consécutives au niveau Débutant pour le débloquer gratuitement. Le paiement de Pro sera indisponible tant qu'Intermédiaire ne sera pas débloqué."
+                  )
+                : (
+                    canPayForLevel
+                        ? "Remportez 5 victoires consécutives au niveau Pro pour débloquer Expert gratuitement, ou payez le prix indiqué ci-dessous."
+                        : "Vous devez d'abord débloquer Pro. Remportez 5 victoires consécutives au niveau Intermédiaire pour le débloquer gratuitement. Le paiement d'Expert sera indisponible tant que Pro ne sera pas débloqué."
+                  )
+      );
 
-    price.textContent = localPrice.code === "XOF"
-        ? "500 FCFA"
-        : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`;
+   
+const levelPricesFCFA = {
+    intermediate: 500,
+    pro: 1000,
+    expert: 2000
+};
+
+const levelPricesAfrica = {
+    intermediate: 350,
+    pro: 600,
+    expert: 1000
+};
+
+const isAfricanPlayer = [
+    "SN", "CI", "ML", "BF", "NE", "TG", "BJ",
+    "GW", "MR", "GN", "CM", "GA", "CG", "CD",
+    "TD", "CF", "GQ", "NG", "GH", "GM", "SL",
+    "LR", "KE", "UG", "TZ", "RW", "BI", "ET",
+    "ZA", "ZM", "ZW", "MW", "MZ", "AO", "NA",
+    "BW", "LS", "SZ", "MG", "MU", "SC", "KM",
+    "DJ", "SO", "ER", "SS", "SD", "LY", "TN",
+    "DZ", "MA", "EG", "CV", "ST"
+].includes(
+    (localStorage.getItem("devine3_country_code") || "").toUpperCase()
+);
+
+const amountFCFA = (
+    isAfricanPlayer
+        ? levelPricesAfrica
+        : levelPricesFCFA
+)[level];
+
+const localPrice = convertFCFAToPlayerCurrency(amountFCFA);
+
+price.textContent = localPrice.code === "XOF"
+    ? `${amountFCFA} FCFA`
+    : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`;
 
     payButton.textContent = isEnglish
         ? "🔓 UNLOCK"
         : "🔓 DÉBLOQUER";
+        payButton.disabled = !canPayForLevel;
+        payButton.style.opacity = canPayForLevel ? "1" : "0.45";
+        payButton.style.cursor = canPayForLevel ? "pointer" : "not-allowed";
 
     closeButton.textContent = isEnglish
         ? "← BACK"
@@ -5580,21 +6052,23 @@ if (!unlockedLevels[level]) {
         overlay.style.display = "none";
     };
 
-    payButton.onclick = () => {
+   payButton.onclick = () => {
+        if (!canPayForLevel) {
+        return;
+    }
 
     const localPrice =
-        convertFCFAToPlayerCurrency(500);
-
+        convertFCFAToPlayerCurrency(amountFCFA);
     localStorage.setItem(
         "devine3_pending_level_unlock",
         JSON.stringify({
             level: level,
-            amountFCFA: 500,
+           amountFCFA: amountFCFA,
             currency: localPrice.code,
-            displayedAmount:
-                localPrice.code === "XOF"
-                    ? "500 FCFA"
-                    : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`
+           displayedAmount:
+    localPrice.code === "XOF"
+        ? `${amountFCFA} FCFA`
+        : `${localPrice.symbol}${localPrice.amount.toFixed(2)}`
         })
     );
 
@@ -5932,6 +6406,7 @@ document
     });
 
  /* Mode en ligne */
+
 async function loadOnlineHistory() {
 
     if (!currentOnlineGame || !currentUser) {
@@ -5956,64 +6431,105 @@ async function loadOnlineHistory() {
             );
 
     if (error) {
-
         console.error(
             "❌ ERREUR HISTORIQUE :",
             error
         );
-
         return;
     }
 
     const myHistory =
-        document.getElementById(
-            "onlineMyHistory"
-        );
+        document.getElementById("onlineMyHistory");
 
     const opponentHistory =
-        document.getElementById(
-            "onlineOpponentHistory"
-        );
+        document.getElementById("onlineOpponentHistory");
 
     if (!myHistory || !opponentHistory) {
         return;
     }
 
+    // 👥 Récupérer les profils des deux joueurs
+    const playerIds = [
+        currentOnlineGame.player1_id,
+        currentOnlineGame.player2_id
+    ].filter(Boolean);
+
+    const { data: players, error: playersError } =
+        await supabaseClient
+            .from("players")
+            .select("id, username, country_code")
+            .in("id", playerIds);
+
+    if (playersError) {
+        console.error(
+            "❌ ERREUR PROFILS DE L'HISTORIQUE :",
+            playersError
+        );
+        return;
+    }
+
+    const playersById = new Map(
+        (players || []).map(player => [
+            player.id,
+            player
+        ])
+    );
+
     myHistory.innerHTML = "";
     opponentHistory.innerHTML = "";
 
-    data.forEach(row => {
+    (data || []).forEach(row => {
 
-        const item =
-            document.createElement("div");
+        const player = playersById.get(row.player_id);
 
-        item.className =
-            "online-history-item";
+        const item = document.createElement("div");
+        item.className = "online-history-item";
 
-        item.innerHTML = `
-            <span class="online-history-guess">
-                ${row.guess}
-            </span>
+        // 👤 Profil du joueur ayant effectué cet essai
+        const profile = document.createElement("span");
+        profile.className = "online-history-player";
 
-            <span class="online-history-result">
-                ${row.well_placed} V ·
-                ${row.misplaced} X
-            </span>
-        `;
-
-        if (
-            row.player_id === currentUser.id
-        ) {
-
-            myHistory.appendChild(item);
-
+        if (player) {
+            profile.textContent =
+                countryCodeToFlag(player.country_code) +
+                " " +
+                (player.username ||
+                    (row.player_id === currentUser.id
+                        ? currentPlayerPseudo
+                        : (currentLanguage === "en"
+                            ? "Opponent"
+                            : "Adversaire")));
         } else {
-
-            opponentHistory.appendChild(item);
+            profile.textContent =
+                row.player_id === currentUser.id
+                    ? (currentLanguage === "en" ? "You" : "Toi")
+                    : (currentLanguage === "en"
+                        ? "Opponent"
+                        : "Adversaire");
         }
 
+        const guess = document.createElement("span");
+        guess.className = "online-history-guess";
+        guess.textContent = row.guess;
+
+        const result = document.createElement("span");
+        result.className = "online-history-result";
+        result.textContent =
+            row.well_placed + " V · " +
+            row.misplaced + " X";
+
+        item.appendChild(profile);
+        item.appendChild(guess);
+        item.appendChild(result);
+
+        if (row.player_id === currentUser.id) {
+            myHistory.appendChild(item);
+        } else {
+            opponentHistory.appendChild(item);
+        }
     });
 }
+
 supabaseClient
     .channel("online-guesses-history")
     .on(
@@ -6832,6 +7348,22 @@ document.getElementById(
     "40 ans et +";
         
             currentLanguage = "fr";
+            // 🏆 CLASSEMENT MONDIAL — FRANÇAIS
+
+document.getElementById(
+    "globalLeaderboardTitle"
+).textContent =
+    "🌍 CLASSEMENT MONDIAL";
+
+document.getElementById(
+    "globalLeaderboardDescription"
+).textContent =
+    "Les 50 meilleurs joueurs de DEVINE 3";
+
+document.getElementById(
+    "backFromLeaderboardBtn"
+).textContent =
+    "← Retour";
             
 document.querySelectorAll(
     ".history:empty"
@@ -6883,16 +7415,9 @@ document.querySelector(
 ).textContent =
     "RÉSUMÉ DE LA PARTIE";
 
-document.querySelectorAll(
-    "#onlineVerdictPopup .verdict-player strong"
-)[0].textContent =
-    "TOI";
+document.getElementById("onlineVerdictMyResult").dataset.label = "TOI";
 
-document.querySelectorAll(
-    "#onlineVerdictPopup .verdict-player strong"
-)[1].textContent =
-    "ADVERSAIRE";
-
+document.getElementById("onlineVerdictOpponentResult").dataset.label = "ADVERSAIRE";
 document.getElementById("onlineVerdictReplayBtn").textContent =
     "🔄 REJOUER";
 
@@ -7071,21 +7596,21 @@ document.querySelector(
 ).textContent =
     unlockedLevels.intermediate
         ? "Niveau débloqué"
-        : "0/5 victoires — 12 secondes par tentative";
+        : "0/5 victoires — 15 secondes par tentative";
 
 document.querySelector(
     '#levelsScreen [data-level="pro"] small'
 ).textContent =
     unlockedLevels.pro
         ? "Niveau débloqué"
-        : "0/5 victoires — 10 secondes par tentative";
+        : "0/5 victoires — 12 secondes par tentative";
 
 document.querySelector(
     '#levelsScreen [data-level="expert"] small'
 ).textContent =
     unlockedLevels.expert
         ? "Niveau débloqué"
-        : `${levelStreak.pro}/5 victoires — 8 secondes par tentative`;
+        : `${levelStreak.pro}/5 victoires — 10 secondes par tentative`;
 
             
 
@@ -7578,6 +8103,22 @@ document.getElementById(
 ).textContent =
     "40 years and older";
             currentLanguage = "en";
+            // 🏆 CLASSEMENT MONDIAL — ANGLAIS
+
+document.getElementById(
+    "globalLeaderboardTitle"
+).textContent =
+    "🌍 WORLD LEADERBOARD";
+
+document.getElementById(
+    "globalLeaderboardDescription"
+).textContent =
+    "The top 50 DEVINE 3 players";
+
+document.getElementById(
+    "backFromLeaderboardBtn"
+).textContent =
+    "← Back";
             document.getElementById("cardPaymentBtn").style.paddingLeft = "0cm";
 
             console.log("🇬🇧 LANGUE : ANGLAIS");
@@ -7785,21 +8326,21 @@ document.querySelector(
 ).textContent =
     unlockedLevels.intermediate
         ? "Level unlocked"
-        : "0/5 wins — 12 seconds per attempt";
+        : "0/5 wins — 15 seconds per attempt";
 
 document.querySelector(
     '#levelsScreen [data-level="pro"] small'
 ).textContent =
     unlockedLevels.pro
         ? "Level unlocked"
-        : "0/5 wins — 10 seconds per attempt";
+        : "0/5 wins — 12 seconds per attempt";
 
 document.querySelector(
     '#levelsScreen [data-level="expert"] small'
 ).textContent =
     unlockedLevels.expert
         ? "Level unlocked"
-        : `${levelStreak.pro}/5 wins — 8 seconds per attempt`;
+        : `${levelStreak.pro}/5 wins — 10 seconds per attempt`;
            
 
 
@@ -8155,7 +8696,6 @@ document.querySelector(
     "#onlineVerdictPopup .verdict-code-box.opponent-code .verdict-code-label"
 ).textContent =
     "YOUR OPPONENT'S CODE";
-
 document.getElementById("onlineVerdictHistoryBtn").textContent =
     "📜 HISTORY";
 
@@ -8174,16 +8714,9 @@ document.querySelector(
 ).textContent =
     "GAME SUMMARY";
 
-document.querySelectorAll(
-    "#onlineVerdictPopup .verdict-player strong"
-)[0].textContent =
-    "YOU";
+document.getElementById("onlineVerdictMyResult").dataset.label = "YOU";
 
-document.querySelectorAll(
-    "#onlineVerdictPopup .verdict-player strong"
-)[1].textContent =
-    "OPPONENT";
-
+document.getElementById("onlineVerdictOpponentResult").dataset.label = "OPPONENT";
 document.getElementById("onlineVerdictReplayBtn").textContent =
     "🔄 PLAY AGAIN";
 
