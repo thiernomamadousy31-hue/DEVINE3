@@ -16,7 +16,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>DEVINE 3</title>
-    <link rel="manifest" href="./manifest.json">
 
     <!-- Feuille de style externe -->
     <link rel="stylesheet" href="style.css">
@@ -95,20 +94,45 @@
                         👥 2 JOUEURS — DUEL
                     </button>
 
+
 <button
     id="onlineBtn"
     class="menu-btn"
     type="button"
 >
-    🌐 JOUER EN LIGNE
+    
+<span class="online-globe" aria-hidden="true">
+    <svg
+        viewBox="0 0 48 48"
+        width="25"
+        height="25"
+        fill="none"
+        stroke="#f5d76e"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+        <circle cx="24" cy="24" r="19"/>
+        <path d="M5 24h38"/>
+        <path d="M24 5c-6 6-9 12-9 19s3 13 9 19"/>
+        <path d="M24 5c6 6 9 12 9 19s-3 13-9 19"/>
+        <path d="M9 14h30M9 34h30"/>
+        <path d="M15 9l3 5-2 5 4 4-3 5 3 7"/>
+        <path d="M31 10l-3 6 4 4-2 5 5 4-4 8"/>
+    </svg>
+</span>
+
+    JOUER EN LIGNE
 </button>
-                    <button
-                        id="statisticsBtn"
-                        class="menu-btn"
-                        type="button"
-                    >
-                        📊 STATISTIQUES
-                    </button>
+                    
+<button
+    id="statisticsBtn"
+    class="menu-btn"
+    type="button"
+>
+    <span class="statistics-icon" aria-hidden="true">📊</span>
+    STATISTIQUES
+</button>
 
 
                     <button
@@ -119,12 +143,14 @@
                         🏆 DÉFIS
                     </button>
                     
+
 <button
     id="globalLeaderboardBtn"
     class="menu-btn"
     type="button"
 >
-    🌍 CLASSEMENT MONDIAL
+    <span class="online-globe" aria-hidden="true">🌍</span>
+    CLASSEMENT MONDIAL
 </button>
 
 
@@ -964,12 +990,11 @@
         </div>
 
 
-        <div class="history-section">
+       <div class="history-section" style="display: none;">
 
-            <div class="section-title">
-                Historique
-            </div>
-
+    <div class="section-title">
+        Historique
+    </div>
 
             <div
                 id="onlineHistory"
@@ -1454,7 +1479,9 @@
                 </button>
 
 
-                <h2>🏆 Défis</h2>
+               
+<h2><span class="trophy-icon">🏆</span> Défis</h2>
+
 
 
                 <div class="challenges-list">
