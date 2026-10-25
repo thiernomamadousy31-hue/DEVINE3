@@ -1818,7 +1818,15 @@ async function startOnlineTurnTimer() {
     clearInterval(onlineTurnTimer);
 
     onlineTurnSeconds = 15;
-
+    console.log(
+    "⏱️ CHRONO DÉMARRÉ — PARTIE :",
+    currentOnlineGame?.id,
+    "— TOUR :",
+    currentOnlineGame?.current_turn,
+    "— HEURE :",
+    new Date().toLocaleTimeString()
+);
+    
     const timerElement =
         document.getElementById("onlineTimer");
 
@@ -7184,9 +7192,8 @@ if (continuePaidGameBtn) {
         () => {
 
             console.log(
-                "💰 CONTINUER À JOUER — 1 000 FCFA CLIQUÉ"
-            );
-
+    "💰 CONTINUER À JOUER CLIQUÉ"
+);
             document
                 .getElementById("freeGamesLimitOverlay")
                 .style.display = "none";
