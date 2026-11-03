@@ -35,6 +35,13 @@ const supabaseClient = window.supabase.createClient(
 let currentUser = null;
 let currentPlayerProfile = null;
 let currentPlayerPseudo = "";
+let currentLanguage = "fr";
+
+const frLanguageBtn =
+    document.getElementById("frLanguageBtn");
+
+const enLanguageBtn =
+    document.getElementById("enLanguageBtn");
 function generateRoomCode() {
     const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
@@ -818,7 +825,16 @@ if (joinRoomInput) {
         onlineTurnTimer = null;
     }
 
-    onlineTurnSeconds = 15;
+    
+onlineTurnSeconds = 15;
+
+const onlineTimerElement =
+    document.getElementById("onlineTimer");
+
+if (onlineTimerElement) {
+    onlineTimerElement.textContent = "15";
+}
+
 
     // Réinitialiser l'écran de saisie du secret
     const secretInput =
@@ -926,6 +942,26 @@ let levelStreak =
 
 let unlockedLevels =
     levelProgress.unlockedLevels;
+    // DÉTECTION D'UNE PARTIE SOLO INTERROMPUE
+const interruptedSoloLevel =
+    localStorage.getItem("devine3_active_solo_level");
+
+if (interruptedSoloLevel) {
+
+    if (
+        ["beginner", "intermediate", "pro"].includes(
+            interruptedSoloLevel
+        )
+    ) {
+        levelStreak[interruptedSoloLevel] = 0;
+
+        saveLevelProgress();
+    }
+
+    localStorage.removeItem(
+        "devine3_active_solo_level"
+    );
+}
 
 /* =========================================================
    AUDIO
@@ -2764,26 +2800,28 @@ document.getElementById(
 
 input.blur();
     });
+
 function showScreen(id) {
 
-    document
-        .querySelectorAll(".screen")
-        .forEach(screen => {
-
-            screen.classList.remove("active");
-        });
-
-
-    const screen =
+    const nextScreen =
         document.getElementById(id);
 
-
-    if (screen) {
-
-        screen.classList.add("active");
-
-        window.scrollTo(0, 0);
+    if (!nextScreen) {
+        return;
     }
+
+    document
+        .querySelectorAll(".screen.active")
+        .forEach(screen => {
+
+            if (screen !== nextScreen) {
+                screen.classList.remove("active");
+            }
+        });
+
+    nextScreen.classList.add("active");
+
+    window.scrollTo(0, 0);
 }
 
 async function loadGlobalLeaderboard() {
@@ -2917,6 +2955,9 @@ username.appendChild(
 
 function updateProfileScreen() {
 
+    const isEnglish =
+        currentLanguage === "en";
+
     const usernameElement =
         document.getElementById("profileUsername");
 
@@ -2927,14 +2968,27 @@ function updateProfileScreen() {
         document.getElementById("profileBestScore");
 
     if (!currentPlayerProfile) {
-        usernameElement.textContent = "Profil indisponible";
-        countryElement.textContent = "🌍 Non renseigné";
+
+        usernameElement.textContent =
+            isEnglish
+                ? "Profile unavailable"
+                : "Profil indisponible";
+
+        countryElement.textContent =
+            isEnglish
+                ? "🌍 Not provided"
+                : "🌍 Non renseigné";
+
         scoreElement.textContent = "0";
+
         return;
     }
 
     usernameElement.textContent =
-        currentPlayerProfile.username || "Pseudo non défini";
+        currentPlayerProfile.username ||
+        (isEnglish
+            ? "Username not defined"
+            : "Pseudo non défini");
 
     const countryCode =
         currentPlayerProfile.country_code || "";
@@ -2942,14 +2996,20 @@ function updateProfileScreen() {
     countryElement.textContent =
         countryCode
             ? countryCodeToFlag(countryCode) + " " + countryCode
-            : "🌍 Non renseigné";
+            : (isEnglish
+                ? "🌍 Not provided"
+                : "🌍 Non renseigné");
 
     scoreElement.textContent =
         Number(currentPlayerProfile.best_score || 0)
-            .toLocaleString("fr-FR");
+            .toLocaleString(
+                isEnglish ? "en-US" : "fr-FR"
+            );
 }
 
 function updateProfileProgress() {
+
+    const isEnglish = currentLanguage === "en";
 
     const levelElement =
         document.getElementById("profileProgressLevel");
@@ -2959,10 +3019,11 @@ function updateProfileProgress() {
 
     const countElement =
         document.getElementById("profileProgressCount");
-        const progressBar =
-    document.querySelector(
-        "#profileScreen .profile-progress-fill"
-    );
+
+    const progressBar =
+        document.querySelector(
+            "#profileScreen .profile-progress-fill"
+        );
 
     if (
         !levelElement ||
@@ -2972,59 +3033,59 @@ function updateProfileProgress() {
         return;
     }
 
-    let levelName = "Débutant";
-    let nextLevelName = "Intermédiaire";
+    let levelName = isEnglish ? "Beginner" : "Débutant";
+    let nextLevelName = isEnglish ? "Intermediate" : "Intermédiaire";
     let wins = Number(levelStreak.beginner || 0);
 
     if (unlockedLevels.expert) {
         levelName = "Expert";
         nextLevelName = "";
         wins = 5;
+
     } else if (unlockedLevels.pro) {
         levelName = "Pro";
         nextLevelName = "Expert";
         wins = Number(levelStreak.pro || 0);
+
     } else if (unlockedLevels.intermediate) {
-        levelName = "Intermédiaire";
-        nextLevelName = "Pro";
+        levelName = isEnglish ? "Intermediate" : "Intermédiaire";
+        nextLevelName = isEnglish ? "Pro" : "Pro";
         wins = Number(levelStreak.intermediate || 0);
     }
 
     levelElement.textContent = levelName;
-   console.log(
-    "TEST BARRE PROFIL",
-    {
-        progressBarTrouvee: Boolean(progressBar),
-        niveau: levelName,
-        victoires: wins,
-        largeurCalculee: nextLevelName
+
+    if (progressBar) {
+
+        const progressPercent = nextLevelName
             ? (Math.min(5, Math.max(0, wins)) / 5) * 100
-            : 100
+            : 100;
+
+        progressBar.style.width =
+            progressPercent + "%";
+
+        progressBar.style.background =
+            "linear-gradient(90deg, #a77b22, #f4d77f)";
     }
-);
-
-if (progressBar) {
-    const progressPercent = nextLevelName
-        ? (Math.min(5, Math.max(0, wins)) / 5) * 100
-        : 100;
-
-    progressBar.style.width =
-        progressPercent + "%";
-        
-
-    progressBar.style.background =
-        "linear-gradient(90deg, #a77b22, #f4d77f)";
-}
 
     if (!nextLevelName) {
-        labelElement.textContent = "Progression";
-        countElement.textContent = "Niveau maximal atteint";
-    } else {
+
         labelElement.textContent =
-            "Progression vers " + nextLevelName;
+            isEnglish ? "Progress" : "Progression";
 
         countElement.textContent =
-            Math.min(5, wins) + "/5 victoires";
+            isEnglish
+                ? "Maximum level reached"
+                : "Niveau maximal atteint";
+
+    } else {
+
+        labelElement.textContent =
+            (isEnglish ? "Progress toward " : "Progression vers ")
+            + nextLevelName;
+
+        countElement.textContent =
+            Math.min(5, wins) + (isEnglish ? "/5 wins" : "/5 victoires");
     }
 }
 
@@ -3114,30 +3175,30 @@ function showPopup(
 }
 
 
+
 function closePopup() {
+    const overlay = document.getElementById("popupOverlay");
+    const popup = document.querySelector(".popup");
 
-    const overlay =
-        document.getElementById(
-            "popupOverlay"
+    if (popup) {
+        popup.classList.remove(
+            "popup-beginner",
+            "popup-intermediate",
+            "popup-pro",
+            "popup-expert",
+            "popup-online",
+            "level-unlocked"
         );
+    }
 
-
-    overlay.classList.remove("active");
-    const popup =
-    document.querySelector(".popup");
-
-if (popup) {
-    popup.classList.remove("level-unlocked");
-}
-
-    overlay.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
+    if (overlay) {
+        overlay.classList.remove("active");
+        overlay.setAttribute("aria-hidden", "true");
+    }
 
     popupConfirmCallback = null;
 }
+
 
 
 /* =========================================================
@@ -3244,6 +3305,10 @@ if (freeGamesCounter) {
     history = [];
 
     gameOver = false;
+    localStorage.setItem(
+    "devine3_active_solo_level",
+    currentLevel
+);
     const isEnglish =
     enLanguageBtn &&
     enLanguageBtn.classList.contains("active");
@@ -3831,6 +3896,9 @@ function winSoloGame() {
     clearInterval(timerInterval);
 
     gameOver = true;
+    localStorage.removeItem(
+    "devine3_active_solo_level"
+);
     console.log(
     "🏆 winSoloGame() EXÉCUTÉ — gameOver passé à true"
 );
@@ -4036,10 +4104,7 @@ if (newlyUnlockedLevel) {
     updateChallengesAfterWin();
 
 
-    document.getElementById(
-        "finalIcon"
-    ).textContent = "🎉";
-
+    document.getElementById("finalIcon").textContent = "👑";
 
        document.getElementById(
         "finalTitle"
@@ -4098,8 +4163,19 @@ if (newlyUnlockedLevel) {
 
     updateChallengesUI();
 
-countCompletedSoloGame();
-   showScreen("finalScreen");
+
+    countCompletedSoloGame();
+
+    // 🏆 Préparer l'animation de victoire
+    const finalScreen = document.getElementById("finalScreen");
+
+    if (finalScreen) {
+        finalScreen.classList.remove("solo-defeat");
+        finalScreen.classList.add("solo-victory");
+    }
+
+    showScreen("finalScreen");
+
 
 console.log(
     "🎉 ÉCRAN FINAL DEMANDÉ — finalScreen"
@@ -4140,6 +4216,9 @@ saveLevelProgress();
 updateLevelsUI();
     clearInterval(timerInterval);
     gameOver = true;
+    localStorage.removeItem(
+    "devine3_active_solo_level"
+);
         const isEnglish =
         enLanguageBtn &&
         enLanguageBtn.classList.contains("active");
@@ -4225,6 +4304,13 @@ document.getElementById(
 updateStatisticsUI();
 
 countCompletedSoloGame();
+// Animation de défaite
+const finalScreen = document.getElementById("finalScreen");
+
+if (finalScreen) {
+    finalScreen.classList.remove("solo-victory");
+    finalScreen.classList.add("solo-defeat");
+}
 
 showScreen("finalScreen");
 
@@ -4548,7 +4634,11 @@ if (!gameOver) {
     saveLevelProgress();
     updateLevelsUI();
 }
-gameOver = true;            document.body.classList.remove(
+gameOver = true;      
+localStorage.removeItem(
+    "devine3_active_solo_level"
+);
+    document.body.classList.remove(
     "sky-beginner",
     "sky-intermediate",
     "sky-pro",
@@ -4660,96 +4750,96 @@ function saveP1Secret() {
     player1Secret = code;
 
 
-    input.value = "";
+   input.value = "";
 
+document.getElementById(
+    "p2SecretMessage"
+).textContent = "";
 
-    document.getElementById(
-        "p2SecretMessage"
-    ).textContent = "";
+const isEnglish =
+    enLanguageBtn &&
+    enLanguageBtn.classList.contains("active");
 
+document.getElementById(
+    "passTitle"
+).textContent = isEnglish
+    ? "Player 1's secret code saved!"
+    : "Code secret du joueur 1 enregistré !";
 
-    showScreen(
-        "twoP2SecretScreen"
-    );
+document.getElementById(
+    "passMessage"
+).textContent = isEnglish
+    ? "Pass the phone to Player 2. Make sure Player 1's secret code stays hidden."
+    : "Passe le téléphone au joueur 2. Assure-toi que le code secret du joueur 1 reste caché.";
 
+document.getElementById(
+    "continueTwoBtn"
+).textContent = isEnglish
+    ? "CONTINUE"
+    : "CONTINUER";
+
+document.getElementById(
+    "continueTwoBtn"
+).onclick = () => {
+    showScreen("twoP2SecretScreen");
 
     setTimeout(() => {
-
-        document
-            .getElementById(
-                "p2SecretInput"
-            )
-            .focus();
-
+        document.getElementById(
+            "p2SecretInput"
+        ).focus();
     }, 150);
+};
 
+showScreen("twoPassScreen");
 
-    playSound("success");
+playSound("success");
 }
-
-
 /* =========================================================
    SECRET JOUEUR 2
    ========================================================= */
 
+
 function saveP2Secret() {
-
-    const input =
-        document.getElementById(
-            "p2SecretInput"
-        );
-
-
-    const message =
-        document.getElementById(
-            "p2SecretMessage"
-        );
-
-
-    const code =
-        input.value.trim();
-
+    const input = document.getElementById("p2SecretInput");
+    const message = document.getElementById("p2SecretMessage");
+    const code = input.value.trim();
 
     if (!isValidCode(code)) {
-
         message.textContent =
             "⚠️ Le code doit contenir 3 chiffres différents.";
-
-        message.className =
-            "message error";
-
-
+        message.className = "message error";
         playSound("error");
-
         return;
     }
 
-
     player2Secret = code;
-
-
     input.value = "";
 
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
-    document.getElementById(
-    "passTitle"
-).textContent =
-    enLanguageBtn.classList.contains("active")
-        ? "Pass the phone"
-        : "Passe le téléphone";
+    document.getElementById("passTitle").textContent =
+        isEnglish
+            ? "Player 2's secret code saved!"
+            : "Code secret du joueur 2 enregistré !";
 
-document.getElementById(
-    "passMessage"
-).textContent =
-    enLanguageBtn.classList.contains("active")
-        ? "Player 1 must now take the phone."
-        : "Le Joueur 1 doit maintenant prendre le téléphone.";
+    document.getElementById("passMessage").textContent =
+        isEnglish
+            ? "Pass the phone to Player 1. Player 1 will now guess Player 2's code."
+            : "Passe le téléphone au joueur 1. Il va maintenant deviner le code du joueur 2.";
 
-    showScreen(
-        "twoPassScreen"
-    );
+    const button = document.getElementById("continueTwoBtn");
 
+    button.textContent = isEnglish
+        ? "PLAYER 1: START"
+        : "JOUEUR 1 : COMMENCER";
 
+    button.onclick = () => {
+        startTwoTurn(1);
+    };
+
+    showScreen("twoPassScreen");
     playSound("success");
 }
 
@@ -5038,12 +5128,10 @@ function submitTwoGuess() {
    FIN D'UN TOUR
    ========================================================= */
 
+
 function finishTwoPlayerTurn() {
-
     clearInterval(twoTimerInterval);
-
     twoGameOver = true;
-
 
     const resultData = {
         found: true,
@@ -5051,52 +5139,40 @@ function finishTwoPlayerTurn() {
         attempts: twoAttempts
     };
 
+    const isEnglish =
+        enLanguageBtn &&
+        enLanguageBtn.classList.contains("active");
 
     if (twoCurrentPlayer === 1) {
+        player1Result = resultData;
 
-        player1Result =
-            resultData;
+        document.getElementById("passTitle").textContent =
+            isEnglish
+                ? "🎉 Player 1 found the secret code!"
+                : "🎉 Le joueur 1 a trouvé le code secret !";
 
+        document.getElementById("passMessage").textContent =
+            isEnglish
+                ? "Well done! Pass the phone to Player 2 for their turn."
+                : "Bravo ! Passe le téléphone au joueur 2 pour sa manche.";
 
-       document.getElementById(
-    "passTitle"
-).textContent =
-    enLanguageBtn.classList.contains("active")
-        ? "Pass the phone"
-        : "Passe le téléphone";
+        document.getElementById("continueTwoBtn").textContent =
+            isEnglish ? "PLAYER 2: START" : "JOUEUR 2 : COMMENCER";
 
-document.getElementById(
-    "passMessage"
-).textContent =
-    enLanguageBtn.classList.contains("active")
-        ? "Player 2 can now take the phone."
-        : "Le Joueur 2 peut maintenant prendre le téléphone.";
-
-        showScreen(
-            "twoPassScreen"
-        );
-
-
-        document.getElementById(
-            "continueTwoBtn"
-        ).onclick = () => {
-
+        document.getElementById("continueTwoBtn").onclick = () => {
             startTwoTurn(2);
         };
 
+        showScreen("twoPassScreen");
 
     } else {
-
-        player2Result =
-            resultData;
-
-
+        player2Result = resultData;
         finishTwoPlayers();
     }
 
-
     playSound("win");
 }
+
 
 
 /* =========================================================
@@ -5334,44 +5410,42 @@ function formatPlayerResult(result) {
    QUITTER LE MODE 2 JOUEURS
    ========================================================= */
 
+
+
+
 function quitTwoPlayers() {
-        document.querySelector(".popup").className = "popup";
+    const popup = document.querySelector(".popup");
 
-
+   if (popup) {
+    popup.className = "popup";
+}
     showPopup(
-    currentLanguage === "en"
-        ? "Quit the duel?"
-        : "Quitter le duel ?",
+        currentLanguage === "en"
+            ? "Quit the duel?"
+            : "Quitter le duel ?",
 
-    currentLanguage === "en"
-        ? "The current game will be abandoned."
-        : "La partie en cours sera abandonnée.",
+        currentLanguage === "en"
+            ? "The current game will be abandoned."
+            : "La partie en cours sera abandonnée.",
+
         () => {
-
-            clearInterval(
-                twoTimerInterval
-            );
-
+            clearInterval(twoTimerInterval);
 
             twoGameOver = true;
+
             document.body.classList.remove(
-    "sky-beginner",
-    "sky-intermediate",
-    "sky-pro",
-    "sky-expert"
-);
-
-
-            showScreen(
-                "homeScreen"
+                "sky-beginner",
+                "sky-intermediate",
+                "sky-pro",
+                "sky-expert"
             );
 
+            showScreen("homeScreen");
 
             playSound("click");
         }
     );
 }
-
 
 /* =========================================================
    NOUVEAU DUEL
@@ -5838,74 +5912,70 @@ function updateLevelsUI() {
         .querySelectorAll(".level-card")
         .forEach(button => {
 
-            const level =
-                button.dataset.level;
+            const level = button.dataset.level;
 
-            const locked =
-                !unlockedLevels[level];
+            const locked = !unlockedLevels[level];
 
-            button.classList.toggle(
-                "locked",
-                locked
-            );
+            button.classList.toggle("locked", locked);
 
-           button.disabled = false;
-          if (level === "intermediate") {
-    const progress = document.getElementById("beginnerProgress");
-    const progressBar = document.getElementById("beginnerProgressBar");
+            button.disabled = false;
 
-    if (progress) {
-        progress.textContent = unlockedLevels.intermediate
-            ? "Niveau débloqué"
-            :`${levelStreak.beginner}/5 victoires — 15 secondes par tentative`;
-    }
+            const isEnglish = currentLanguage === "en";
 
-    if (progressBar) {
-        const victories = Math.min(5, Math.max(0, levelStreak.beginner));
-        const progressPercent = unlockedLevels.intermediate
-            ? 100
-            : (victories / 5) * 100;
+            if (level === "intermediate") {
 
-        progressBar.style.width = progressPercent + "%";
-    }
-}        if (level === "pro") {
-    const progress = document.getElementById("intermediateProgress");
-    const progressBar = document.getElementById("intermediateProgressBar");
+                const progress = document.getElementById("beginnerProgress");
+                const progressBar = document.getElementById("beginnerProgressBar");
 
-    if (progress) {
-        progress.textContent = unlockedLevels.pro
-            ? "Niveau débloqué"
-            : `${levelStreak.intermediate}/5 victoires — 12 secondes par tentative`;
-    }
+                if (progress) {
+                    progress.textContent = unlockedLevels.intermediate
+                        ? (isEnglish ? "Level unlocked" : "Niveau débloqué")
+                        : `${levelStreak.beginner}/5 ${isEnglish ? "wins — 15 seconds per attempt" : "victoires — 15 secondes par tentative"}`;
+                }
 
-    if (progressBar) {
-        const victories = Math.min(5, Math.max(0, levelStreak.intermediate));
-        const progressPercent = unlockedLevels.pro
-            ? 100
-            : (victories / 5) * 100;
+                if (progressBar) {
+                    const victories = Math.min(5, Math.max(0, levelStreak.beginner));
+                    progressBar.style.width =
+                        (unlockedLevels.intermediate ? 100 : (victories / 5) * 100) + "%";
+                }
+            }
 
-        progressBar.style.width = progressPercent + "%";
-    }
-}
-if (level === "expert") {
-    const progress = document.getElementById("proProgress");
-    const progressBar = document.getElementById("proProgressBar");
+            if (level === "pro") {
 
-    if (progress) {
-        progress.textContent = unlockedLevels.expert
-            ? "Niveau débloqué"
-            : `${levelStreak.pro}/5 victoires — 10 secondes par tentative`;
-    }
+                const progress = document.getElementById("intermediateProgress");
+                const progressBar = document.getElementById("intermediateProgressBar");
 
-    if (progressBar) {
-        const victories = Math.min(5, Math.max(0, levelStreak.pro));
-        const progressPercent = unlockedLevels.expert
-            ? 100
-            : (victories / 5) * 100;
+                if (progress) {
+                    progress.textContent = unlockedLevels.pro
+                        ? (isEnglish ? "Level unlocked" : "Niveau débloqué")
+                        : `${levelStreak.intermediate}/5 ${isEnglish ? "wins — 12 seconds per attempt" : "victoires — 12 secondes par tentative"}`;
+                }
 
-        progressBar.style.width = progressPercent + "%";
-    }
-}        });
+                if (progressBar) {
+                    const victories = Math.min(5, Math.max(0, levelStreak.intermediate));
+                    progressBar.style.width =
+                        (unlockedLevels.pro ? 100 : (victories / 5) * 100) + "%";
+                }
+            }
+
+            if (level === "expert") {
+
+                const progress = document.getElementById("proProgress");
+                const progressBar = document.getElementById("proProgressBar");
+
+                if (progress) {
+                    progress.textContent = unlockedLevels.expert
+                        ? (isEnglish ? "Level unlocked" : "Niveau débloqué")
+                        : `${levelStreak.pro}/5 ${isEnglish ? "wins — 10 seconds per attempt" : "victoires — 10 secondes par tentative"}`;
+                }
+
+                if (progressBar) {
+                    const victories = Math.min(5, Math.max(0, levelStreak.pro));
+                    progressBar.style.width =
+                        (unlockedLevels.expert ? 100 : (victories / 5) * 100) + "%";
+                }
+            }
+        });
 }
 
 
@@ -6482,6 +6552,41 @@ async function loadOnlineHistory() {
             player
         ])
     );
+    
+    // 👥 Afficher les profils dans les titres de l'historique
+    const myProfile = playersById.get(currentUser.id);
+
+    const opponentId = playerIds.find(
+        id => id !== currentUser.id
+    );
+
+    const opponentProfile = playersById.get(opponentId);
+
+    const myHistoryTitle =
+        document.getElementById("onlineMyHistoryTitle");
+
+    const opponentHistoryTitle =
+        document.getElementById("onlineOpponentHistoryTitle");
+
+    if (myHistoryTitle) {
+        myHistoryTitle.textContent =
+            "👤 " +
+            (myProfile
+                ? countryCodeToFlag(myProfile.country_code) +
+                  " " + (myProfile.username || currentPlayerPseudo)
+                : (currentLanguage === "en" ? "You" : "Toi"));
+    }
+
+    if (opponentHistoryTitle) {
+        opponentHistoryTitle.textContent =
+            "👤 " +
+            (opponentProfile
+                ? countryCodeToFlag(opponentProfile.country_code) +
+                  " " + (opponentProfile.username ||
+                      (currentLanguage === "en" ? "Opponent" : "Adversaire"))
+                : (currentLanguage === "en" ? "Opponent" : "Adversaire"));
+    }
+
 
     myHistory.innerHTML = "";
     opponentHistory.innerHTML = "";
@@ -6893,15 +6998,15 @@ document.addEventListener(
     "click",
     event => {
 
-        const button =
-            event.target.closest(
-                "button"
-            );
+       const button =
+    event.target.closest(
+        "button, .menu-dropdown-toggle"
+    );
 
 
-        if (!button) {
-            return;
-        }
+if (!button) {
+    return;
+}
 
 
         if (
@@ -7309,16 +7414,9 @@ if (backFromCardPaymentBtn) {
     );
 
 }
-let currentLanguage = "fr";
 // 🌍 SÉLECTEUR DE LANGUE
-const frLanguageBtn =
-    document.getElementById("frLanguageBtn");
-
-const enLanguageBtn =
-    document.getElementById("enLanguageBtn");
 
 if (frLanguageBtn && enLanguageBtn) {
-
     frLanguageBtn.addEventListener(
         "click",
         () => {
@@ -7356,7 +7454,9 @@ document.getElementById(
         
             currentLanguage = "fr";
             // 🏆 CLASSEMENT MONDIAL — FRANÇAIS
-
+document.getElementById(
+    "globalLeaderboardBtn"
+).textContent = "🌍 CLASSEMENT MONDIAL";
 document.getElementById(
     "globalLeaderboardTitle"
 ).textContent =
@@ -7652,6 +7752,30 @@ document.getElementById("statAttemptsLabel").textContent =
     "Moyenne d'essais par victoire";
 document.getElementById("statBestScoreLabel").textContent =
     "Meilleur score";
+    // 👤 PROFIL — FRANÇAIS
+
+document.getElementById("profileTitle").textContent =
+    "👤 Mon profil";
+
+document.getElementById("profilePlayerLabel").textContent =
+    "Joueur";
+
+document.getElementById("profileBestScoreLabel").textContent =
+    "Meilleur score";
+
+document.getElementById("profileProgressLevelLabel").textContent =
+    "Niveau de progression";
+
+document.getElementById("profileWarningTitle").textContent =
+    "Règle importante";
+
+document.getElementById("profileAbandonWarning").textContent =
+    "Attention : abandonner une partie solo entraîne la perte des victoires comptabilisées pour la progression.";
+
+document.getElementById("profileProgressBar").setAttribute(
+    "aria-label",
+    "Progression vers le niveau suivant"
+);
 
 document.getElementById("resetStatsLabel").textContent =
     "Réinitialiser les statistiques";
@@ -8111,7 +8235,9 @@ document.getElementById(
     "40 years and older";
             currentLanguage = "en";
             // 🏆 CLASSEMENT MONDIAL — ANGLAIS
-
+document.getElementById(
+    "globalLeaderboardBtn"
+).textContent = "🌍 WORLD LEADERBOARD";
 document.getElementById(
     "globalLeaderboardTitle"
 ).textContent =
@@ -8382,6 +8508,30 @@ document.getElementById("statAttemptsLabel").textContent =
     "Average Attempts per Win";
 document.getElementById("statBestScoreLabel").textContent =
     "Best score";
+    // 👤 PROFILE — ENGLISH
+
+document.getElementById("profileTitle").textContent =
+    "👤 My Profile";
+
+document.getElementById("profilePlayerLabel").textContent =
+    "Player";
+
+document.getElementById("profileBestScoreLabel").textContent =
+    "Best Score";
+
+document.getElementById("profileProgressLevelLabel").textContent =
+    "Progress Level";
+
+document.getElementById("profileWarningTitle").textContent =
+    "Important Rule";
+
+document.getElementById("profileAbandonWarning").textContent =
+    "Warning: abandoning a solo game causes you to lose the wins counted toward your progress.";
+
+document.getElementById("profileProgressBar").setAttribute(
+    "aria-label",
+    "Progress toward the next level"
+);
 
 document.getElementById("resetStatsLabel").textContent =
     "Reset statistics";
@@ -9764,3 +9914,4 @@ updateSoundButton();
 
     showPanel("letters");
 })();
+
