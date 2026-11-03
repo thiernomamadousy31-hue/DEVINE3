@@ -19,6 +19,7 @@
     <title>DEVINE 3</title>
 
     <!-- Feuille de style externe -->
+     
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -39,44 +40,50 @@
 
             <div class="home-container">
 
-                <div class="logo-area">
+               
+<div class="home-header">
 
-                    <div class="logo-number">
-                        3
-                    </div>
+    <div class="logo-area">
 
-                    <h1>DEVINE</h1>
+        <div class="logo-number">3</div>
 
-                    <p class="version">
-                        DEVINE 3
-                    </p>
+        <h1>DEVINE</h1>
 
-                    <p class="tagline">
-                        Trouve le code. Bat le chrono.
-                    </p>
+        <p class="version">DEVINE 3</p>
 
-                </div>
+        <p class="tagline">Trouve le code. Bat le chrono.</p>
 
-<div class="language-selector">
+    </div>
 
-    <button
-        id="frLanguageBtn"
-        type="button"
-        class="language-btn active"
-    >
-        🇫🇷 FR
-    </button>
+    <div class="language-selector">
 
-    <button
-        id="enLanguageBtn"
-        type="button"
-        class="language-btn"
-    >
-        🇬🇧 EN
-    </button>
+       
+<button
+    id="frLanguageBtn"
+    type="button"
+    class="language-btn active"
+>
+    🇫🇷 FR
+</button>
+
+<button
+    id="enLanguageBtn"
+    type="button"
+    class="language-btn"
+>
+    🇬🇧 EN
+</button>
+
+    </div>
 
 </div>
-                <div class="home-menu">
+
+<details class="home-menu-dropdown">
+    <summary class="menu-dropdown-toggle">
+        ☰ MENU
+    </summary>
+
+    <div class="home-menu">
 
                     <button
                         id="soloBtn"
@@ -174,7 +181,7 @@
                     </button>
 
                 </div>
-
+                </details>
 
                 <div class="home-bottom">
 
@@ -235,10 +242,9 @@
                         type="button"
                     >
 
-                        <span class="level-icon">
-                            🟢
+                        <span class="level-icon beginner-icon">
+                              🎖️
                         </span>
-
                         <span class="level-info">
                             <strong>Débutant</strong>
                             <small>2 minutes</small>
@@ -257,10 +263,9 @@
                         type="button"
                     >
 
-                        <span class="level-icon">
-                            🔵
+                      <span class="level-icon intermediate-icon">
+                            🎯
                         </span>
-
                         <span class="level-info">
     <strong>Intermédiaire</strong>
     <small id="beginnerProgress">0/5 victoires</small>
@@ -285,8 +290,8 @@
                         type="button"
                     >
 
-                        <span class="level-icon">
-                            🟠
+                        <span class="level-icon pro-icon">
+                            💎
                         </span>
 
                        
@@ -318,7 +323,7 @@
                     >
 
                         <span class="level-icon">
-                            🔴
+                            🏆
                         </span>
 
                        <span class="level-info">
@@ -892,6 +897,8 @@
      ========================================= -->
 
 <!-- =================================================
+    
+<!-- =================================================
      HISTORIQUE PERMANENT DE LA PARTIE EN LIGNE
      ================================================= -->
 
@@ -899,7 +906,7 @@
 
     <div class="online-history-column">
 
-        <div class="online-history-title">
+        <div class="online-history-title" id="onlineMyHistoryTitle">
             👤 TOI
         </div>
 
@@ -910,10 +917,9 @@
 
     </div>
 
-
     <div class="online-history-column">
 
-        <div class="online-history-title">
+        <div class="online-history-title" id="onlineOpponentHistoryTitle">
             👤 ADVERSAIRE
         </div>
 
@@ -925,6 +931,7 @@
     </div>
 
 </div>
+
 
 
         <form
@@ -1386,7 +1393,7 @@
             ← Retour
         </button>
 
-        <h2 class="profile-title">👤 Mon profil</h2>
+        <h2 id="profileTitle" class="profile-title">👤 Mon profil</h2>
 
         <div class="profile-identity">
             <div class="profile-avatar" aria-hidden="true">
@@ -1394,7 +1401,7 @@
             </div>
 
             <div class="profile-identity-info">
-                <span class="profile-label">Joueur</span>
+                <span id="profilePlayerLabel" class="profile-label">Joueur</span>
                 <strong id="profileUsername">Chargement...</strong>
                 <span id="profileCountry" class="profile-country">
                     🌍 Non renseigné
@@ -1405,13 +1412,13 @@
         <div class="profile-stats-grid">
 
             <div class="stat-card profile-stat-card">
-                <span>Meilleur score</span>
+                <span id="profileBestScoreLabel">Meilleur score</span>
                 <strong id="profileBestScore">0</strong>
             </div>
 
             <div class="stat-card profile-stat-card">
-                <span>Niveau de progression</span>
-                <strong id="profileProgressLevel">Débutant</strong>
+               <span id="profileProgressLevelLabel">Niveau de progression</span>
+<strong id="profileProgressLevel">Débutant</strong>
             </div>
 
         </div>
@@ -1429,6 +1436,7 @@
             </div>
 
             <div
+                id="profileProgressBar"
                 class="profile-progress-track"
                 role="progressbar"
                 aria-label="Progression vers le niveau suivant"
@@ -1445,7 +1453,7 @@
 
             <div class="profile-warning-heading">
                 <span aria-hidden="true">⚠️</span>
-                <strong>Règle importante</strong>
+                <strong id="profileWarningTitle">Règle importante</strong>
             </div>
 
             <p id="profileAbandonWarning">
@@ -2022,16 +2030,15 @@
                 </div>
 
 
-                <h2>
-                    Choisis ton code secret
-                </h2>
+               <h2 class="secret-title">
+    🔐 JOUEUR 1 : CHOISIS TON CODE SECRET
+</h2>
 
-
-                <p class="two-instruction">
-                    Le joueur 2 devra deviner ton code.
-                </p>
-
-
+<p class="two-instruction">
+    C'est ton code personnel !
+    <strong>Le joueur 2 devra le deviner.</strong>
+    Garde-le secret et ne le montre pas à ton adversaire.
+</p>
                 <form
                     id="p1SecretForm"
                     class="guess-form"
@@ -2112,14 +2119,16 @@
                 </div>
 
 
-                <h2>
-                    Choisis ton code secret
-                </h2>
+               
+<h2 class="secret-title">
+    🔐 JOUEUR 2 : CHOISIS TON CODE SECRET
+</h2>
 
-
-                <p class="two-instruction">
-                    Le joueur 1 devra deviner ton code.
-                </p>
+<p class="two-instruction">
+    C'est ton code personnel !
+    <strong>Le joueur 1 devra le deviner.</strong>
+    Garde-le secret et ne le montre pas à ton adversaire.
+</p>
 
 
                 <form
